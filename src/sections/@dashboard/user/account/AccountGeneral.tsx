@@ -96,7 +96,7 @@ export default function AccountGeneral() {
     },
     [setValue]
   );
-  const onCitySelected = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onProvinceSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value);
   };
   return (

@@ -89,7 +89,7 @@ export default function Router() {
       element: (
         <AuthGuard>
           {/* <VerifyGuard>   */}
-          <RoleBasedGuard accessibleRoles={["ROLE_ADMIN"]}>
+          <RoleBasedGuard accessibleRoles={["ADMIN"]}>
             <DashboardLayout />
           </RoleBasedGuard>
           {/* </VerifyGuard> */}

@@ -1,178 +1,387 @@
-import { createContext, ReactNode, useEffect, useState } from "react";
-import { ActionMap } from "src/@types/common";
-import { LocationState } from "src/@types/location";
-import { LocationContextProps } from "src/components/settings/type";
-import { locationApi, responseDataLocation } from "src/service/app-apis/location";
+import { createContext, ReactNode, useEffect, useState } from 'react';
+import { ActionMap } from 'src/@types/common';
+import { LocationState } from 'src/@types/location';
+import { LocationContextProps } from 'src/components/settings/type';
+import { locationApi, areaResponse } from 'src/service/app-apis/location';
 
 const initialState: LocationContextProps = {
-    locationState: {
-        cityOptions: [],
-        districtOptions: [],
-        wardOptions: [],
-        selectedCity: {
-            id: null,
-            name: null
-        },
-        selectedDistrict: {
-            id: null,
-            name: null
-        },
-        selectedWard: {
-            id: null,
-            name: null
-        }
+  locationState: {
+    provinces: [],
+    districts: [],
+    precincts: [],
+    streetBlocks: [],
+    province: {
+      id: null,
+      name: null,
+      createDatetime: null,
+      updateDatetime: null,
+      createUser: null,
+      updateUser: null,
+      status: null,
+      areaCode: null,
+      province: null,
+      district: null,
+      precinct: null,
+      streetBlock: null,
+      parentCode: null,
+      fullName: null,
     },
-
-    onSubmit: () => { },
-    onWardSelect: () => { },
-    onCitySelect: () => { },
-    onDistrictSelect: () => { }
-}
+    district: {
+      id: null,
+      name: null,
+      createDatetime: null,
+      updateDatetime: null,
+      createUser: null,
+      updateUser: null,
+      status: null,
+      areaCode: null,
+      province: null,
+      district: null,
+      precinct: null,
+      streetBlock: null,
+      parentCode: null,
+      fullName: null,
+    },
+    precinct: {
+      id: null,
+      name: null,
+      createDatetime: null,
+      updateDatetime: null,
+      createUser: null,
+      updateUser: null,
+      status: null,
+      areaCode: null,
+      province: null,
+      district: null,
+      precinct: null,
+      streetBlock: null,
+      parentCode: null,
+      fullName: null,
+    },
+    streetBlock: {
+      id: null,
+      name: null,
+      createDatetime: null,
+      updateDatetime: null,
+      createUser: null,
+      updateUser: null,
+      status: null,
+      areaCode: null,
+      province: null,
+      district: null,
+      precinct: null,
+      streetBlock: null,
+      parentCode: null,
+      fullName: null,
+    },
+  },
+  onPrecinctSelect: () => {},
+  onStreetBlockSelect: () => {},
+  onProvinceSelect: () => {},
+  onDistrictSelect: () => {},
+  onSubmit: () => {},
+};
 const LocationContext = createContext(initialState);
 
 type LocationProviderProps = {
-    children: ReactNode;
+  children: ReactNode;
 };
 const initialLocation = async () => {
-
-    const { cityId, districtId, wardId } = await locationApi.locations();
-    const cities = await locationApi.citys();
-    const districts = await locationApi.districts(cityId);
-    const wards = await locationApi.wards(districtId);
-
-    return {
-        cityOptions: cities,
-        districtOptions: districts,
-        wardOptions: wards,
-        selectedCity: cities.find((c) => c.id === cityId),
-        selectedDistrict: districts.find((d) => d.id === districtId),
-        selectedWard: wards.find((w) => w.id === wardId)
-    }
-}
+  const provinces = await locationApi.area(null);
+  //   const districts = await locationApi.districts(cityId);
+  //   const wards = await locationApi.wards(districtId);
+  return {
+    provinces: provinces,
+    // districtOptions: districts,
+    // wardOptions: wards,
+    // selectedCity: cities.find((c) => c.id === cityId),
+    // selectedDistrict: districts.find((d) => d.id === districtId),
+    // selectedWard: wards.find((w) => w.id === wardId),
+  };
+};
 
 export interface locationObject {
-    cityOptions: Array<responseDataLocation>;
-    districtOptions: Array<responseDataLocation>;
-    wardOptions: Array<responseDataLocation>;
-    selectedCity: responseDataLocation | undefined;
-    selectedDistrict: responseDataLocation | undefined;
-    selectedWard: responseDataLocation | undefined
+  provinces: Array<areaResponse>;
+  districts: Array<areaResponse>;
+  precincts: Array<areaResponse>;
+  streetBlocks: Array<areaResponse>;
+  streetBlock: areaResponse | undefined;
+  province: areaResponse | undefined;
+  district: areaResponse | undefined;
+  precinct: areaResponse | undefined;
 }
 
 function LocationProvider({ children }: LocationProviderProps) {
+  const [locationState, setLocationState] = useState<locationObject>({
+    provinces: [],
+    districts: [],
+    precincts: [],
+    streetBlocks: [],
+    province: {
+      id: null,
+      name: null,
+      createDatetime: null,
+      updateDatetime: null,
+      createUser: null,
+      updateUser: null,
+      status: null,
+      areaCode: null,
+      province: null,
+      district: null,
+      precinct: null,
+      streetBlock: null,
+      parentCode: null,
+      fullName: null,
+    },
+    district: {
+      id: null,
+      name: null,
+      createDatetime: null,
+      updateDatetime: null,
+      createUser: null,
+      updateUser: null,
+      status: null,
+      areaCode: null,
+      province: null,
+      district: null,
+      precinct: null,
+      streetBlock: null,
+      parentCode: null,
+      fullName: null,
+    },
+    precinct: {
+      id: null,
+      name: null,
+      createDatetime: null,
+      updateDatetime: null,
+      createUser: null,
+      updateUser: null,
+      status: null,
+      areaCode: null,
+      province: null,
+      district: null,
+      precinct: null,
+      streetBlock: null,
+      parentCode: null,
+      fullName: null,
+    },
+    streetBlock: {
+      id: null,
+      name: null,
+      createDatetime: null,
+      updateDatetime: null,
+      createUser: null,
+      updateUser: null,
+      status: null,
+      areaCode: null,
+      province: null,
+      district: null,
+      precinct: null,
+      streetBlock: null,
+      parentCode: null,
+      fullName: null,
+    },
+  });
+  const { province, district, precinct, streetBlock } = locationState;
 
-    const [locationState, setLocationState] = useState<locationObject>({
-        cityOptions: [],
-        districtOptions: [],
-        wardOptions: [],
-        selectedCity: {
-            id: null,
-            name: null
-        },
-        selectedDistrict: {
-            id: null,
-            name: null
-        },
-        selectedWard: {
-            id: null,
-            name: null
-        }
-    })
-    const { selectedCity, selectedDistrict } = locationState;
-
-    useEffect(() => {
-        (async () => {
-
-            try {
-                const initData = await initialLocation();
-                setLocationState({
-                    ...locationState,
-                    cityOptions:initData.cityOptions,
-                    // selectedCity:initData.selectedCity
-                })
-            } catch (error) {
-                console.log(error)
-            }
-
-        })()
-    }
-        , [])
-    useEffect(() => {
-        (async () => {
-            if (!selectedCity?.id) return;
-          
-            const options = await locationApi.districts(selectedCity.id!)
-            setLocationState({ ...locationState, districtOptions: options });
-        })()
-    }, [selectedCity])
-    useEffect(() => {
-        (async () => {
-            if (!selectedDistrict?.id) return;
-           
-            const options = await locationApi.wards(selectedDistrict.id!)
-            setLocationState({ ...locationState, wardOptions: options });
-        })()
-    }, [selectedDistrict])
-
-    const onCitySelect = (option: responseDataLocation) => {
-        if (option !== selectedCity) {
-            setLocationState({
-                ...locationState,
-                districtOptions: [],
-                wardOptions: [],
-                selectedCity: option,
-                selectedDistrict: {
-                    id: null,
-                    name: null
-                },
-                selectedWard: {
-                    id: null,
-                    name: null
-                }
-            });
-        }
-    }
-
-    const onDistrictSelect = (option: responseDataLocation) => {
-        if (option !== selectedDistrict) {
-            setLocationState({
-                ...locationState,
-                wardOptions: [],
-                selectedDistrict: option,
-                selectedWard: {
-                    id: null,
-                    name: null
-                }
-            });
-        }
-    }
-
-    const onWardSelect = (option: responseDataLocation) => {
-
+  useEffect(() => {
+    (async () => {
+      console.log('effect1');
+      try {
+        const initData = await initialLocation();
         setLocationState({
-            ...locationState,
-            selectedWard: option,
-
+          ...locationState,
+          provinces: initData.provinces,
+          // selectedCity:initData.selectedCity
         });
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, []);
+  useEffect(() => {
+    (async () => {
+      console.log(province);
+      if (!province?.areaCode) return;
 
+      const options = await locationApi.area(province.areaCode);
+      setLocationState({ ...locationState, districts: options });
+    })();
+  }, [province]);
+  useEffect(() => {
+    (async () => {
+      console.log('effect');
+
+      if (!district?.areaCode) return;
+      const options = await locationApi.area(district.areaCode!);
+      setLocationState({ ...locationState, precincts: options });
+    })();
+  }, [district]);
+  useEffect(() => {
+    (async () => {
+      console.log('effect');
+      if (!precinct?.areaCode) return;
+      const options = await locationApi.area(precinct.areaCode!);
+      setLocationState({ ...locationState, streetBlocks: options });
+    })();
+  }, [precinct]);
+
+
+  const onProvinceSelect = (option: areaResponse) => {
+    console.log(option);
+    if (option !== province) {
+      console.log(province);
+      setLocationState({
+        ...locationState,
+        districts: [],
+        precincts: [],
+        streetBlocks: [],
+        province: option,
+        district: {
+          id: null,
+          name: null,
+          createDatetime: null,
+          updateDatetime: null,
+          createUser: null,
+          updateUser: null,
+          status: null,
+          areaCode: null,
+          province: null,
+          district: null,
+          precinct: null,
+          streetBlock: null,
+          parentCode: null,
+          fullName: null,
+        },
+        precinct: {
+          id: null,
+          name: null,
+          createDatetime: null,
+          updateDatetime: null,
+          createUser: null,
+          updateUser: null,
+          status: null,
+          areaCode: null,
+          province: null,
+          district: null,
+          precinct: null,
+          streetBlock: null,
+          parentCode: null,
+          fullName: null,
+        },
+        streetBlock: {
+          id: null,
+          name: null,
+          createDatetime: null,
+          updateDatetime: null,
+          createUser: null,
+          updateUser: null,
+          status: null,
+          areaCode: null,
+          province: null,
+          district: null,
+          precinct: null,
+          streetBlock: null,
+          parentCode: null,
+          fullName: null,
+        },
+      });
     }
-    const onSubmit = (e: Event) => {
-        e.preventDefault();
-        window.location.reload();
+  };
+
+  const onDistrictSelect = (option: areaResponse) => {
+    console.log('district select');
+    if (option !== district) {
+      setLocationState({
+        ...locationState,
+        precincts: [],
+        streetBlocks: [],
+        district: option,
+        precinct: {
+          id: null,
+          name: null,
+          createDatetime: null,
+          updateDatetime: null,
+          createUser: null,
+          updateUser: null,
+          status: null,
+          areaCode: null,
+          province: null,
+          district: null,
+          precinct: null,
+          streetBlock: null,
+          parentCode: null,
+          fullName: null,
+        },
+        streetBlock: {
+          id: null,
+          name: null,
+          createDatetime: null,
+          updateDatetime: null,
+          createUser: null,
+          updateUser: null,
+          status: null,
+          areaCode: null,
+          province: null,
+          district: null,
+          precinct: null,
+          streetBlock: null,
+          parentCode: null,
+          fullName: null,
+        },
+      });
     }
+  };
 
-    return (
-        <LocationContext.Provider value={{
-            locationState,
-            onSubmit,
-            onWardSelect,
-            onCitySelect,
-            onDistrictSelect
-        }
+  const onPrecinctSelect = (option: areaResponse) => {
+    if (option !== precinct) {
+      setLocationState({
+        ...locationState,
+        precinct: option,
+        streetBlock: {
+          id: null,
+          name: null,
+          createDatetime: null,
+          updateDatetime: null,
+          createUser: null,
+          updateUser: null,
+          status: null,
+          areaCode: null,
+          province: null,
+          district: null,
+          precinct: null,
+          streetBlock: null,
+          parentCode: null,
+          fullName: null,
+        },
+      });
+    }
+  };
+  const onStreetBlockSelect = (option: areaResponse) => {
+    if (option !== streetBlock) {
+    setLocationState({
+      ...locationState,
+      streetBlock: option,
+    });}
+  };
+  const onSubmit = (e: Event) => {
+    e.preventDefault();
+    window.location.reload();
+  };
 
-        }>
-            {children}
-        </LocationContext.Provider>
-    )
+  return (
+    <LocationContext.Provider
+      value={{
+        locationState,
+        onSubmit,
+        onPrecinctSelect,
+        onStreetBlockSelect,
+        onProvinceSelect,
+        onDistrictSelect,
+      }}
+    >
+      {children}
+    </LocationContext.Provider>
+  );
 }
 export { LocationContext, LocationProvider };

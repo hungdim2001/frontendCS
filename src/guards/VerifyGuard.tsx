@@ -31,7 +31,7 @@ export default function VerifyGuard({ children }: AuthGuardProps) {
     return <Navigate to={PATH_AUTH.login} />;;
   }
 
-  if (isAuthenticated&& user?.isActive) {
+  if (isAuthenticated&& user?.status) {
     return <Navigate to={PATH_DASHBOARD.root} />;
   }
 

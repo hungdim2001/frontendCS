@@ -46,7 +46,7 @@ export type UserAccount = {
   phone: string;
   userName: string;
   address: string;
-  isActive:Boolean;
+  status:Boolean;
 }
 export type Profile = {
   id: string;

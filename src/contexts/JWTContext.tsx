@@ -1,6 +1,8 @@
 import { createContext, ReactNode, useEffect, useReducer, useRef } from 'react';
 // utils
 import axios from '../utils/axios';
+import useAuth from '../hooks/useAuth';
+
 import { isValidToken, setSession } from '../utils/jwt';
 // @types
 import { ActionMap, AuthState, AuthUser, JWTContextType } from '../@types/auth';
@@ -261,6 +263,7 @@ function AuthProvider({ children }: AuthProviderProps) {
     // storage
     _clearSilentRefreshToken();
     dispatch({ type: Types.Logout });
+     localStorage.removeItem(REFRESH_TOKEN_KEY)
 
     // auth-channel
     authChannel.triggerAuthRefreshing();

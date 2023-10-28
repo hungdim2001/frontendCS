@@ -3,6 +3,7 @@ import { UserAccount } from 'src/@types/user';
 import { OrNull } from 'src/@types/common';
 import { Verify } from 'crypto';
 const authApiIns = new BaseApi('/api/auth');
+const tokenApiIns  = new BaseApi('/api/token');
 export type LoginRequestBody = {
     account: string;
     password: string;
@@ -24,7 +25,7 @@ type RegisterResponeData = {
     phone: string;
     userName: string;
     address: string;
-    isActive: Boolean;
+    status: Boolean;
 };
 type LoginResponseData = {
 
@@ -44,14 +45,17 @@ type RefreshTokenResponseData = {
     refreshExpiresIn: number;
 };
 const register = (bodyData: RegisterRequestBody) =>
-    authApiIns.post<RegisterResponeData>('/signUp', bodyData);
+    authApiIns.post<RegisterResponeData>('/register', bodyData);
 
-const login = (bodyData: LoginRequestBody) =>
-    authApiIns.post<LoginResponseData>('/signIn', bodyData);
+const login = (bodyData: LoginRequestBody) =>{
+    console.log("url "+authApiIns)
+  return  authApiIns.post<LoginResponseData>('/login', bodyData);
+}
+    
 
 
 const refreshToken = (bodyData: RefreshTokenBody) =>
-    authApiIns.post<RefreshTokenResponseData>('/refreshToken', bodyData);
+tokenApiIns.post<RefreshTokenResponseData>('/refreshToken', bodyData);
 const whoAmI = () => authApiIns.get<OrNull<UserAccount>>('/whoami');
 
 

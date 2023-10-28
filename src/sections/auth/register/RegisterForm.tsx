@@ -33,21 +33,24 @@ type FormValuesProps = {
 export default function RegisterForm() {
   const { register } = useAuth();
   const { locationState,
-    onCitySelect,
+    onProvinceSelect,onStreetBlockSelect,
     onDistrictSelect,
-    onWardSelect,
+    onPrecinctSelect,
   } = useLocationContext();
   const {
-    cityOptions,
-    districtOptions,
-    wardOptions,
-    selectedCity,
-    selectedDistrict,
-    selectedWard
+    provinces,
+    districts,
+    precincts,
+    streetBlocks,
+    streetBlock,
+    province,
+    district,
+    precinct,
   } = locationState;
 
   const isMountedRef = useIsMountedRef();
 
+  
   const [showPassword, setShowPassword] = useState(false);
 
   const RegisterSchema = Yup.object().shape({
@@ -158,19 +161,19 @@ export default function RegisterForm() {
         </Stack>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <RHFSelect
-            disabled={cityOptions.length === 0}
-            defaultValue={selectedCity}
-            name="city" label="Thành phố/Tỉnh" placeholder="Thành phố/Tỉnh"
+            disabled={provinces.length === 0}
+            defaultValue={province}
+            name="city" label="Tỉnh/Thành phố" placeholder="Thành phố/Tỉnh"
             onChange={(e) => {
               setValue('city', e.target.value, { shouldValidate: true })
-              const option = cityOptions.find((c) => c.name === e.target.value)
-              onCitySelect(option!)
+              const option = provinces.find((c) => c.name === e.target.value)
+              onProvinceSelect(option!)
             }}
           >
             <option value="" />
-            {cityOptions.map((option) => (
+            {provinces.map((option) => (
               <
-                option key={option.id} value={option.name!} >
+                option key={option.areaCode} value={option.name!} >
                 {option.name}
               </option>
             ))}
@@ -180,15 +183,15 @@ export default function RegisterForm() {
           <RHFSelect
            onChange={(e) => {
             setValue('district', e.target.value, { shouldValidate: true })
-            const option = districtOptions.find((c) => c.name === e.target.value)
+            const option = districts.find((c) => c.name === e.target.value)
             onDistrictSelect(option!)
           }}
-            disabled={districtOptions.length === 0}
-            defaultValue={selectedDistrict}
+            disabled={districts.length === 0}
+            defaultValue={district}
             name="district" label="Quận/Huyện" placeholder="Quận/Huyện"
           >  <option value="" />
-            {districtOptions.map((option) => (
-              <option key={option.id} value={option.name!}>
+            {districts.map((option) => (
+              <option key={option.areaCode} value={option.name!}>
                 {option.name}
               </option>
             ))}
@@ -199,23 +202,40 @@ export default function RegisterForm() {
           <RHFSelect
            onChange={(e) => {
             setValue('ward', e.target.value, { shouldValidate: true })
-            const option = wardOptions.find((c) => c.name === e.target.value)
-            onWardSelect(option!)
+            const option = precincts.find((c) => c.name === e.target.value)
+            onPrecinctSelect(option!)
           }}
-            defaultValue={selectedWard}
-            disabled={wardOptions.length === 0}
+            defaultValue={precinct}
+            disabled={precincts.length === 0}
             name="ward"
             label="Phường/Xã"
             placeholder="Phường/Xã"
           >  <option value="" />
-            {wardOptions.map((option) => (
-              <option key={option.id} value={option.name!}>
+            {precincts.map((option) => (
+              <option key={option.areaCode} value={option.name!}>
+                {option.name}
+              </option>
+            ))}
+          </RHFSelect>
+          <RHFSelect
+           onChange={(e) => {
+            setValue('ward', e.target.value, { shouldValidate: true })
+            const option = streetBlocks.find((c) => c.name === e.target.value)
+            onStreetBlockSelect(option!)
+          }}
+            defaultValue={streetBlock}
+            disabled={streetBlocks.length === 0}
+            name="streetBlock"
+            label="Thôn/Xóm"
+            placeholder="Thôn/Xóm"
+          >  <option value="" />
+            {streetBlocks.map((option) => (
+              <option key={option.areaCode} value={option.name!}>
                 {option.name}
               </option>
             ))}
           </RHFSelect>
 
-          <RHFTextField name="village" label="Số nhà/Thôn" />
 
         </Stack>
 

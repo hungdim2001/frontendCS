@@ -87,7 +87,7 @@ export default function Login() {
               Hi, Welcome Back
             </Typography>
             <Image
-              src="https://minimal-assets-api.vercel.app/assets/illustrations/illustration_login.png"
+              src="/img/illustration_dashboard.png"
               alt="login"
             />
           </SectionStyle>

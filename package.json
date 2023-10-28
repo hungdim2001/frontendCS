@@ -124,7 +124,7 @@
     "@types/node": "^17.0.0",
     "@types/nprogress": "^0.2.0",
     "@types/numeral": "^2.0.2",
-    "@types/qs": "^6.9.7",
+    "@types/qs": "^6.9.9",
     "@types/react": "^17.0.37",
     "@types/react-beautiful-dnd": "^13.1.2",
     "@types/react-copy-to-clipboard": "^5.0.2",

@@ -32,7 +32,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     }
     return <Login />;
   }
-  if (isAuthenticated&&!user?.isActive) {
+  if (isAuthenticated && !user?.status) {
     if (pathname !== requestedLocation) {
       setRequestedLocation(pathname);
     }

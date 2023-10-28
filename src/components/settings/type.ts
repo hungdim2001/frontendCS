@@ -1,7 +1,7 @@
 // ----------------------------------------------------------------------
 
 import { locationObject } from "src/contexts/LocationContext";
-import { responseDataLocation } from "src/service/app-apis/location";
+import { areaResponse } from "src/service/app-apis/location";
 
 export type ThemeMode = 'light' | 'dark';
 export type ThemeDirection = 'rtl' | 'ltr';
@@ -29,16 +29,12 @@ export type SettingsValueProps = {
 
 export type LocationContextProps = {
   onSubmit:(event: Event) => void;
-  onWardSelect:(option: responseDataLocation)=> void;
-  onCitySelect:(option: responseDataLocation)=> void;
-  onDistrictSelect:(option: responseDataLocation)=> void;
-  locationState:locationObject
-  // cityOptions: Array<responseDataLocation>;
-  // districtOptions: Array<responseDataLocation>;
-  // wardOptions: Array<responseDataLocation>;
-  // selectedCity: responseDataLocation;
-  // selectedDistrict: responseDataLocation;
-  // selectedWard: responseDataLocation
+  onPrecinctSelect:(option: areaResponse)=> void;
+  onProvinceSelect:(option: areaResponse)=> void;
+  onDistrictSelect:(option: areaResponse)=> void;
+  onStreetBlockSelect:(option: areaResponse)=> void;
+  locationState:locationObject 
+
 }
 export type SettingsContextProps = {
   themeMode: ThemeMode;

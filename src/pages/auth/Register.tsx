@@ -88,7 +88,7 @@ export default function Register() {
             </Typography>
             <Image
               alt="register"
-              src="https://minimal-assets-api.vercel.app/assets/illustrations/illustration_register.png"
+              src="/img/illustration_dashboard.png"
             />
           </SectionStyle>
         )}
