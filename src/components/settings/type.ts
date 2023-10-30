@@ -29,10 +29,7 @@ export type SettingsValueProps = {
 
 export type LocationContextProps = {
   onSubmit:(event: Event) => void;
-  onPrecinctSelect:(option: areaResponse)=> void;
-  onProvinceSelect:(option: areaResponse)=> void;
-  onDistrictSelect:(option: areaResponse)=> void;
-  onStreetBlockSelect:(option: areaResponse)=> void;
+  handleLocationSelect: (option: areaResponse|undefined, selectedField: string) =>void;
   locationState:locationObject 
 
 }

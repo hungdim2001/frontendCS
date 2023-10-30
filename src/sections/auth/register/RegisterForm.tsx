@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 // form
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -13,6 +13,7 @@ import useIsMountedRef from '../../../hooks/useIsMountedRef';
 import Iconify from '../../../components/Iconify';
 import { FormProvider, RHFSelect, RHFTextField } from '../../../components/hook-form';
 import useLocationContext from 'src/hooks/useLocation';
+import { areaResponse } from 'src/service/app-apis/location';
 
 // ----------------------------------------------------------------------
 
@@ -22,20 +23,19 @@ type FormValuesProps = {
   email: string;
   password: string;
   phone: string;
-  city: string;
+  province: string;
   district: string;
-  ward: string;
+  precinct: string;
   repassword: string;
-  village: string;
+  streetBlock: string;
   afterSubmit?: string;
 };
 
 export default function RegisterForm() {
   const { register } = useAuth();
   const { locationState,
-    onProvinceSelect,onStreetBlockSelect,
-    onDistrictSelect,
-    onPrecinctSelect,
+    
+    handleLocationSelect,
   } = useLocationContext();
   const {
     provinces,
@@ -66,10 +66,10 @@ export default function RegisterForm() {
     ,
     phone: Yup.string().required('Trường này không được để trống')
       .matches(/^0[1-9]\d{8}$/, 'không đúng định dạng số điện thoại'),
-    city: Yup.string().required('Trường này không được để trống'),
+    province: Yup.string().required('Trường này không được để trống'),
     district: Yup.string().required('Trường này không được để trống'),
-    ward: Yup.string().required('Trường này không được để trống'),
-    village: Yup.string().required('Trường này không được để trống'),
+    precinct: Yup.string().required('Trường này không được để trống'),
+    streetBlock: Yup.string().required('Trường này không được để trống'),
     repassword: Yup.string().required('Trường này không được để trống')
       .oneOf([Yup.ref('password'), null], 'Passwords must match')
     ,
@@ -81,11 +81,11 @@ export default function RegisterForm() {
     email: '',
     password: '',
     phone: '',
-    // city: ' ',
-    // district: ' ',
-    // ward: ' ',
+    province: ' ',
+    district: ' ',
+    precinct: ' ',
     repassword: '',
-    village: ''
+    streetBlock: ''
   };
 
   const methods = useForm<FormValuesProps>({
@@ -103,18 +103,32 @@ export default function RegisterForm() {
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
-      console.log(data.city)
-      const address = data.city + " "+ data.district +" "+ data.ward + " "+data.village
-      await register(data.email, data.phone, address, data.password, data.firstName, data.lastName);
+      const areaCode = data.province +  data.district +data.precinct + data.streetBlock
+      const role ="user"
+      await register(data.email, data.phone, areaCode, role,data.password, data.firstName, data.lastName);
     } catch (error) {
       console.error("register");
       console.error(error);
-      // reset();
       if (isMountedRef.current) {
         setError('afterSubmit', error);
       }
     }
   };
+
+  type Field = "province" | "district" | "precinct" | "streetBlock";
+  const handleChange = (e:React.ChangeEvent<HTMLInputElement>,field: Field) => {
+    const selectedValue = e.target.value;
+    setValue(field, selectedValue, { shouldValidate: true });
+    const option:areaResponse|undefined = field === 'province'
+      ? provinces.find((c) => c.name === selectedValue)
+      : field === 'district'
+        ? districts.find((c) => c.name === selectedValue)
+        : field === 'precinct'
+          ? precincts.find((c) => c.name === selectedValue)
+          : streetBlocks.find((c) => c.name === selectedValue);
+    handleLocationSelect(option, field);
+  };
+  
  
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -163,12 +177,8 @@ export default function RegisterForm() {
           <RHFSelect
             disabled={provinces.length === 0}
             defaultValue={province}
-            name="city" label="Tỉnh/Thành phố" placeholder="Thành phố/Tỉnh"
-            onChange={(e) => {
-              setValue('city', e.target.value, { shouldValidate: true })
-              const option = provinces.find((c) => c.name === e.target.value)
-              onProvinceSelect(option!)
-            }}
+            name="province" label="Tỉnh/Thành phố" placeholder="Thành phố/Tỉnh"
+            onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'province')}
           >
             <option value="" />
             {provinces.map((option) => (
@@ -181,11 +191,8 @@ export default function RegisterForm() {
           </RHFSelect>
 
           <RHFSelect
-           onChange={(e) => {
-            setValue('district', e.target.value, { shouldValidate: true })
-            const option = districts.find((c) => c.name === e.target.value)
-            onDistrictSelect(option!)
-          }}
+            onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'district')}
+
             disabled={districts.length === 0}
             defaultValue={district}
             name="district" label="Quận/Huyện" placeholder="Quận/Huyện"
@@ -200,14 +207,11 @@ export default function RegisterForm() {
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
 
           <RHFSelect
-           onChange={(e) => {
-            setValue('ward', e.target.value, { shouldValidate: true })
-            const option = precincts.find((c) => c.name === e.target.value)
-            onPrecinctSelect(option!)
-          }}
+            onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'precinct')}
+
             defaultValue={precinct}
             disabled={precincts.length === 0}
-            name="ward"
+            name="precinct"
             label="Phường/Xã"
             placeholder="Phường/Xã"
           >  <option value="" />
@@ -218,11 +222,8 @@ export default function RegisterForm() {
             ))}
           </RHFSelect>
           <RHFSelect
-           onChange={(e) => {
-            setValue('ward', e.target.value, { shouldValidate: true })
-            const option = streetBlocks.find((c) => c.name === e.target.value)
-            onStreetBlockSelect(option!)
-          }}
+            onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'streetBlock')}
+
             defaultValue={streetBlock}
             disabled={streetBlocks.length === 0}
             name="streetBlock"

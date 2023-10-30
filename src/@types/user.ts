@@ -45,7 +45,7 @@ export type UserAccount = {
   email: string;
   phone: string;
   userName: string;
-  address: string;
+  areaCode: string;
   status:Boolean;
 }
 export type Profile = {

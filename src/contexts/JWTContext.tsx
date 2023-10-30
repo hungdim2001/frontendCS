@@ -233,13 +233,14 @@ function AuthProvider({ children }: AuthProviderProps) {
 
   const register = async (email: string,
     phone: string,
-    address: string,
+    areaCode: string,
+    role:string,
     password: string,
     firstName: string,
     lastName: string) => {
     const response = await authApi.register({
       email, phone,
-      address, password, firstName
+      areaCode, role,password, firstName
       , lastName,
 
     })

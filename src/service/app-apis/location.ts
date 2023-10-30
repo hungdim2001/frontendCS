@@ -3,20 +3,20 @@ import { BaseApi } from './base-api';
 
 const locationApiIns = new BaseApi('/api/area');
 export type areaResponse = {
-   id: number|null;
-   name: string|null;
-   createDatetime:Date|null ;
-   updateDatetime: Date|null ;
-   createUser: string|null;
-    updateUser: string|null;
-    status: Boolean|null,
-    areaCode: string|null;
-    province: string|null;
-    district: string|null;
-    precinct: string|null;
-    streetBlock: string|null;
-    parentCode: string|null;
-    fullName: string|null;
+   id: number|undefined;
+   name: string|undefined;
+   createDatetime:Date|undefined ;
+   updateDatetime: Date|undefined ;
+   createUser: string|undefined;
+    updateUser: string|undefined;
+    status: Boolean|undefined,
+    areaCode: string|undefined;
+    province: string|undefined;
+    district: string|undefined;
+    precinct: string|undefined;
+    streetBlock: string|undefined;
+    parentCode: string|undefined;
+    fullName: string|undefined;
 }
 const area = (parentCode:string|null) => {
   const path = parentCode ? `/${parentCode}`:''; 

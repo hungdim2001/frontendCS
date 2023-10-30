@@ -31,8 +31,9 @@ export type JWTContextType = {
   login: (email: string, password: string) => Promise<void>;
   register: (email:string,
     phone:string,
-    address:string,
+    areaCode:string,
     password:string,
+    role:string,
     firstName:string,
     lastName:string) => Promise<void>;
   logout: () => Promise<void>;

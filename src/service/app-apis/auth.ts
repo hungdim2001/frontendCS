@@ -11,7 +11,8 @@ export type LoginRequestBody = {
 export type RegisterRequestBody = {
     email: String;
     phone: String;
-    address: String;
+    areaCode: String;
+    role:String;
     password: String;
     firstName: String;
     lastName: String;
@@ -24,7 +25,7 @@ type RegisterResponeData = {
     email: string;
     phone: string;
     userName: string;
-    address: string;
+    areaCode: string;
     status: Boolean;
 };
 type LoginResponseData = {
