@@ -4,7 +4,6 @@ import { LocationState } from 'src/@types/location';
 import { LocationContextProps } from 'src/components/settings/type';
 import { locationApi, areaResponse } from 'src/service/app-apis/location';
 
-
 const locationStateInit = {
   provinces: [],
   districts: [],
@@ -12,13 +11,13 @@ const locationStateInit = {
   streetBlocks: [],
   province: undefined,
   district: undefined,
-  precinct:undefined,
-  streetBlock: undefined
-}
+  precinct: undefined,
+  streetBlock: undefined,
+};
 const initialState: LocationContextProps = {
   locationState: locationStateInit,
   onSubmit: () => {},
-  handleLocationSelect:  () => {},
+  handleLocationSelect: () => {},
 };
 const LocationContext = createContext(initialState);
 
@@ -31,8 +30,6 @@ const initialLocation = async () => {
     provinces: provinces,
   };
 };
-
-
 
 export interface locationObject {
   provinces: Array<areaResponse>;
@@ -75,7 +72,6 @@ function LocationProvider({ children }: LocationProviderProps) {
   }, [province]);
   useEffect(() => {
     (async () => {
-
       if (!district?.areaCode) return;
       const options = await locationApi.area(district.areaCode!);
       setLocationState({ ...locationState, precincts: options });
@@ -89,12 +85,11 @@ function LocationProvider({ children }: LocationProviderProps) {
     })();
   }, [precinct]);
 
-
-  const handleLocationSelect = (option: areaResponse|undefined, selectedField: string) => {
+  const handleLocationSelect = (option: areaResponse | undefined, selectedField: string) => {
     const updatedState: Partial<locationObject> = {
       [selectedField]: option,
     };
-  
+
     if (selectedField === 'province') {
       updatedState.districts = [];
       updatedState.precincts = [];
@@ -105,10 +100,10 @@ function LocationProvider({ children }: LocationProviderProps) {
     } else if (selectedField === 'precinct') {
       updatedState.streetBlocks = [];
     }
-  
+
     setLocationState({ ...locationState, ...updatedState });
   };
-  
+
   const onSubmit = (e: Event) => {
     e.preventDefault();
     window.location.reload();
@@ -119,7 +114,7 @@ function LocationProvider({ children }: LocationProviderProps) {
       value={{
         locationState,
         onSubmit,
-        handleLocationSelect
+        handleLocationSelect,
       }}
     >
       {children}

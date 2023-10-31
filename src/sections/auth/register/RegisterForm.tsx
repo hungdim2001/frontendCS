@@ -14,6 +14,7 @@ import Iconify from '../../../components/Iconify';
 import { FormProvider, RHFSelect, RHFTextField } from '../../../components/hook-form';
 import useLocationContext from 'src/hooks/useLocation';
 import { areaResponse } from 'src/service/app-apis/location';
+import { fileURLToPath } from 'url';
 
 // ----------------------------------------------------------------------
 
@@ -42,10 +43,6 @@ export default function RegisterForm() {
     districts,
     precincts,
     streetBlocks,
-    streetBlock,
-    province,
-    district,
-    precinct,
   } = locationState;
 
   const isMountedRef = useIsMountedRef();
@@ -54,24 +51,24 @@ export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   const RegisterSchema = Yup.object().shape({
-    firstName: Yup.string().required('Trường này không được để trống'),
-    lastName: Yup.string().required('Trường này không được để trống'),
-    email: Yup.string().email('Trường này phải là email')
-      .required('Trường này không được để trống')
+    firstName: Yup.string().required('Fist name is required'),
+    lastName: Yup.string().required('Last name is required'),
+    email: Yup.string().email('Email address can include only letters, numbers, \- (dash), _ (underscore), . (periods), \'(apostrophe), and one @')
+      .required('Email is required')
     ,
-    password: Yup.string().required('Trường này không được để trống')
-      .matches(/^.{6,}$/, "Mật khẩu phải có ít nhất 6 ký tự").
-      matches(/[A-Z\s]+/, "Mật khẩu phải có ít nhất một ký tự hoa").
-      matches(/[$&+,:;=?@#|'<>.^*()%!-]/, "Mật khẩu phải có ít nhất một ký tự đặc biệt")
+    password: Yup.string().required('Password is required')
+      .matches(/^.{6,}$/, "Passwords must be at least 6 characters").
+      matches(/[A-Z\s]+/, "Password must have at least one uppercase character").
+      matches(/[$&+,:;=?@#|'<>.^*()%!-]/, "Password must have at least one special character")
     ,
-    phone: Yup.string().required('Trường này không được để trống')
-      .matches(/^0[1-9]\d{8}$/, 'không đúng định dạng số điện thoại'),
-    province: Yup.string().required('Trường này không được để trống'),
-    district: Yup.string().required('Trường này không được để trống'),
-    precinct: Yup.string().required('Trường này không được để trống'),
-    streetBlock: Yup.string().required('Trường này không được để trống'),
-    repassword: Yup.string().required('Trường này không được để trống')
-      .oneOf([Yup.ref('password'), null], 'Passwords must match')
+    phone: Yup.string().required('Phone number is required')
+      .matches(/^0[1-9]\d{8}$/, 'This is not a valid phone number'),
+    province: Yup.string().required('Province is required'),
+    district: Yup.string().required('District is required'),
+    precinct: Yup.string().required('Precinct is required'),
+    streetBlock: Yup.string().required('Street block is required'),
+    repassword: Yup.string().required('is required')
+      .oneOf([Yup.ref('password'), null], 'Passwords do not match')
     ,
   });
 
@@ -94,7 +91,7 @@ export default function RegisterForm() {
   });
 
   const {
-    reset,
+    resetField,
     setValue,
     setError,
     handleSubmit,
@@ -103,9 +100,8 @@ export default function RegisterForm() {
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
-      const areaCode = data.province +  data.district +data.precinct + data.streetBlock
       const role ="user"
-      await register(data.email, data.phone, areaCode, role,data.password, data.firstName, data.lastName);
+      await register(data.email, data.phone, data.precinct, role,data.password, data.firstName, data.lastName);
     } catch (error) {
       console.error("register");
       console.error(error);
@@ -118,15 +114,33 @@ export default function RegisterForm() {
   type Field = "province" | "district" | "precinct" | "streetBlock";
   const handleChange = (e:React.ChangeEvent<HTMLInputElement>,field: Field) => {
     const selectedValue = e.target.value;
+    let option:areaResponse|undefined
     setValue(field, selectedValue, { shouldValidate: true });
-    const option:areaResponse|undefined = field === 'province'
-      ? provinces.find((c) => c.name === selectedValue)
-      : field === 'district'
-        ? districts.find((c) => c.name === selectedValue)
-        : field === 'precinct'
-          ? precincts.find((c) => c.name === selectedValue)
-          : streetBlocks.find((c) => c.name === selectedValue);
+    if(field === 'province'){
+     option = provinces.find((c) => c.areaCode === selectedValue)
+      resetField("district")
+      resetField("precinct")
+      resetField("streetBlock")
     handleLocationSelect(option, field);
+
+    }else if(field ==='district'){
+      option = districts.find((c) => c.areaCode === selectedValue)
+      resetField("precinct")
+      resetField("streetBlock")
+      handleLocationSelect(option, field);
+      console.log(option)
+      console.log(field)
+
+    }else if(field === 'precinct')
+    {
+      option = precincts.find((c) => c.areaCode === selectedValue)
+      resetField("streetBlock")
+      handleLocationSelect(option, field);
+
+    }else{
+      handleLocationSelect(option, field);
+
+    }
   };
   
  
@@ -136,17 +150,17 @@ export default function RegisterForm() {
         {!!errors.afterSubmit && <Alert severity="error">{errors.afterSubmit.message}</Alert>}
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <RHFTextField name="firstName" label="Tên" />
-          <RHFTextField name="lastName" label="Họ" />
+          <RHFTextField name="firstName" label="First name" />
+          <RHFTextField name="lastName" label="Last name" />
         </Stack>
 
         <RHFTextField name="email" label="Email" />
-        <RHFTextField name="phone" label="Số điện thoại" />
+        <RHFTextField name="phone" label="Phone number" />
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <RHFTextField
             name="password"
-            label="Mật khâu"
+            label="Password"
             type={showPassword ? 'text' : 'password'}
             InputProps={{
               endAdornment: (
@@ -160,7 +174,7 @@ export default function RegisterForm() {
           />
           <RHFTextField
             name="repassword"
-            label="Nhập lại mật khẩu"
+            label="Retype password"
             type={showPassword ? 'text' : 'password'}
             InputProps={{
               endAdornment: (
@@ -176,14 +190,13 @@ export default function RegisterForm() {
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <RHFSelect
             disabled={provinces.length === 0}
-            defaultValue={province}
-            name="province" label="Tỉnh/Thành phố" placeholder="Thành phố/Tỉnh"
+            name="province" label="Province" placeholder="Province"
             onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'province')}
           >
             <option value="" />
             {provinces.map((option) => (
               <
-                option key={option.areaCode} value={option.name!} >
+                option key={option.areaCode} value={option.areaCode!} >
                 {option.name}
               </option>
             ))}
@@ -192,13 +205,11 @@ export default function RegisterForm() {
 
           <RHFSelect
             onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'district')}
-
             disabled={districts.length === 0}
-            defaultValue={district}
-            name="district" label="Quận/Huyện" placeholder="Quận/Huyện"
+            name="district" label="District" placeholder="District"
           >  <option value="" />
             {districts.map((option) => (
-              <option key={option.areaCode} value={option.name!}>
+              <option key={option.areaCode} value={option.areaCode!}>
                 {option.name}
               </option>
             ))}
@@ -208,30 +219,26 @@ export default function RegisterForm() {
 
           <RHFSelect
             onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'precinct')}
-
-            defaultValue={precinct}
             disabled={precincts.length === 0}
             name="precinct"
-            label="Phường/Xã"
-            placeholder="Phường/Xã"
+            label="Precinct"
+            placeholder="Precinct"
           >  <option value="" />
             {precincts.map((option) => (
-              <option key={option.areaCode} value={option.name!}>
+              <option key={option.areaCode} value={option.areaCode!}>
                 {option.name}
               </option>
             ))}
           </RHFSelect>
           <RHFSelect
             onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'streetBlock')}
-
-            defaultValue={streetBlock}
             disabled={streetBlocks.length === 0}
             name="streetBlock"
-            label="Thôn/Xóm"
-            placeholder="Thôn/Xóm"
+            label="Street Block"
+            placeholder="Street Block"
           >  <option value="" />
             {streetBlocks.map((option) => (
-              <option key={option.areaCode} value={option.name!}>
+              <option key={option.areaCode} value={option.areaCode!}>
                 {option.name}
               </option>
             ))}
@@ -249,7 +256,7 @@ export default function RegisterForm() {
           variant="contained"
           loading={isSubmitting}
         >
-          Đăng ký
+          Create account
         </LoadingButton>
       </Stack>
     </FormProvider>
