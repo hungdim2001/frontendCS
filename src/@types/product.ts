@@ -29,6 +29,20 @@ export type ProductReview = {
   postedAt: Date | string | number;
 };
 
+export type ProductChar= {
+  id: number;
+  name: string;
+  code: string;
+  status: boolean;
+  productCharValues: ProductCharValue[]|null;
+};
+
+export type ProductCharValue= {
+  id: number|null;
+  code: string;
+  value: string;
+  status: boolean;
+};
 export type Product = {
   id: string;
   cover: string;

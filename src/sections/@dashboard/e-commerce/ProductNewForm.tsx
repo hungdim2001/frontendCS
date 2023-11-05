@@ -31,6 +31,7 @@ import {
   RHFTextField,
   RHFRadioGroup,
   RHFUploadMultiFile,
+  RHFUploadSingleFile,
 } from '../../../components/hook-form';
 
 // ----------------------------------------------------------------------
@@ -176,13 +177,16 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
           <Card sx={{ p: 3 }}>
             <Stack spacing={3}>
               <RHFTextField name="name" label="Product Name" />
-
               <div>
-                <LabelStyle>Description</LabelStyle>
-                <RHFEditor simple name="description" />
-              </div>
-
-              <div>
+                  <LabelStyle>Thumbnail</LabelStyle>
+                  <RHFUploadSingleFile
+                    name="thumbnail"
+                    accept="image/*"
+                    maxSize={3145728}
+                    onDrop={handleDrop}
+                  />
+                </div>
+                <div>
                 <LabelStyle>Images</LabelStyle>
                 <RHFUploadMultiFile
                   name="images"
@@ -194,6 +198,12 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                   onRemoveAll={handleRemoveAll}
                 />
               </div>
+              <div>
+                <LabelStyle>Description</LabelStyle>
+                <RHFEditor simple name="description" />
+              </div>
+
+          
             </Stack>
           </Card>
         </Grid>

@@ -20,14 +20,14 @@ type Props = {
   numSelected: number;
   filterName: string;
   onFilterName: (value: string) => void;
-  onDeleteUsers: VoidFunction;
+  onDeleteProducts: VoidFunction;
 };
 
-export default function UserListToolbar({
+export default function ProductCharToolbar({
   numSelected,
   filterName,
   onFilterName,
-  onDeleteUsers,
+  onDeleteProducts,
 }: Props) {
   const theme = useTheme();
   const isLight = theme.palette.mode === 'light';
@@ -49,8 +49,8 @@ export default function UserListToolbar({
         <InputStyle
           stretchStart={240}
           value={filterName}
-          onChange={(event:any) => onFilterName(event.target.value)}
-          placeholder="Search user..."
+          onChange={(event) => onFilterName(event.target.value)}
+          placeholder="Search product Characteristic ..."
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -66,7 +66,7 @@ export default function UserListToolbar({
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton onClick={onDeleteUsers}>
+          <IconButton onClick={onDeleteProducts}>
             <Iconify icon={'eva:trash-2-outline'} />
           </IconButton>
         </Tooltip>

@@ -25,7 +25,7 @@ const Loadable = (Component: ElementType) => (props: any) => {
   const { pathname } = useLocation();
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { isAuthenticated, } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const isDashboard = pathname.includes('/dashboard') && isAuthenticated;
   return (
@@ -63,22 +63,20 @@ export default function Router() {
           element: (
             <GuestGuard>
               <FindEmail />
-            </GuestGuard>)
-
+            </GuestGuard>
+          ),
         },
         {
           path: 'reset-password/:id/:token',
-          element: (
-            <ResetPassWord />
-          )
+          element: <ResetPassWord />,
         },
         {
           path: 'verify',
-          element:
-            (<VerifyGuard>
+          element: (
+            <VerifyGuard>
               <VerifyCode />
-            </VerifyGuard>)
-
+            </VerifyGuard>
+          ),
         },
       ],
     },
@@ -89,7 +87,7 @@ export default function Router() {
       element: (
         <AuthGuard>
           {/* <VerifyGuard>   */}
-          <RoleBasedGuard accessibleRoles={["ADMIN"]}>
+          <RoleBasedGuard accessibleRoles={['ADMIN']}>
             <DashboardLayout />
           </RoleBasedGuard>
           {/* </VerifyGuard> */}
@@ -111,6 +109,8 @@ export default function Router() {
             { path: 'product/:name', element: <EcommerceProductDetails /> },
             { path: 'list', element: <EcommerceProductList /> },
             { path: 'product/new', element: <EcommerceProductCreate /> },
+            { path: 'product/char/list', element: <ProductCharList /> },
+            { path: 'product/char/create', element: <ProductCharCreate /> },
             { path: 'product/:name/edit', element: <EcommerceProductCreate /> },
             { path: 'checkout', element: <EcommerceCheckout /> },
             { path: 'invoice', element: <EcommerceInvoice /> },
@@ -210,6 +210,12 @@ const EcommerceProductList = Loadable(
 );
 const EcommerceProductCreate = Loadable(
   lazy(() => import('../pages/dashboard/EcommerceProductCreate'))
+);
+const ProductCharList = Loadable(
+  lazy(() => import('../pages/dashboard/ProductCharList'))
+);
+const ProductCharCreate = Loadable(
+  lazy(() => import('../pages/dashboard/ProductCharCreate'))
 );
 const EcommerceCheckout = Loadable(lazy(() => import('../pages/dashboard/EcommerceCheckout')));
 const EcommerceInvoice = Loadable(lazy(() => import('../pages/dashboard/EcommerceInvoice')));
