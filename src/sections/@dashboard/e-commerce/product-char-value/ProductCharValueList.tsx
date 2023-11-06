@@ -1,5 +1,5 @@
 import { sentenceCase } from 'change-case';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { useTheme } from '@mui/material/styles';
@@ -27,7 +27,7 @@ import useSettings from '../../../../hooks/useSettings';
 // @types
 import { UserManager } from '../../../../@types/user';
 // _mock_
-// import { _productCharValueList } from '../../_mock';
+// import { _CharValues } from '../../_mock';
 // components
 import Page from '../../../../components/Page';
 import Label from '../../../../components/Label';
@@ -59,18 +59,11 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 
-export default function ProductCharValueList() {
-  const [openProper, setOpenProper] = useState<HTMLElement | null>(null);
-
-  const handleOpenProper = (event: React.MouseEvent<HTMLElement>) => {
-    console.log(productCharValue);
-    setOpenProper(event.currentTarget);
-  };
-
-  const handleCloseProper = () => {
-    setOpenProper(null);
-  };
-
+type Props = {
+  charValues: ProductCharValue[];
+  setCharValues: (productCharValues: any) => void;
+};
+export default function CharValues({setCharValues, charValues}: Props) {
   const ICON = {
     mr: 2,
     width: 20,
@@ -79,9 +72,7 @@ export default function ProductCharValueList() {
 
   const theme = useTheme();
 
-  const { themeStretch } = useSettings();
-
-  const [productCharValueList, setproductCharValueList] = useState<ProductCharValue[]>([]);
+  // const [CharValues, setCharValues] = useState<ProductCharValue[]>([]);
 
   const [productCharValue, setproductCharValue] = useState<ProductCharValue>({
     code: '',
@@ -102,15 +93,22 @@ export default function ProductCharValueList() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [open, setOpen] = useState<boolean>(false);
+  // useEffect(()=>{
+  //  setCharValues(charValues)
+   
+  // },[charValues, CharValues])
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
-    console.log('sdfsafds');
     setOpen(true);
-    setEdit(false)
+    setEdit(false);
+    setproductCharValue({
+      code: '',
+      id: null,
+      value: '',
+      status: true,
+    });
   };
   const handleClose = () => {
-    console.log('3');
-
     setOpen(false);
   };
 
@@ -122,7 +120,7 @@ export default function ProductCharValueList() {
 
   const handleSelectAllClick = (checked: boolean) => {
     if (checked) {
-      const newSelecteds = productCharValueList.map((n) => n.code);
+      const newSelecteds = charValues.map((n) => n.code);
       setSelected(newSelecteds);
       return;
     }
@@ -158,39 +156,40 @@ export default function ProductCharValueList() {
   };
 
   const handleDeleteProductCharValue = (code: string) => {
-    console.log('1');
-    const deleteProduct = productCharValueList.filter((charValue) => charValue.code !== code);
+    const deleteProduct = charValues.filter((charValue) => charValue.code !== code);
     setSelected([]);
-    setproductCharValueList(deleteProduct);
+    setCharValues(deleteProduct);
   };
 
   const handleDeleteProductsCharValues = (selected: string[]) => {
-    console.log('2');
-
-    const deleteProducts = productCharValueList.filter(
+    const deleteProducts = charValues.filter(
       (product) => !selected.includes(product.code)
     );
     setSelected([]);
-    setproductCharValueList(deleteProducts);
+    setCharValues(deleteProducts);
   };
-  const handleProductCharValueSubmit = (productCharValueCode: ProductCharValue) => {
-    console.log('4');
-    // Update the state in the parent component with the received data
-    setproductCharValueList((prevList) => [...prevList, productCharValueCode]);
+
+  const setProductCharValues = (productCharValueCodes: any) => {
+    setCharValues(productCharValueCodes);
+  };
+  const setProductCharValue = (productCharValueCodes: any) => {
+    setproductCharValue(productCharValueCodes);
   };
   const [isEdit, setEdit] = useState<boolean>(false);
   const handleProductCharValueEdit = (productCharValueCode: string) => {
-    const editCharValue = productCharValueList.filter((charValue) => charValue.code === productCharValueCode)[0];
+    const editCharValue = charValues.filter(
+      (charValue) => charValue.code === productCharValueCode
+    )[0];
     setproductCharValue(editCharValue);
-    setEdit(true)
+    setEdit(true);
     setOpen(true);
   };
 
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productCharValueList.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - CharValues.length) : 0;
 
   const filteredUsers = applySortFilter(
-    productCharValueList,
+    charValues,
     getComparator(order, orderBy),
     filterName
   );
@@ -208,12 +207,13 @@ export default function ProductCharValueList() {
         Create value characteristic
       </Button>
       <ProductCharValueDialog
+        setProductCharValues={setProductCharValues}
+        setProductCharValue={setProductCharValue}
         isEdit={isEdit}
         productCharValue={productCharValue}
-        productCharValues={productCharValueList}
+        productCharValues={charValues}
         isOpenCompose={open}
         onCloseCompose={handleClose}
-        onProductCharValueSubmit={handleProductCharValueSubmit}
       />
 
       <ProductCharValueToolbar
@@ -229,7 +229,7 @@ export default function ProductCharValueList() {
               order={order}
               orderBy={orderBy}
               headLabel={TABLE_HEAD}
-              rowCount={productCharValueList.length}
+              rowCount={CharValues.length}
               numSelected={selected.length}
               onRequestSort={handleRequestSort}
               onSelectAllClick={handleSelectAllClick}
@@ -269,19 +269,17 @@ export default function ProductCharValueList() {
                       </TableCell>
                       <TableCell align="center">
                         <Button
-                          onClick={()=> handleProductCharValueEdit(code)}
+                          onClick={() => handleProductCharValueEdit(code)}
                           startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
-                        >
-                        </Button>
+                        ></Button>
                       </TableCell>
                       <TableCell align="center">
-                        <Button sx={{ color: 'error.main' }}
-                              onClick={() => handleDeleteProductCharValue(code)}
+                        <Button
+                          sx={{ color: 'error.main' }}
+                          onClick={() => handleDeleteProductCharValue(code)}
                           startIcon={<Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />}
-                        >
-                        </Button>
+                        ></Button>
                       </TableCell>
-                    
                     </TableRow>
                   );
                 })}
@@ -307,7 +305,7 @@ export default function ProductCharValueList() {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={productCharValueList.length}
+        count={CharValues.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={(e, page) => setPage(page)}

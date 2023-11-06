@@ -30,7 +30,7 @@ export type ProductReview = {
 };
 
 export type ProductChar= {
-  id: number;
+  id: number|null;
   name: string;
   code: string;
   status: boolean;

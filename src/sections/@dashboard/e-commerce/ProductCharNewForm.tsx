@@ -23,7 +23,7 @@ import {
 // routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // @types
-import { Product } from '../../../@types/product';
+import { Product, ProductChar, ProductCharValue } from '../../../@types/product';
 // components
 import {
   FormProvider,
@@ -80,14 +80,16 @@ interface FormValuesProps  {
 
 type Props = {
   isEdit: boolean;
-  currentProduct?: Product;
+  productChar?: ProductChar;
 };
 
-export default function ProductCharcNewForm({ isEdit, currentProduct }: Props) {
+export default function ProductCharcNewForm({ isEdit, productChar }: Props) {
   const navigate = useNavigate();
-  
+  const [productCharValues, setproductCharValues] = useState<ProductCharValue[]>([]);
   const { enqueueSnackbar } = useSnackbar();
-
+  const setProductCharValues = (productCharValueCodes: any) => {
+    setproductCharValues(productCharValueCodes);
+};
   const NewProductSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     code: Yup.string().required('Description is required'),
@@ -95,27 +97,17 @@ export default function ProductCharcNewForm({ isEdit, currentProduct }: Props) {
 
   const defaultValues = useMemo(
     () => ({
-      name: currentProduct?.name || '',
-      description: currentProduct?.description || '',
-      images: currentProduct?.images || [],
-      code: currentProduct?.code || '',
-      sku: currentProduct?.sku || '',
-      price: currentProduct?.price || 0,
-      priceSale: currentProduct?.priceSale || 0,
-      tags: currentProduct?.tags || [TAGS_OPTION[0]],
-      inStock: true,
-      taxes: true,
-      gender: currentProduct?.gender || GENDER_OPTION[2],
-      category: currentProduct?.category || CATEGORY_OPTION[0].classify[1],
+      name: productChar?.name || '', 
+      code: productChar?.code || '',
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentProduct]
+    [productChar]
   );
 
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(NewProductSchema),
     defaultValues,
   });
+  
 
   const {
     reset,
@@ -130,17 +122,18 @@ export default function ProductCharcNewForm({ isEdit, currentProduct }: Props) {
   const values = watch();
 
   useEffect(() => {
-    if (isEdit && currentProduct) {
+    if (isEdit && productChar) {
       reset(defaultValues);
     }
     if (!isEdit) {
       reset(defaultValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEdit, currentProduct]);
+  }, [isEdit, productChar]);
 
   const onSubmit2 = async (data: FormValuesProps) => {
     try {
+      console.log(productCharValues)
       // await new Promise((resolve) => setTimeout(resolve, 500));
       // reset();
       // enqueueSnackbar(!isEdit ? 'Create success!' : 'Update success!');
@@ -175,7 +168,8 @@ export default function ProductCharcNewForm({ isEdit, currentProduct }: Props) {
             </RHFSelect>
         
           </Box>
-          <ProductCharValueList ></ProductCharValueList>   
+          <ProductCharValueList setCharValues = {setProductCharValues} charValues  = {productCharValues }
+            ></ProductCharValueList>   
           <Stack alignItems="flex-end" sx={{ mt: 3 }}>
             <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
               {!isEdit ? 'Create product characteristic' : 'Save Changes'}

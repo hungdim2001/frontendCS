@@ -63,77 +63,88 @@ interface productCharValueForm {
 type Props = {
   isOpenCompose: boolean;
   onCloseCompose: VoidFunction;
-  onProductCharValueSubmit: (productCharValue: ProductCharValue) => void;
   productCharValues: ProductCharValue[];
   productCharValue: ProductCharValue;
   isEdit: boolean;
+  setProductCharValues: (productCharValues: any) => void;
+  setProductCharValue: (productCharValues: any) => void;
 };
 
 export default function ProductCharValueDialog({
   isOpenCompose,
   onCloseCompose,
-  onProductCharValueSubmit,
   productCharValues,
   productCharValue,
   isEdit,
+  setProductCharValue,
+  setProductCharValues,
 }: Props) {
   const defaultValues = {
     codeCharValue: productCharValue?.code || '',
     valueCharValue: productCharValue?.value || '',
-    statusCharValue: productCharValue?.status ? 'active' : 'inactive' || 'active',
+    statusCharValue: productCharValue
+      ? productCharValue.status
+        ? 'Active'
+        : 'InActive'
+      : 'Active',
   };
 
   const productcharValueSchema = Yup.object().shape({
     valueCharValue: Yup.string().required('Value is required'),
     codeCharValue: Yup.string().required('Code is required'),
+    statusCharValue: Yup.string().required('Status is required'),
   });
 
   const childMethod = useForm<productCharValueForm>({
     resolver: yupResolver(productcharValueSchema),
     defaultValues,
   });
-  let oldProductCharValue: ProductCharValue|null;
   const isMountedRef = useIsMountedRef();
   useEffect(() => {
     if (isEdit && productCharValue) {
-      oldProductCharValue = {
-        ...productCharValue,
-      };
+        reset(defaultValues);
+        setValue("statusCharValue", defaultValues.statusCharValue, { shouldValidate: true });
 
-      reset(defaultValues);
-      console.log('defproductCharValueault');
     }
     if (!isEdit) {
-      reset(defaultValues);
-      console.log('defalu');
+        reset(defaultValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEdit, productCharValue]);
+}, [isEdit, productCharValue,productCharValue]);
   const {
-    resetField,
     reset,
-    getValues,
     setValue,
-    register,
     setError,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = childMethod;
 
   const handleChildFormSubmit = async (data: productCharValueForm) => {
     try {
-        console.log(oldProductCharValue)
-      // validate code unique backedng
+      // validate code unique
       // Check if the data.codeCharValue is unique
       if (isEdit) {
         const isCodeUnique = !productCharValues.some(
-          (productCharValue) =>
-            productCharValue.code === data.codeCharValue &&
-            productCharValue.code === oldProductCharValue?.code
+          (charValue) =>
+            charValue.code === data.codeCharValue && data.codeCharValue !== productCharValue?.code
         );
         if (!isCodeUnique) {
           throw new Error('Code is not unique');
         }
+
+        const deleteProductCharValues = productCharValues.filter((charValue) => {
+          return charValue.code !== productCharValue?.code;
+        });
+
+        const newProductCharValue: ProductCharValue = {
+          id: null,
+          code: data.codeCharValue,
+          value: data.valueCharValue,
+          status: data.statusCharValue === 'Active' ? true : false,
+        };
+        setProductCharValue(newProductCharValue);
+        const newProductCharValues = [...deleteProductCharValues, newProductCharValue];
+        setProductCharValues(newProductCharValues);
       } else {
         const isCodeUnique = !productCharValues.some(
           (productCharValue) => productCharValue.code === data.codeCharValue
@@ -142,23 +153,28 @@ export default function ProductCharValueDialog({
           throw new Error('Code is not unique');
         }
         const newProductCharValue: ProductCharValue = {
-            ...productCharValue,
-            code: data.codeCharValue,
-            value: data.valueCharValue,
-            status: data.statusCharValue === 'active' ? true : false,
-          };
-       
-          onProductCharValueSubmit(newProductCharValue);
+          id: null,
+          code: data.codeCharValue,
+          value: data.valueCharValue,
+          status: data.statusCharValue === 'Active' ? true : false,
+        };
+        const newProductCharValues = [...productCharValues, newProductCharValue];
+        setProductCharValues(newProductCharValues);
       }
-     
       reset();
-      oldProductCharValue= null;
     } catch (error) {
       console.log(error);
       if (isMountedRef.current) {
         setError('afterSubmit', { type: 'custom', message: error.message });
       }
     }
+  };
+
+  type Field = 'statusCharValue';
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, field: Field) => {
+    const selectedValue = e.target.value;
+    setValue(field, selectedValue, { shouldValidate: true });
   };
 
   const handleCreateButtonClick = () => {
@@ -198,7 +214,7 @@ export default function ProductCharValueDialog({
             alignItems: 'center',
           }}
         >
-          <Typography variant="h6">Create value characteristic</Typography>
+        <Typography variant="h6">{!isEdit ?'Create value characteristic': 'Edit value characteristic' }</Typography>
           <Box sx={{ flexGrow: 1 }} />
           <IconButton onClick={handleClose}>
             <Iconify icon={'eva:close-fill'} width={20} height={20} />
@@ -220,16 +236,18 @@ export default function ProductCharValueDialog({
               >
                 <RHFTextField name="codeCharValue" label="Code" />
                 <RHFTextField name="valueCharValue" label="Value" />
-                <RHFSelect name="statusCharValue" label="Status">
+                <RHFSelect name="statusCharValue" label="Status" 
+                  onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'statusCharValue')}
+                >
                   <option>Active</option>
-                  <option>Inactive</option>
+                  <option>InActive</option>
                 </RHFSelect>
               </Box>
             </Grid>
           </Grid>
           <Stack alignItems="center" sx={{ mt: 3, mb: 3 }}>
             <Button type="button" variant="contained" onClick={handleCreateButtonClick}>
-              Create
+            {!isEdit ?'Create': 'Update' }
             </Button>
           </Stack>
         </FormProvider>
