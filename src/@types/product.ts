@@ -1,4 +1,5 @@
-// ----------------------------------------------------------------------
+
+import {BaseDTO} from "./common";
 
 export type PaymentType = 'paypal' | 'credit_card' | 'cash';
 
@@ -29,19 +30,15 @@ export type ProductReview = {
   postedAt: Date | string | number;
 };
 
-export type ProductChar= {
-  id: number|null;
+export type ProductChar = BaseDTO & {
   name: string;
   code: string;
-  status: boolean;
-  productCharValues: ProductCharValue[]|null;
+  productSpecCharValueDTOS: ProductCharValue[]|null;
 };
 
-export type ProductCharValue= {
-  id: number|null;
+export type ProductCharValue  = BaseDTO &{
   code: string;
   value: string;
-  status: boolean;
 };
 export type Product = {
   id: string;

@@ -1,50 +1,24 @@
-import { sentenceCase } from 'change-case';
-import { useEffect, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+
+import {sentenceCase} from 'change-case';
+import {useState} from 'react';
 // @mui
-import { useTheme } from '@mui/material/styles';
-import {
-  Card,
-  Table,
-  Avatar,
-  Button,
-  Checkbox,
-  TableRow,
-  TableBody,
-  TableCell,
-  Container,
-  Typography,
-  TableContainer,
-  TablePagination,
-  Box,
-  MenuItem,
-  IconButton,
-} from '@mui/material';
+import {useTheme} from '@mui/material/styles';
+import {Button, Checkbox, Table, TableBody, TableCell, TableContainer, TablePagination, TableRow,} from '@mui/material';
 // routes
-import { PATH_DASHBOARD } from '../../../../routes/paths';
 // hooks
-import useSettings from '../../../../hooks/useSettings';
 // @types
-import { UserManager } from '../../../../@types/user';
 // _mock_
 // import { _CharValues } from '../../_mock';
 // components
-import Page from '../../../../components/Page';
 import Label from '../../../../components/Label';
 import Iconify from '../../../../components/Iconify';
 import Scrollbar from '../../../../components/Scrollbar';
 import SearchNotFound from '../../../../components/SearchNotFound';
-import HeaderBreadcrumbs from '../../../../components/HeaderBreadcrumbs';
 // sections
-import { ProductChar, ProductCharValue } from 'src/@types/product';
-import ProductCharToolbar from 'src/sections/@dashboard/e-commerce/product-char/ProductCharToolbar';
+import {ProductCharValue} from 'src/@types/product';
 import ProductCharValueToolbar from './ProductCharValueToolbar';
 import ProductCharValueHead from './ProductCharValueHead';
-import MenuPopover from 'src/components/MenuPopover';
 import ProductCharValueDialog from './ProductCharValueDialog';
-import UserMoreMenu from '../../user/list/UserMoreMenu';
-import ProductCharValueMoreMenu from './ProductCharValueMoreMenu';
-import { boolean } from 'yup';
 
 // ----------------------------------------------------------------------
 
@@ -52,6 +26,7 @@ const TABLE_HEAD = [
   { id: 'id', label: 'ID', alignRight: false },
   { id: 'code', label: 'Code', alignRight: false },
   { id: 'value', label: 'Value', alignRight: false },
+  { id: 'description', label: 'Description', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
   { id: 'Edit' },
   { id: 'Delete' },
@@ -63,7 +38,7 @@ type Props = {
   charValues: ProductCharValue[];
   setCharValues: (productCharValues: any) => void;
 };
-export default function CharValues({setCharValues, charValues}: Props) {
+export default function CharValues({setCharValues, charValues }: Props) {
   const ICON = {
     mr: 2,
     width: 20,
@@ -74,12 +49,13 @@ export default function CharValues({setCharValues, charValues}: Props) {
 
   // const [CharValues, setCharValues] = useState<ProductCharValue[]>([]);
 
-  const [productCharValue, setproductCharValue] = useState<ProductCharValue>({
-    code: '',
-    id: null,
-    value: '',
-    status: true,
-  });
+  const [productCharValue, setproductCharValue] = useState<ProductCharValue>({status:true} as ProductCharValue);
+  // {
+  //   code: '',
+  //       id: null,
+  //     value: '',
+  //     status: true,
+  // }
 
   const [page, setPage] = useState(0);
 
@@ -101,12 +77,7 @@ export default function CharValues({setCharValues, charValues}: Props) {
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setOpen(true);
     setEdit(false);
-    setproductCharValue({
-      code: '',
-      id: null,
-      value: '',
-      status: true,
-    });
+    setproductCharValue({status:true} as ProductCharValue);
   };
   const handleClose = () => {
     setOpen(false);
@@ -238,7 +209,7 @@ export default function CharValues({setCharValues, charValues}: Props) {
               {filteredUsers
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
-                  const { id, code, value, status } = row;
+                  const { id, code, value, status,description } = row;
                   const isItemSelected = selected.indexOf(code) !== -1;
                   // function handleDeleteProductCharValue(code: string|null) {
                   //   throw new Error('Function not implemented.');
@@ -259,6 +230,8 @@ export default function CharValues({setCharValues, charValues}: Props) {
                       <TableCell align="left">{id}</TableCell>
                       <TableCell align="left">{code}</TableCell>
                       <TableCell align="left">{value}</TableCell>
+                      <TableCell align="left">{description}</TableCell>
+
                       <TableCell align="left">
                         <Label
                           variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}

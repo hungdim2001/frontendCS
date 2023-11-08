@@ -1,3 +1,4 @@
+
 import { UserCredential } from 'firebase/auth';
 import { OrNull } from './common';
 import { UserAccount } from './user';

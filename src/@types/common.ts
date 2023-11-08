@@ -1,3 +1,4 @@
+
 export type Anonymous = Record<string | number, any>;
 
 export type ActionMap<Payload extends { [index: string]: any }> = {
@@ -38,3 +39,13 @@ export type PaginatedData<T> = {
   page: number;
   content: Array<OrNull<T>>;
 };
+
+export type BaseDTO ={
+    id: number|null;
+    createDatetime:Date|null;
+    updateDatetime:Date|null;
+    createUser:number|null;
+    updateUser:number|null;
+    status:boolean|null;
+    description:string|null;
+}
