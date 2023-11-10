@@ -1,5 +1,5 @@
 import { sentenceCase } from 'change-case';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { useTheme } from '@mui/material/styles';
@@ -37,6 +37,7 @@ import HeaderBreadcrumbs from '../../components/HeaderBreadcrumbs';
 import { ProductChar } from 'src/@types/product';
 import ProductCharToolbar from 'src/sections/@dashboard/e-commerce/product-char/ProductCharToolbar';
 import ProductCharListHead from 'src/sections/@dashboard/e-commerce/product-char/ProductCharListHead';
+import { productSpecCharApi } from 'src/service/app-apis/product-char';
 
 // ----------------------------------------------------------------------
 
@@ -44,8 +45,10 @@ const TABLE_HEAD = [
   { id: 'id', label: 'ID', alignRight: false },
   { id: 'name', label: 'Name', alignRight: false },
   { id: 'code', label: 'Code', alignRight: false },
+  { id: 'description', label: 'Description', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
-  { id: '' },
+  { id: 'update' },
+  { id: 'delete' },
 ];
 
 // ----------------------------------------------------------------------
@@ -76,6 +79,17 @@ export default function ProductCharList() {
     setOrderBy(property);
   };
 
+  useEffect(() => {
+    (async () => {
+      console.log('effect1');
+      try {
+        const initData = await productSpecCharApi.getProductSpecChars();
+        console.log(initData)
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, []);
   const handleSelectAllClick = (checked: boolean) => {
     if (checked) {
       const newSelecteds = productCharList.map((n) => n.name);

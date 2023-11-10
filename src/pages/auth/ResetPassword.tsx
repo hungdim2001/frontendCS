@@ -34,7 +34,7 @@ export default function ResetPassword() {
             <Typography variant="h3" paragraph>
              Lấy lại mật khẩu
             </Typography>
-            <ResetPasswordForm></ResetPasswordForm>
+            <ResetPasswordForm />
 
           </Box>
         </Container>

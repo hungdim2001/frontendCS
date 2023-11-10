@@ -1,5 +1,5 @@
 
-import {BaseDTO} from "./common";
+import { BaseDTO } from "./common";
 
 export type PaymentType = 'paypal' | 'credit_card' | 'cash';
 

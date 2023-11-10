@@ -1,8 +1,8 @@
 
 import * as Yup from 'yup';
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 // @mui
-import {styled} from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import {
     Box,
     Input,
@@ -19,20 +19,20 @@ import {
 } from '@mui/material';
 import useResponsive from 'src/hooks/useResponsive';
 import Iconify from 'src/components/Iconify';
-import {FormProvider, RHFSelect, RHFTextField} from 'src/components/hook-form';
-import {LoadingButton} from '@mui/lab';
-import {useForm} from 'react-hook-form';
-import {ProductCharValue} from 'src/@types/product';
-import {yupResolver} from '@hookform/resolvers/yup';
+import { FormProvider, RHFSelect, RHFTextField } from 'src/components/hook-form';
+import { LoadingButton } from '@mui/lab';
+import { useForm } from 'react-hook-form';
+import { ProductCharValue } from 'src/@types/product';
+import { yupResolver } from '@hookform/resolvers/yup';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
-import {productSpecCharApi} from "../../../../service/app-apis/product-char";
+import { productSpecCharApi } from "../../../../service/app-apis/product-char";
 import useAuth from "../../../../hooks/useAuth";
 // hooks
 // components
 
 // ----------------------------------------------------------------------
 
-const RootStyle = styled('div')(({theme}) => ({
+const RootStyle = styled('div')(({ theme }) => ({
     // margin: 'auto',
     top: '50%',
     left: '50%',
@@ -50,7 +50,7 @@ const RootStyle = styled('div')(({theme}) => ({
     backgroundColor: theme.palette.background.paper,
 }));
 
-const InputStyle = styled(Input)(({theme}) => ({
+const InputStyle = styled(Input)(({ theme }) => ({
     padding: theme.spacing(0.5, 3),
     borderBottom: `solid 1px ${theme.palette.divider}`,
 }));
@@ -94,7 +94,7 @@ export default function ProductCharValueDialog({
         descriptionCharValue:productCharValue?.description||'',
     };
 
-    const {user} = useAuth();
+    const { user } = useAuth();
 
     const productcharValueSchema = Yup.object().shape({
         valueCharValue: Yup.string().required('Value is required'),
@@ -110,7 +110,7 @@ export default function ProductCharValueDialog({
     useEffect(() => {
         if (isEdit && productCharValue) {
             reset(defaultValues);
-            setValue("statusCharValue", defaultValues.statusCharValue, {shouldValidate: true});
+            setValue("statusCharValue", defaultValues.statusCharValue, { shouldValidate: true });
 
         }
         if (!isEdit) {
@@ -123,7 +123,7 @@ export default function ProductCharValueDialog({
         setValue,
         setError,
         handleSubmit,
-        formState: {errors},
+        formState: { errors },
     } = childMethod;
 
     const handleChildFormSubmit = async (data: productCharValueForm) => {
@@ -143,9 +143,7 @@ export default function ProductCharValueDialog({
                     throw new Error('Code is not unique');
                 }
 
-                const deleteProductCharValues = productCharValues.filter((charValue) => {
-                    return charValue.code !== productCharValue?.code;
-                });
+                const deleteProductCharValues = productCharValues.filter((charValue) => charValue.code !== productCharValue?.code);
 
                 const newProductCharValue: ProductCharValue = {
                     ...productCharValue,
@@ -185,7 +183,7 @@ export default function ProductCharValueDialog({
         } catch (error) {
             console.log(error);
             if (isMountedRef.current) {
-                setError('afterSubmit', {type: 'custom', message: error.message});
+                setError('afterSubmit', { type: 'custom', message: error.message });
             }
         }
     };
@@ -194,7 +192,7 @@ export default function ProductCharValueDialog({
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>, field: Field) => {
         const selectedValue = e.target.value;
-        setValue(field, selectedValue, {shouldValidate: true});
+        setValue(field, selectedValue, { shouldValidate: true });
     };
 
     const handleCreateButtonClick = () => {
@@ -209,7 +207,7 @@ export default function ProductCharValueDialog({
     }
     return (
         <Portal>
-            <Backdrop open={true} sx={{zIndex: 1998}}/>
+            <Backdrop open={true} sx={{ zIndex: 1998 }}/>
             <RootStyle
                 sx={{
                     ...{
@@ -236,7 +234,7 @@ export default function ProductCharValueDialog({
                 >
                     <Typography
                         variant="h6">{!isEdit ? 'Create value characteristic' : 'Edit value characteristic'}</Typography>
-                    <Box sx={{flexGrow: 1}}/>
+                    <Box sx={{ flexGrow: 1 }}/>
                     <IconButton onClick={handleClose}>
                         <Iconify icon={'eva:close-fill'} width={20} height={20}/>
                     </IconButton>
@@ -252,7 +250,7 @@ export default function ProductCharValueDialog({
 
                                     columnGap: 3,
                                     rowGap: 3,
-                                    gridTemplateColumns: {xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)'},
+                                    gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
                                 }}
                             >
                                 <RHFTextField name="codeCharValue" label="Code"/>
@@ -267,7 +265,7 @@ export default function ProductCharValueDialog({
                             </Box>
                         </Grid>
                     </Grid>
-                    <Stack alignItems="center" sx={{mt: 3, mb: 3}}>
+                    <Stack alignItems="center" sx={{ mt: 3, mb: 3 }}>
                         <Button type="button" variant="contained" onClick={handleCreateButtonClick}>
                             {!isEdit ? 'Create' : 'Update'}
                         </Button>

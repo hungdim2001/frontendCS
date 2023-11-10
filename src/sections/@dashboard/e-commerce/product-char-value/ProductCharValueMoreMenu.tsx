@@ -33,7 +33,7 @@ type Props = {
   handOpen: (event: React.MouseEvent<HTMLElement>) => void; // Add the handOpen prop
 };
 
-export default function ProductCharValueMoreMenu({ onDelete, productCharValueCode,  handOpen}: Props) {
+export default function ProductCharValueMoreMenu({ onDelete, productCharValueCode,  handOpen }: Props) {
   const [open, setOpen] = useState<HTMLElement | null>(null);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {

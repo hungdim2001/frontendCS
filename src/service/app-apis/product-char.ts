@@ -8,10 +8,11 @@ const checkDuplicateCode = (code: string) =>
     productSpecCharValuedIns.post<boolean>(`/${code}`);
 const createProductSpecChar  =(productSpecChars: ProductChar)=>
     productSpecCharIns.post<ProductChar>('', productSpecChars)
-
+const getProductSpecChars  =()=>
+    productSpecCharIns.get<ProductChar[]>('')
 
 const productSpecCharApi = {
-    checkDuplicateCode,createProductSpecChar
+    checkDuplicateCode,createProductSpecChar,getProductSpecChars
 }
 
 Object.freeze(productSpecCharApi);

@@ -19,7 +19,7 @@ const useCurrentRole = () => {
 
 export default function RoleBasedGuard({ accessibleRoles, children }: RoleBasedGuardProp) {
   const { enqueueSnackbar } = useSnackbar();
-  const {logout} = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const currentRole = useCurrentRole();
   if (!accessibleRoles.includes(currentRole)) {

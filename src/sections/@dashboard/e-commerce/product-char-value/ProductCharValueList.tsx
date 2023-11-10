@@ -1,9 +1,9 @@
 
-import {sentenceCase} from 'change-case';
-import {useState} from 'react';
+import { sentenceCase } from 'change-case';
+import { useState } from 'react';
 // @mui
-import {useTheme} from '@mui/material/styles';
-import {Button, Checkbox, Table, TableBody, TableCell, TableContainer, TablePagination, TableRow,} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { Button, Checkbox, Table, TableBody, TableCell, TableContainer, TablePagination, TableRow, } from '@mui/material';
 // routes
 // hooks
 // @types
@@ -15,7 +15,7 @@ import Iconify from '../../../../components/Iconify';
 import Scrollbar from '../../../../components/Scrollbar';
 import SearchNotFound from '../../../../components/SearchNotFound';
 // sections
-import {ProductCharValue} from 'src/@types/product';
+import { ProductCharValue } from 'src/@types/product';
 import ProductCharValueToolbar from './ProductCharValueToolbar';
 import ProductCharValueHead from './ProductCharValueHead';
 import ProductCharValueDialog from './ProductCharValueDialog';
@@ -38,7 +38,7 @@ type Props = {
   charValues: ProductCharValue[];
   setCharValues: (productCharValues: any) => void;
 };
-export default function CharValues({setCharValues, charValues }: Props) {
+export default function CharValues({ setCharValues, charValues }: Props) {
   const ICON = {
     mr: 2,
     width: 20,
@@ -49,7 +49,7 @@ export default function CharValues({setCharValues, charValues }: Props) {
 
   // const [CharValues, setCharValues] = useState<ProductCharValue[]>([]);
 
-  const [productCharValue, setproductCharValue] = useState<ProductCharValue>({status:true} as ProductCharValue);
+  const [productCharValue, setproductCharValue] = useState<ProductCharValue>({ status:true } as ProductCharValue);
   // {
   //   code: '',
   //       id: null,
@@ -77,7 +77,7 @@ export default function CharValues({setCharValues, charValues }: Props) {
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setOpen(true);
     setEdit(false);
-    setproductCharValue({status:true} as ProductCharValue);
+    setproductCharValue({ status:true } as ProductCharValue);
   };
   const handleClose = () => {
     setOpen(false);
@@ -244,14 +244,14 @@ export default function CharValues({setCharValues, charValues }: Props) {
                         <Button
                           onClick={() => handleProductCharValueEdit(code)}
                           startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
-                        ></Button>
+                         />
                       </TableCell>
                       <TableCell align="center">
                         <Button
                           sx={{ color: 'error.main' }}
                           onClick={() => handleDeleteProductCharValue(code)}
                           startIcon={<Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />}
-                        ></Button>
+                         />
                       </TableCell>
                     </TableRow>
                   );

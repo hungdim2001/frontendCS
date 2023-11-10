@@ -10,7 +10,7 @@ import { PATH_AUTH } from '../../routes/paths';
 import Page from '../../components/Page';
 import Iconify from '../../components/Iconify';
 // sections
-import {BackVerifyFromButton, VerifyCodeForm } from '../../sections/auth/verify-code';
+import { BackVerifyFromButton, VerifyCodeForm } from '../../sections/auth/verify-code';
 import ReSendCodeButton from 'src/sections/auth/verify-code/ReSendCodeButton';
 
 // ----------------------------------------------------------------------

@@ -1,22 +1,22 @@
 
 import * as Yup from 'yup';
-import {useSnackbar} from 'notistack';
-import {useNavigate} from 'react-router-dom';
-import {useEffect, useMemo, useState} from 'react';
+import { useSnackbar } from 'notistack';
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
 // form
-import {useForm} from 'react-hook-form';
-import {yupResolver} from '@hookform/resolvers/yup';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
-import {LoadingButton} from '@mui/lab';
-import {Alert, Box, Card, Grid, Stack,} from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { Alert, Box, Card, Grid, Stack, } from '@mui/material';
 // routes
 // @types
-import {ProductChar, ProductCharValue} from '../../../@types/product';
+import { ProductChar, ProductCharValue } from '../../../@types/product';
 // components
-import {FormProvider, RHFSelect, RHFTextField,} from '../../../components/hook-form';
+import { FormProvider, RHFSelect, RHFTextField, } from '../../../components/hook-form';
 import ProductCharValueList from './product-char-value/ProductCharValueList';
 import useAuth from "../../../hooks/useAuth";
-import {productSpecCharApi} from "../../../service/app-apis/product-char";
+import { productSpecCharApi } from "../../../service/app-apis/product-char";
 import useIsMountedRef from "../../../hooks/useIsMountedRef";
 
 // ----------------------------------------------------------------------
@@ -36,11 +36,11 @@ type Props = {
     productChar?: ProductChar;
 };
 
-export default function ProductCharNewForm({isEdit, productChar}: Props) {
+export default function ProductCharNewForm({ isEdit, productChar }: Props) {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [productCharValues, setproductCharValues] = useState<ProductCharValue[]>([]);
-    const {enqueueSnackbar} = useSnackbar();
+    const { enqueueSnackbar } = useSnackbar();
     const setProductCharValues = (productCharValueCodes: any) => {
         setproductCharValues(productCharValueCodes);
     };
@@ -69,7 +69,7 @@ export default function ProductCharNewForm({isEdit, productChar}: Props) {
         watch,
         setError,
         handleSubmit,
-        formState: {errors, isSubmitting},
+        formState: { errors, isSubmitting },
     } = methods;
 
     const values = watch();
@@ -111,7 +111,7 @@ export default function ProductCharNewForm({isEdit, productChar}: Props) {
         } catch (error) {
             console.log(error)
             if (isMountedRef.current) {
-                setError('afterSubmit', {type: 'custom', message: error.message});
+                setError('afterSubmit', { type: 'custom', message: error.message });
             }
         }
     };
@@ -121,13 +121,13 @@ export default function ProductCharNewForm({isEdit, productChar}: Props) {
             {!!errors.afterSubmit && <Alert severity="error">{errors.afterSubmit.message}</Alert>}
             <Grid container spacing={3}>
                 <Grid item xs={12} md={12}>
-                    <Card sx={{p: 3}}>
+                    <Card sx={{ p: 3 }}>
                         <Box
                             sx={{
                                 display: 'grid',
                                 columnGap: 3,
                                 rowGap: 3,
-                                gridTemplateColumns: {xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)'},
+                                gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
                             }}
                         >
                             <RHFTextField name="name" label="Name"/>
@@ -145,7 +145,7 @@ export default function ProductCharNewForm({isEdit, productChar}: Props) {
                         </Box>
                         <ProductCharValueList setCharValues={setProductCharValues} charValues={productCharValues}
                         />
-                        <Stack alignItems="flex-end" sx={{mt: 3}}>
+                        <Stack alignItems="flex-end" sx={{ mt: 3 }}>
                             <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
                                 {!isEdit ? 'Create product characteristic' : 'Save Changes'}
                             </LoadingButton>

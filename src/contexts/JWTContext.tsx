@@ -231,18 +231,19 @@ function AuthProvider({ children }: AuthProviderProps) {
 
   };
 
-  const register = async (email: string,
+  const register = async (
+    id: number|null,
+    email: string,
     phone: string,
     areaCode: string,
     role:string,
     password: string,
     firstName: string,
     lastName: string) => {
-    const response = await authApi.register({
+    const response = await authApi.register({ id,
       email, phone,
       areaCode, role,password, firstName
-      , lastName,
-
+      , lastName
     })
     await login(email, password, response);
     dispatch({

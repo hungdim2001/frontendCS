@@ -13,7 +13,7 @@ type GuestGuardProps = {
 };
 
 export default function GuestGuard({ children }: GuestGuardProps) {
-  const { isAuthenticated, user, isInitialized} = useAuth();
+  const { isAuthenticated, user, isInitialized } = useAuth();
 console.log("isAuthen: " +isAuthenticated)
 console.log("active:" +user)
   if (!isInitialized) {
