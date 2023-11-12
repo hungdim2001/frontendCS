@@ -38,6 +38,9 @@ import { ProductChar } from 'src/@types/product';
 import ProductCharToolbar from 'src/sections/@dashboard/e-commerce/product-char/ProductCharToolbar';
 import ProductCharListHead from 'src/sections/@dashboard/e-commerce/product-char/ProductCharListHead';
 import { productSpecCharApi } from 'src/service/app-apis/product-char';
+import { useDispatch, useSelector } from '../../redux/store';
+
+import { deleteProductChars, getProductChars } from 'src/redux/slices/product-char';
 
 // ----------------------------------------------------------------------
 
@@ -45,8 +48,8 @@ const TABLE_HEAD = [
   { id: 'id', label: 'ID', alignRight: false },
   { id: 'name', label: 'Name', alignRight: false },
   { id: 'code', label: 'Code', alignRight: false },
-  { id: 'description', label: 'Description', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
+  { id: 'description', label: 'Description', alignRight: false },
   { id: 'update' },
   { id: 'delete' },
 ];
@@ -54,13 +57,20 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 export default function ProductCharList() {
+  const ICON = {
+    mr: 2,
+    width: 20,
+    height: 20,
+  };
+
   const theme = useTheme();
 
   const { themeStretch } = useSettings();
 
   const [productCharList, setProductCharList] = useState<ProductChar[]>([]);
+  const { productChars } = useSelector((state) => state.productChars);
 
-
+  const dispatch = useDispatch();
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
@@ -80,16 +90,15 @@ export default function ProductCharList() {
   };
 
   useEffect(() => {
-    (async () => {
-      console.log('effect1');
-      try {
-        const initData = await productSpecCharApi.getProductSpecChars();
-        console.log(initData)
-      } catch (error) {
-        console.log(error);
-      }
-    })();
-  }, []);
+    dispatch(getProductChars());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (productChars.length) {
+      setProductCharList(productChars);
+    }
+  }, [productChars]);
+
   const handleSelectAllClick = (checked: boolean) => {
     if (checked) {
       const newSelecteds = productCharList.map((n) => n.name);
@@ -127,10 +136,14 @@ export default function ProductCharList() {
     setPage(0);
   };
 
-  const handleDeleteProductChar = (id: number) => {
-    const deleteProduct = productCharList.filter((product) => product.id !== id);
-    setSelected([]);
-    setProductCharList(deleteProduct);
+  const handleDeleteProductChar = (id: number | null) => {
+    if (id) {
+      const ids = [id];
+      dispatch(deleteProductChars(ids));
+      // const deleteProduct = productCharList.filter((product) => product.id !== id);
+      // setSelected([]);
+      // setProductCharList(deleteProduct);
+    }
   };
 
   const handleDeleteProducts = (selected: string[]) => {
@@ -138,6 +151,11 @@ export default function ProductCharList() {
     // setSelected([]);
     // setProductCharList(deleteProducts);
   };
+  // const handleDeleteProductCha= (id: number|null) => {
+  //   // const deleteProduct = charValues.filter((charValue) => charValue.code !== code);
+  //   // setSelected([]);
+  //   // setCharValues(deleteProduct);
+  // };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productCharList.length) : 0;
 
@@ -169,8 +187,6 @@ export default function ProductCharList() {
         {/* <ProductCharacteristicNewForm isEdit={false}/> */}
 
         <Card>
-
-          
           <ProductCharToolbar
             numSelected={selected.length}
             filterName={filterName}
@@ -194,7 +210,7 @@ export default function ProductCharList() {
                   {filteredUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row) => {
-                      const { id, name, code, status } = row;
+                      const { id, name, code, status, description } = row;
                       const isItemSelected = selected.indexOf(name) !== -1;
 
                       return (
@@ -211,18 +227,29 @@ export default function ProductCharList() {
                           </TableCell>
                           <TableCell align="left">{id}</TableCell>
                           <TableCell align="left">{name}</TableCell>
-                          <TableCell align="left">{code ? 'Yes' : 'No'}</TableCell>
+                          <TableCell align="left">{code}</TableCell>
                           <TableCell align="left">
                             <Label
                               variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
                               color={(status === false && 'error') || 'success'}
                             >
-                              {sentenceCase(status === true?'active': 'inactive')}
+                              {sentenceCase(status === true ? 'active' : 'inactive')}
                             </Label>
                           </TableCell>
+                          <TableCell align="left">{description}</TableCell>
 
-                          <TableCell align="right">
-                            {/* <UserMoreMenu onDelete={() => handleDeleteUser(id)} userName={name} /> */}
+                          <TableCell align="center">
+                            <Button
+                              onClick={() => handleDeleteProductChar(id)}
+                              startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            <Button
+                              sx={{ color: 'error.main' }}
+                              onClick={() => handleDeleteProductChar(id)}
+                              startIcon={<Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />}
+                            />
                           </TableCell>
                         </TableRow>
                       );

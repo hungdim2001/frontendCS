@@ -35,6 +35,10 @@ export type ProductChar = BaseDTO & {
   code: string;
   productSpecCharValueDTOS: ProductCharValue[]|null;
 };
+export type ProductCharState  = {
+  productChars :ProductChar[]|[]
+};
+
 
 export type ProductCharValue  = BaseDTO &{
   code: string;
@@ -85,6 +89,7 @@ export type BillingAddress = {
   addressType: string;
   isDefault: boolean;
 };
+
 
 export type ProductState = {
   isLoading: boolean;
