@@ -17,6 +17,7 @@ import ProductCharValueList from './product-char-value/ProductCharValueList';
 import useAuth from '../../../hooks/useAuth';
 import { productSpecCharApi } from '../../../service/app-apis/product-char';
 import useIsMountedRef from '../../../hooks/useIsMountedRef';
+import { useDispatch, useSelector } from 'react-redux';
 
 // ----------------------------------------------------------------------
 
@@ -38,6 +39,7 @@ type Props = {
 export default function ProductCharNewForm({ isEdit, productChar }: Props) {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [productCharValues, setproductCharValues] = useState<ProductCharValue[]>([]);
   const { enqueueSnackbar } = useSnackbar();
   const setProductCharValues = (productCharValueCodes: any) => {
@@ -47,12 +49,11 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
     name: Yup.string().required('Name is required'),
     code: Yup.string().required('Description is required'),
   });
-
   const defaultValues = useMemo(
     () => ({
       name: productChar?.name || '',
       code: productChar?.code || '',
-      status: productChar
+      status: productChar?.status
       ? productChar.status
           ? 'Active'
           : 'InActive'
@@ -80,14 +81,10 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
   const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
-    if (isEdit && productChar) {
       reset(defaultValues);
-    }
-    if (!isEdit) {
-      reset(defaultValues);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEdit, productChar]);
+      console.log(productChar?.productSpecCharValueDTOS)
+      setProductCharValues(productChar?.productSpecCharValueDTOS? productChar.productSpecCharValueDTOS:[])
+  }, [ productChar]);
 
   const onSubmit2 = async (data: FormValuesProps) => {
     try {
@@ -106,10 +103,6 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
       await productSpecCharApi.createProductSpecChar(productChar);
       reset();
       setproductCharValues([]);
-      // await new Promise((resolve) => setTimeout(resolve, 500));
-      // reset();
-      // enqueueSnackbar(!isEdit ? 'Create success!' : 'Update success!');
-      // navigate(PATH_DASHBOARD.eCommerce.list);
     } catch (error) {
       console.log(error);
       if (isMountedRef.current) {
@@ -154,7 +147,7 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
             />
             <Stack alignItems="flex-end" sx={{ mt: 3 }}>
               <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-                {!isEdit ? 'Create product characteristic' : 'Save Changes'}
+                {!isEdit ? 'Create' : 'Save Changes'}
               </LoadingButton>
             </Stack>
           </Card>

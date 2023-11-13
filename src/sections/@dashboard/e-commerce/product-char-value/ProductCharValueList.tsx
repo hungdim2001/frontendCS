@@ -175,7 +175,7 @@ export default function CharValues({ setCharValues, charValues }: Props) {
         onClick={handleOpen}
         startIcon={<Iconify icon={'eva:plus-fill'} />}
       >
-        Create value characteristic
+        Create value
       </Button>
       <ProductCharValueDialog
         setProductCharValues={setProductCharValues}

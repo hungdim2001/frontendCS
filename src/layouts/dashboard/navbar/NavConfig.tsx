@@ -58,6 +58,15 @@ const navConfig = [
           { title: 'account', path: PATH_DASHBOARD.user.account },
         ],
       },
+      {
+        title: 'Product Characteristic',
+        path: PATH_DASHBOARD.productChar.root,
+        icon: ICONS.kanban,
+        children: [
+          { title: 'list', path: PATH_DASHBOARD.productChar.list },
+          { title: 'create', path: PATH_DASHBOARD.productChar.create },
+        ],
+      },
 
       // MANAGEMENT : E-COMMERCE
       {

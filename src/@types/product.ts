@@ -37,6 +37,7 @@ export type ProductChar = BaseDTO & {
 };
 export type ProductCharState  = {
   productChars :ProductChar[]|[]
+  productChar: ProductChar
 };
 
 

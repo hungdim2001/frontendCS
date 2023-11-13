@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { paramCase } from 'change-case';
 import { useParams, useLocation } from 'react-router-dom';
 // @mui
@@ -16,6 +16,9 @@ import HeaderBreadcrumbs from '../../components/HeaderBreadcrumbs';
 // sections
 import ProductNewForm from '../../sections/@dashboard/e-commerce/ProductNewForm';
 import ProductCharNewForm from 'src/sections/@dashboard/e-commerce/ProductCharNewForm';
+import { ProductChar } from 'src/@types/product';
+import { productSpecCharApi } from 'src/service/app-apis/product-char';
+import { getProductChars } from 'src/redux/slices/product-char';
 
 // ----------------------------------------------------------------------
 
@@ -26,17 +29,13 @@ export default function ProductCharCreate() {
 
   const { pathname } = useLocation();
 
-  const { name = '' } = useParams();
+  const { id = '' } = useParams();
 
-  const { products } = useSelector((state) => state.product);
-
+  const { productChar } = useSelector((state) => state.productChars);
   const isEdit = pathname.includes('edit');
-
-  const currentProduct = products.find((product) => paramCase(product.name) === name);
-
   useEffect(() => {
-    dispatch(getProducts());
-  }, [dispatch]);
+    if (isEdit) dispatch(getProductChars(+id));
+  }, [dispatch, id]);
 
   return (
     <Page title="Create new product characteristic">
@@ -45,14 +44,11 @@ export default function ProductCharCreate() {
           heading={!isEdit ? 'Create new product characteristic' : 'Edit product characteristic'}
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            {
-              name: 'E-Commerce',
-              href: PATH_DASHBOARD.eCommerce.root,
-            },
-            { name: !isEdit ? 'New product' : name },
+            { name: 'Product char list', href: PATH_DASHBOARD.productChar.list },
+            { name: !isEdit ? 'New product characteristic' : productChar.code||'' },
           ]}
         />
-        <ProductCharNewForm isEdit={false}/>
+        <ProductCharNewForm productChar={productChar} isEdit={isEdit} />
       </Container>
     </Page>
   );

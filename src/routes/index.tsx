@@ -109,11 +109,20 @@ export default function Router() {
             { path: 'product/:name', element: <EcommerceProductDetails /> },
             { path: 'list', element: <EcommerceProductList /> },
             { path: 'product/new', element: <EcommerceProductCreate /> },
-            { path: 'product/char/list', element: <ProductCharList /> },
-            { path: 'product/char/create', element: <ProductCharCreate /> },
             { path: 'product/:name/edit', element: <EcommerceProductCreate /> },
             { path: 'checkout', element: <EcommerceCheckout /> },
             { path: 'invoice', element: <EcommerceInvoice /> },
+          ],
+        },
+        {
+          path: 'product-char',
+          children: [
+            { element: <Navigate to="/dashboard/product-char/list" replace />, index: true },
+            { path: 'list', element: <ProductCharList /> },
+            { path: 'create', element: <ProductCharCreate /> },
+            { path: 'edit/:id', element: <ProductCharCreate /> },
+
+            // { path: 'product/:name/edit', element: <EcommerceProductCreate /> },
           ],
         },
         {

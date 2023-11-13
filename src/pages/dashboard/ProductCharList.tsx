@@ -1,6 +1,6 @@
 import { sentenceCase } from 'change-case';
 import { useEffect, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import {
@@ -37,7 +37,6 @@ import HeaderBreadcrumbs from '../../components/HeaderBreadcrumbs';
 import { ProductChar } from 'src/@types/product';
 import ProductCharToolbar from 'src/sections/@dashboard/e-commerce/product-char/ProductCharToolbar';
 import ProductCharListHead from 'src/sections/@dashboard/e-commerce/product-char/ProductCharListHead';
-import { productSpecCharApi } from 'src/service/app-apis/product-char';
 import { useDispatch, useSelector } from '../../redux/store';
 
 import { deleteProductChars, getProductChars } from 'src/redux/slices/product-char';
@@ -69,13 +68,13 @@ export default function ProductCharList() {
 
   const [productCharList, setProductCharList] = useState<ProductChar[]>([]);
   const { productChars } = useSelector((state) => state.productChars);
-
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<(number|null)[]>([]);
 
   const [orderBy, setOrderBy] = useState('name');
 
@@ -90,7 +89,7 @@ export default function ProductCharList() {
   };
 
   useEffect(() => {
-    dispatch(getProductChars());
+    dispatch(getProductChars(null));
   }, [dispatch]);
 
   useEffect(() => {
@@ -101,18 +100,18 @@ export default function ProductCharList() {
 
   const handleSelectAllClick = (checked: boolean) => {
     if (checked) {
-      const newSelecteds = productCharList.map((n) => n.name);
+      const newSelecteds = productCharList.map((n) => n.id);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (name: string) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: string[] = [];
+  const handleClick = (id:number|null) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected: (number|null)[] = [];
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selected, id);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -140,23 +139,24 @@ export default function ProductCharList() {
     if (id) {
       const ids = [id];
       dispatch(deleteProductChars(ids));
-      // const deleteProduct = productCharList.filter((product) => product.id !== id);
-      // setSelected([]);
-      // setProductCharList(deleteProduct);
     }
   };
 
-  const handleDeleteProducts = (selected: string[]) => {
-    // const deleteProducts = productCharList.filter((product) => !selected.includes(product.id));
-    // setSelected([]);
-    // setProductCharList(deleteProducts);
+  const handleEditProductChar = (id: number | null) => {
+    if (id) {
+      console.log(`${PATH_DASHBOARD.productChar.edit}/${id}`)
+      navigate(`${PATH_DASHBOARD.productChar.edit}/${id}`, { replace: true });
+    }
   };
-  // const handleDeleteProductCha= (id: number|null) => {
-  //   // const deleteProduct = charValues.filter((charValue) => charValue.code !== code);
-  //   // setSelected([]);
-  //   // setCharValues(deleteProduct);
-  // };
 
+  const handleDeleteProducts = (ids: (number | null)[]) => {
+    const validIds = ids.filter(id => id !== null) as number[];
+    
+    if (validIds.length > 0) {
+      dispatch(deleteProductChars(validIds));
+    }
+  };
+  
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productCharList.length) : 0;
 
   const filteredUsers = applySortFilter(productCharList, getComparator(order, orderBy), filterName);
@@ -170,17 +170,16 @@ export default function ProductCharList() {
           heading="Product characteristics"
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            { name: 'Product', href: PATH_DASHBOARD.user.root },
             { name: 'Product characteristics' },
           ]}
           action={
             <Button
               variant="contained"
               component={RouterLink}
-              to={PATH_DASHBOARD.user.newUser}
+              to={PATH_DASHBOARD.productChar.create}
               startIcon={<Iconify icon={'eva:plus-fill'} />}
             >
-              New User
+              Create
             </Button>
           }
         />
@@ -211,7 +210,7 @@ export default function ProductCharList() {
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row) => {
                       const { id, name, code, status, description } = row;
-                      const isItemSelected = selected.indexOf(name) !== -1;
+                      const isItemSelected = selected.indexOf(id) !== -1;
 
                       return (
                         <TableRow
@@ -223,7 +222,7 @@ export default function ProductCharList() {
                           aria-checked={isItemSelected}
                         >
                           <TableCell padding="checkbox">
-                            <Checkbox checked={isItemSelected} onClick={() => handleClick(name)} />
+                            <Checkbox checked={isItemSelected} onClick={() => handleClick(id)} />
                           </TableCell>
                           <TableCell align="left">{id}</TableCell>
                           <TableCell align="left">{name}</TableCell>
@@ -240,7 +239,7 @@ export default function ProductCharList() {
 
                           <TableCell align="center">
                             <Button
-                              onClick={() => handleDeleteProductChar(id)}
+                              onClick={() => handleEditProductChar(id)}
                               startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
                             />
                           </TableCell>
