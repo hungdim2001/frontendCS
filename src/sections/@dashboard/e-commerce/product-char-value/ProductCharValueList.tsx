@@ -35,7 +35,7 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 type Props = {
-  charValues: ProductCharValue[];
+  charValues:  ProductCharValue[];
   setCharValues: (productCharValues: any) => void;
 };
 export default function CharValues({ setCharValues, charValues }: Props) {
