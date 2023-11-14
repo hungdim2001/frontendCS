@@ -53,15 +53,12 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
     () => ({
       name: productChar?.name || '',
       code: productChar?.code || '',
-      status: productChar?.status
-      ? productChar.status
-          ? 'Active'
-          : 'InActive'
-      : 'Active',
+      status: productChar?.status ? (productChar.status ? 'Active' : 'InActive') : 'Active',
       description: productChar?.description || '',
     }),
     [productChar]
   );
+
 
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(NewProductSchema),
@@ -81,10 +78,13 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
   const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
-      reset(defaultValues);
-      console.log(productChar?.productSpecCharValueDTOS)
-      setProductCharValues(productChar?.productSpecCharValueDTOS? productChar.productSpecCharValueDTOS:[])
-  }, [ productChar]);
+    console.log(productChar)
+    reset(defaultValues);
+    setProductCharValues(
+      productChar?.productSpecCharValueDTOS ? productChar.productSpecCharValueDTOS : []
+    );
+  }, [productChar]);
+
 
   const onSubmit2 = async (data: FormValuesProps) => {
     try {

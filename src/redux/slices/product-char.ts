@@ -33,6 +33,8 @@ export function getProductChars(id: number | null) {
         dispatch(slice.actions.getProductCharSucess(response[0]));
       }else{
         dispatch(slice.actions.getProductCharsSucess(response));
+        dispatch(slice.actions.getProductCharSucess({} as ProductChar));
+
       }
     } catch (error) {
       console.log(error);
@@ -44,10 +46,20 @@ export function deleteProductChars(productCharIds: number[]) {
   return async () => {
     try {
       const response = await productSpecCharApi.deleteProductSpecChars(productCharIds);
-
       dispatch(slice.actions.getProductCharsSucess(response));
     } catch (error) {
       console.log(error);
     }
   };
+  
 }
+export function deleteProductCharValue(productCharValueIds: number[]) {
+  return async () => {
+    try {
+      const response = await productSpecCharApi.deleteProductSpecCharValue(productCharValueIds);
+      dispatch(slice.actions.getProductCharsSucess(response));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+};

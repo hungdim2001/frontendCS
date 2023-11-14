@@ -1,9 +1,17 @@
-
 import { sentenceCase } from 'change-case';
 import { useState } from 'react';
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Button, Checkbox, Table, TableBody, TableCell, TableContainer, TablePagination, TableRow, } from '@mui/material';
+import {
+  Button,
+  Checkbox,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TablePagination,
+  TableRow,
+} from '@mui/material';
 // routes
 // hooks
 // @types
@@ -19,6 +27,8 @@ import { ProductCharValue } from 'src/@types/product';
 import ProductCharValueToolbar from './ProductCharValueToolbar';
 import ProductCharValueHead from './ProductCharValueHead';
 import ProductCharValueDialog from './ProductCharValueDialog';
+import { useDispatch, useSelector } from 'src/redux/store';
+import { deleteProductCharValue } from 'src/redux/slices/product-char';
 
 // ----------------------------------------------------------------------
 
@@ -35,7 +45,7 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 type Props = {
-  charValues:  ProductCharValue[];
+  charValues: ProductCharValue[];
   setCharValues: (productCharValues: any) => void;
 };
 export default function CharValues({ setCharValues, charValues }: Props) {
@@ -46,17 +56,9 @@ export default function CharValues({ setCharValues, charValues }: Props) {
   };
 
   const theme = useTheme();
-
-  // const [CharValues, setCharValues] = useState<ProductCharValue[]>([]);
-
-  const [productCharValue, setproductCharValue] = useState<ProductCharValue>({ status:true } as ProductCharValue);
-  // {
-  //   code: '',
-  //       id: null,
-  //     value: '',
-  //     status: true,
-  // }
-
+  const [productCharValue, setproductCharValue] = useState<ProductCharValue>({
+    status: true,
+  } as ProductCharValue);
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
@@ -69,15 +71,12 @@ export default function CharValues({ setCharValues, charValues }: Props) {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [open, setOpen] = useState<boolean>(false);
-  // useEffect(()=>{
-  //  setCharValues(charValues)
-   
-  // },[charValues, CharValues])
+  const dispatch = useDispatch();
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setOpen(true);
     setEdit(false);
-    setproductCharValue({ status:true } as ProductCharValue);
+    setproductCharValue({ status: true } as ProductCharValue);
   };
   const handleClose = () => {
     setOpen(false);
@@ -127,17 +126,38 @@ export default function CharValues({ setCharValues, charValues }: Props) {
   };
 
   const handleDeleteProductCharValue = (code: string) => {
-    const deleteProduct = charValues.filter((charValue) => charValue.code !== code);
+    const deleteCharValue: ProductCharValue[] = charValues.filter(
+      (charValue) => charValue.code === code
+    );
+    const restProduct = charValues.filter((charValue) => charValue.code !== code);
+    // if (!deleteCharValue[0].id) {
+    //   const deleteProduct = charValues.filter((charValue) => charValue.code !== code);
+    //   setSelected([]);
+    //   setCharValues(deleteProduct);
+    // }
+    if (deleteCharValue[0].id) {
+      const id = deleteCharValue[0].id; // Use optional chaining to handle the possibility of isNew[0] being undefined
+      if (id) {
+        dispatch(deleteProductCharValue([id]));
+      }
+    }
     setSelected([]);
-    setCharValues(deleteProduct);
+    setCharValues(restProduct);
   };
 
   const handleDeleteProductsCharValues = (selected: string[]) => {
-    const deleteProducts = charValues.filter(
-      (product) => !selected.includes(product.code)
-    );
+    const restProducts = charValues.filter((product) => !selected.includes(product.code));
+    const deleteProducts = charValues.filter((product) => selected.includes(product.code));
+
+    const isOld = deleteProducts.filter((charValue) => charValue.id);
+    if (isOld.length > 0) {
+      const idArray = isOld.map((item) => item.id).filter((id) => id !== null) as number[];
+      if (idArray.length > 0) {
+        dispatch(deleteProductCharValue(idArray));
+      }
+    }
     setSelected([]);
-    setCharValues(deleteProducts);
+    setCharValues(restProducts);
   };
 
   const setProductCharValues = (productCharValueCodes: any) => {
@@ -156,14 +176,9 @@ export default function CharValues({ setCharValues, charValues }: Props) {
     setOpen(true);
   };
 
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - CharValues.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - CharValues.length) : 0;
 
-  const filteredUsers = applySortFilter(
-    charValues,
-    getComparator(order, orderBy),
-    filterName
-  );
+  const filteredUsers = applySortFilter(charValues, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && Boolean(filterName);
 
@@ -208,8 +223,9 @@ export default function CharValues({ setCharValues, charValues }: Props) {
             <TableBody>
               {filteredUsers
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .filter((row) => row.code)
                 .map((row) => {
-                  const { id, code, value, status,description } = row;
+                  const { id, code, value, status, description } = row;
                   const isItemSelected = selected.indexOf(code) !== -1;
                   // function handleDeleteProductCharValue(code: string|null) {
                   //   throw new Error('Function not implemented.');
@@ -244,14 +260,14 @@ export default function CharValues({ setCharValues, charValues }: Props) {
                         <Button
                           onClick={() => handleProductCharValueEdit(code)}
                           startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
-                         />
+                        />
                       </TableCell>
                       <TableCell align="center">
                         <Button
                           sx={{ color: 'error.main' }}
                           onClick={() => handleDeleteProductCharValue(code)}
                           startIcon={<Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />}
-                         />
+                        />
                       </TableCell>
                     </TableRow>
                   );

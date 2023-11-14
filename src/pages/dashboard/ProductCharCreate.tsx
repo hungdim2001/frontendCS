@@ -35,6 +35,8 @@ export default function ProductCharCreate() {
   const isEdit = pathname.includes('edit');
   useEffect(() => {
     if (isEdit) dispatch(getProductChars(+id));
+    else dispatch(getProductChars(null))
+    console.log(productChar)
   }, [dispatch, id]);
 
   return (

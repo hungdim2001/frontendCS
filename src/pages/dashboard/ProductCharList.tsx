@@ -67,7 +67,6 @@ export default function ProductCharList() {
   const { themeStretch } = useSettings();
 
   const [productCharList, setProductCharList] = useState<ProductChar[]>([]);
-  const { productChars } = useSelector((state) => state.productChars);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [page, setPage] = useState(0);
@@ -81,6 +80,7 @@ export default function ProductCharList() {
   const [filterName, setFilterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const { productChars } = useSelector((state) => state.productChars);
 
   const handleRequestSort = (property: string) => {
     const isAsc = orderBy === property && order === 'asc';
