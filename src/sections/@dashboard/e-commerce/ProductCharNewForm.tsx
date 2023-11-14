@@ -18,6 +18,7 @@ import useAuth from '../../../hooks/useAuth';
 import { productSpecCharApi } from '../../../service/app-apis/product-char';
 import useIsMountedRef from '../../../hooks/useIsMountedRef';
 import { useDispatch, useSelector } from 'react-redux';
+import { el } from 'date-fns/locale';
 
 // ----------------------------------------------------------------------
 
@@ -88,21 +89,39 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
 
   const onSubmit2 = async (data: FormValuesProps) => {
     try {
-      const productChar: ProductChar = {
-        id: null,
-        status: data.status === 'Active' ? true : false,
-        createDatetime: new Date(),
-        updateDatetime: null,
-        createUser: user?.id || null,
-        updateUser: null,
-        description: data.description,
-        name: data.name,
-        code: data.code,
-        productSpecCharValueDTOS: productCharValues,
-      };
-      await productSpecCharApi.createProductSpecChar(productChar);
-      reset();
-      setproductCharValues([]);
+      if(!isEdit){
+        const productChar: ProductChar = {
+          id: null,
+          status: data.status === 'Active' ? true : false,
+          createDatetime: new Date(),
+          updateDatetime: null,
+          createUser: user?.id || null,
+          updateUser: null,
+          description: data.description,
+          name: data.name,
+          code: data.code,
+          productSpecCharValueDTOS: productCharValues,
+        };
+        await productSpecCharApi.createProductSpecChar(productChar);
+        reset();
+        setproductCharValues([]);
+      }
+      else{
+
+        const updateProductChar = {
+          ...productChar,
+          status: data.status === 'Active' ? true : false,
+          updateDatetime:new Date(),
+          updateUser: user?.id||undefined,
+          description: data.description,
+          name: data.name,
+          code: data.code,
+          productSpecCharValueDTOS: productCharValues,
+
+        };
+        await productSpecCharApi.createProductSpecChar(updateProductChar as ProductChar);
+      }
+      
     } catch (error) {
       console.log(error);
       if (isMountedRef.current) {

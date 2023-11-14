@@ -176,7 +176,7 @@ export default function CharValues({ setCharValues, charValues }: Props) {
     setOpen(true);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - CharValues.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - charValues.length) : 0;
 
   const filteredUsers = applySortFilter(charValues, getComparator(order, orderBy), filterName);
 
@@ -215,7 +215,7 @@ export default function CharValues({ setCharValues, charValues }: Props) {
               order={order}
               orderBy={orderBy}
               headLabel={TABLE_HEAD}
-              rowCount={CharValues.length}
+              rowCount={charValues.length}
               numSelected={selected.length}
               onRequestSort={handleRequestSort}
               onSelectAllClick={handleSelectAllClick}
@@ -294,7 +294,7 @@ export default function CharValues({ setCharValues, charValues }: Props) {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={CharValues.length}
+        count={charValues.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={(e, page) => setPage(page)}
