@@ -47,7 +47,7 @@ export default function ProductCharCreate() {
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
             { name: 'Product char list', href: PATH_DASHBOARD.productChar.list },
-            { name: !isEdit ? 'New product characteristic' : productChar.code||'' },
+            { name: !isEdit ? 'New product characteristic' : productChar.id?.toString() ||'' },
           ]}
         />
         <ProductCharNewForm productChar={productChar} isEdit={isEdit} />

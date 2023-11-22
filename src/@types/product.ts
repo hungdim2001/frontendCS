@@ -32,7 +32,6 @@ export type ProductReview = {
 
 export type ProductChar = BaseDTO & {
   name: string;
-  code: string;
   productSpecCharValueDTOS: ProductCharValue[]|null;
 };
 export type ProductCharState  = {
@@ -42,7 +41,6 @@ export type ProductCharState  = {
 
 
 export type ProductCharValue  = BaseDTO &{
-  code: string;
   value: string;
 };
 export type Product = {

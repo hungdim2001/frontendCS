@@ -46,3 +46,6 @@ Your app is ready to be deployed.
 ## User Guide
 
 You can find detailed instructions on using Create React App and many tips in [its documentation](https://facebook.github.io/create-react-app/).
+
+set NODE_OPTIONS=--openssl-legacy-provider
+export NODE_OPTIONS=--openssl-legacy-provider

@@ -46,7 +46,6 @@ import { deleteProductChars, getProductChars } from 'src/redux/slices/product-ch
 const TABLE_HEAD = [
   { id: 'id', label: 'ID', alignRight: false },
   { id: 'name', label: 'Name', alignRight: false },
-  { id: 'code', label: 'Code', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
   { id: 'description', label: 'Description', alignRight: false },
   { id: 'update' },
@@ -139,6 +138,9 @@ export default function ProductCharList() {
     if (id) {
       const ids = [id];
       dispatch(deleteProductChars(ids));
+      const deleteProduct = productCharList.filter((product) => product.id !== id);
+      setSelected([]);
+      setProductCharList(deleteProduct);
     }
   };
 
@@ -154,6 +156,9 @@ export default function ProductCharList() {
     
     if (validIds.length > 0) {
       dispatch(deleteProductChars(validIds));
+      const deleteProducts = productCharList.filter((product) => !ids.includes(product.id));
+      setSelected([]);
+      setProductCharList(deleteProducts);
     }
   };
   
@@ -209,7 +214,7 @@ export default function ProductCharList() {
                   {filteredUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row) => {
-                      const { id, name, code, status, description } = row;
+                      const { id, name, status, description } = row;
                       const isItemSelected = selected.indexOf(id) !== -1;
 
                       return (
@@ -226,7 +231,6 @@ export default function ProductCharList() {
                           </TableCell>
                           <TableCell align="left">{id}</TableCell>
                           <TableCell align="left">{name}</TableCell>
-                          <TableCell align="left">{code}</TableCell>
                           <TableCell align="left">
                             <Label
                               variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}

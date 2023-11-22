@@ -34,7 +34,6 @@ import { deleteProductCharValue } from 'src/redux/slices/product-char';
 
 const TABLE_HEAD = [
   { id: 'id', label: 'ID', alignRight: false },
-  { id: 'code', label: 'Code', alignRight: false },
   { id: 'value', label: 'Value', alignRight: false },
   { id: 'description', label: 'Description', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
@@ -90,7 +89,7 @@ export default function CharValues({ setCharValues, charValues }: Props) {
 
   const handleSelectAllClick = (checked: boolean) => {
     if (checked) {
-      const newSelecteds = charValues.map((n) => n.code);
+      const newSelecteds = charValues.map((n) => n.value);
       setSelected(newSelecteds);
       return;
     }
@@ -127,9 +126,9 @@ export default function CharValues({ setCharValues, charValues }: Props) {
 
   const handleDeleteProductCharValue = (code: string) => {
     const deleteCharValue: ProductCharValue[] = charValues.filter(
-      (charValue) => charValue.code === code
+      (charValue) => charValue.value === code
     );
-    const restProduct = charValues.filter((charValue) => charValue.code !== code);
+    const restProduct = charValues.filter((charValue) => charValue.value !== code);
     // if (!deleteCharValue[0].id) {
     //   const deleteProduct = charValues.filter((charValue) => charValue.code !== code);
     //   setSelected([]);
@@ -146,8 +145,8 @@ export default function CharValues({ setCharValues, charValues }: Props) {
   };
 
   const handleDeleteProductsCharValues = (selected: string[]) => {
-    const restProducts = charValues.filter((product) => !selected.includes(product.code));
-    const deleteProducts = charValues.filter((product) => selected.includes(product.code));
+    const restProducts = charValues.filter((product) => !selected.includes(product.value));
+    const deleteProducts = charValues.filter((product) => selected.includes(product.value));
 
     const isOld = deleteProducts.filter((charValue) => charValue.id);
     if (isOld.length > 0) {
@@ -169,7 +168,7 @@ export default function CharValues({ setCharValues, charValues }: Props) {
   const [isEdit, setEdit] = useState<boolean>(false);
   const handleProductCharValueEdit = (productCharValueCode: string) => {
     const editCharValue = charValues.filter(
-      (charValue) => charValue.code === productCharValueCode
+      (charValue) => charValue.value === productCharValueCode
     )[0];
     setproductCharValue(editCharValue);
     setEdit(true);
@@ -223,10 +222,10 @@ export default function CharValues({ setCharValues, charValues }: Props) {
             <TableBody>
               {filteredUsers
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .filter((row) => row.code)
+                .filter((row) => row.value)
                 .map((row) => {
-                  const { id, code, value, status, description } = row;
-                  const isItemSelected = selected.indexOf(code) !== -1;
+                  const { id, value, status, description } = row;
+                  const isItemSelected = selected.indexOf(value) !== -1;
                   // function handleDeleteProductCharValue(code: string|null) {
                   //   throw new Error('Function not implemented.');
                   // }
@@ -234,17 +233,16 @@ export default function CharValues({ setCharValues, charValues }: Props) {
                   return (
                     <TableRow
                       hover
-                      key={code}
+                      key={value}
                       tabIndex={-1}
                       role="checkbox"
                       selected={isItemSelected}
                       aria-checked={isItemSelected}
                     >
                       <TableCell padding="checkbox">
-                        <Checkbox checked={isItemSelected} onClick={() => handleClick(code)} />
+                        <Checkbox checked={isItemSelected} onClick={() => handleClick(value)} />
                       </TableCell>
                       <TableCell align="left">{id}</TableCell>
-                      <TableCell align="left">{code}</TableCell>
                       <TableCell align="left">{value}</TableCell>
                       <TableCell align="left">{description}</TableCell>
 
@@ -258,14 +256,14 @@ export default function CharValues({ setCharValues, charValues }: Props) {
                       </TableCell>
                       <TableCell align="center">
                         <Button
-                          onClick={() => handleProductCharValueEdit(code)}
+                          onClick={() => handleProductCharValueEdit(value)}
                           startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
                         />
                       </TableCell>
                       <TableCell align="center">
                         <Button
                           sx={{ color: 'error.main' }}
-                          onClick={() => handleDeleteProductCharValue(code)}
+                          onClick={() => handleDeleteProductCharValue(value)}
                           startIcon={<Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />}
                         />
                       </TableCell>
@@ -336,7 +334,7 @@ function applySortFilter(
     return a[1] - b[1];
   });
   if (query) {
-    return array.filter((_user) => _user.code.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return array.filter((_user) => _user.value.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }

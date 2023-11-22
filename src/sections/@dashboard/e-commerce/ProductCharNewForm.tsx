@@ -26,7 +26,6 @@ import { el } from 'date-fns/locale';
 
 interface FormValuesProps {
   name: string;
-  code: string;
   description: string;
   status: string;
   afterSubmit?: string;
@@ -48,12 +47,10 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
   };
   const NewProductSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
-    code: Yup.string().required('Description is required'),
   });
   const defaultValues = useMemo(
     () => ({
       name: productChar?.name || '',
-      code: productChar?.code || '',
       status: productChar?.status ? (productChar.status ? 'Active' : 'InActive') : 'Active',
       description: productChar?.description || '',
     }),
@@ -87,8 +84,9 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
   }, [productChar]);
 
 
-  const onSubmit2 = async (data: FormValuesProps) => {
+  const onSubmit = async (data: FormValuesProps) => {
     try {
+      console.log("sfsf")
       if(!isEdit){
         const productChar: ProductChar = {
           id: null,
@@ -99,7 +97,6 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
           updateUser: null,
           description: data.description,
           name: data.name,
-          code: data.code,
           productSpecCharValueDTOS: productCharValues,
         };
         await productSpecCharApi.createProductSpecChar(productChar);
@@ -115,7 +112,6 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
           updateUser: user?.id||undefined,
           description: data.description,
           name: data.name,
-          code: data.code,
           productSpecCharValueDTOS: productCharValues,
 
         };
@@ -135,7 +131,7 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
     setValue(field, selectedValue, { shouldValidate: true });
   };
   return (
-    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit2)}>
+    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       {!!errors.afterSubmit && <Alert severity="error">{errors.afterSubmit.message}</Alert>}
       <Grid container spacing={3}>
         <Grid item xs={12} md={12}>
@@ -149,7 +145,6 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
               }}
             >
               <RHFTextField name="name" label="Name" />
-              <RHFTextField name="code" label="Code" />
               <RHFTextField name="description" label="Description" />
               <RHFSelect
                 name="status"
