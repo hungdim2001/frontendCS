@@ -62,6 +62,11 @@ export const PATH_DASHBOARD = {
     editById: path(ROOTS_DASHBOARD, `/user/reece-chung/edit`),
     account: path(ROOTS_DASHBOARD, '/user/account'),
   },
+  product: {
+    root: path(ROOTS_DASHBOARD, '/product/list'),
+    productTypes: path(ROOTS_DASHBOARD, '/product-type'),
+
+  },
   productChar: {
     root: path(ROOTS_DASHBOARD, '/product-char'),
     list: path(ROOTS_DASHBOARD, '/product-char/list'),

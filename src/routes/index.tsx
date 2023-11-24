@@ -115,6 +115,13 @@ export default function Router() {
           ],
         },
         {
+          path: 'product-type',
+          children: [
+            { path: '', element: <ProductType /> },
+
+          ],
+        },
+        {
           path: 'product-char',
           children: [
             { element: <Navigate to="/dashboard/product-char/list" replace />, index: true },
@@ -222,6 +229,9 @@ const EcommerceProductCreate = Loadable(
 );
 const ProductCharList = Loadable(
   lazy(() => import('../pages/dashboard/ProductCharList'))
+);
+const ProductType = Loadable(
+  lazy(() => import('../pages/dashboard/ProductType'))
 );
 const ProductCharCreate = Loadable(
   lazy(() => import('../pages/dashboard/ProductCharCreate'))
