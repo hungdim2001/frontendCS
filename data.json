@@ -1,0 +1,777 @@
+[
+    {
+        "createDatetime": "2023-11-24T15:54:20.182027",
+        "name": "Màn hình:",
+        "productSpecCharValueDTOS": [
+            {
+                "createDatetime": "2023-11-24T15:54:20.103899",
+                "status": true,
+                "value": "OLED"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:20.119524",
+                "status": true,
+                "value": "6.7\""
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:20.135149",
+                "status": true,
+                "value": "Super Retina XDR"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:22.206233",
+                "status": true,
+                "value": "6.1\""
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:31.614619",
+                "status": true,
+                "value": "AMOLED"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:31.629618",
+                "status": true,
+                "value": "6.67\""
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:31.668616",
+                "status": true,
+                "value": "Full HD+"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:11.239582",
+                "status": true,
+                "value": "IPS LCD"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:11.256646",
+                "status": true,
+                "value": "6.74\""
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:11.272451",
+                "status": true,
+                "value": "HD+"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:51.411488",
+                "status": true,
+                "value": "Super AMOLED"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:51.425494",
+                "status": true,
+                "value": "6.5\""
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:13.194837",
+                "status": true,
+                "value": "6.79\""
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:18.179568",
+                "status": true,
+                "value": "1.5K"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:34.349934",
+                "status": true,
+                "value": "Liquid Retina"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:38.558444",
+                "status": true,
+                "value": "6.64\""
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:23.377093",
+                "status": true,
+                "value": "6.62\""
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:46.898339",
+                "status": true,
+                "value": "6.56\""
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:53.039461",
+                "status": true,
+                "value": "6.55\""
+            },
+            {
+                "createDatetime": "2023-11-24T16:00:58.567584",
+                "status": true,
+                "value": "Chính 6.8\" & Phụ 3.26\""
+            },
+            {
+                "createDatetime": "2023-11-24T16:01:35.198903",
+                "status": true,
+                "value": "Dynamic AMOLED 2X"
+            },
+            {
+                "createDatetime": "2023-11-24T16:02:13.807910",
+                "status": true,
+                "value": "6.4\""
+            },
+            {
+                "createDatetime": "2023-11-24T16:02:19.650384",
+                "status": true,
+                "value": "6.28\""
+            },
+            {
+                "createDatetime": "2023-11-24T16:02:43.298635",
+                "status": true,
+                "value": "6.6\""
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:02.650278",
+                "status": true,
+                "value": "6.44\""
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:16.435339",
+                "status": true,
+                "value": "LTPS LCD"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:16.446335",
+                "status": true,
+                "value": "6.72\""
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:48.747951",
+                "status": true,
+                "value": "PLS LCD"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:54.121361",
+                "status": true,
+                "value": "6.51\""
+            },
+            {
+                "createDatetime": "2023-11-24T16:04:36.433319",
+                "status": true,
+                "value": "6.52\""
+            }
+        ],
+        "status": true
+    },
+    {
+        "createDatetime": "2023-11-24T15:54:20.213275",
+        "name": "Hệ điều hành:",
+        "productSpecCharValueDTOS": [
+            {
+                "createDatetime": "2023-11-24T15:54:20.197650",
+                "status": true,
+                "value": "iOS 17"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:31.716917",
+                "status": true,
+                "value": "Android 13"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:47.606270",
+                "status": true,
+                "value": "iOS 16"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:34.411935",
+                "status": true,
+                "value": "iOS 15"
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:53.134497",
+                "status": true,
+                "value": "Android 12"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:13.495070",
+                "status": true,
+                "value": "Android 11"
+            },
+            {
+                "createDatetime": "2023-11-24T16:04:36.495637",
+                "status": true,
+                "value": "Android 13 (Go Edition)"
+            }
+        ],
+        "status": true
+    },
+    {
+        "createDatetime": "2023-11-24T15:54:20.260152",
+        "name": "Camera sau:",
+        "productSpecCharValueDTOS": [
+            {
+                "createDatetime": "2023-11-24T15:54:20.228900",
+                "status": true,
+                "value": "Chính 48 MP & Phụ 12 MP, 12 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:23.981688",
+                "status": true,
+                "value": "Chính 48 MP & Phụ 12 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:31.743922",
+                "status": true,
+                "value": "Chính 64 MP & Phụ 8 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:11.340287",
+                "status": true,
+                "value": "Chính 50 MP & Phụ 0.08 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:51.513585",
+                "status": true,
+                "value": "Chính 50 MP & Phụ 5 MP, 2 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:13.274142",
+                "status": true,
+                "value": "Chính 50 MP & Phụ 8 MP, 2 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:18.261169",
+                "status": true,
+                "value": "Chính 50 MP & Phụ 50 MP, 12 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:34.453556",
+                "status": true,
+                "value": "2 camera 12 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:38.673437",
+                "status": true,
+                "value": "Chính 50 MP & Phụ 2 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:23.465917",
+                "status": true,
+                "value": "Chính 64 MP & Phụ 2 MP, 2 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:46.988337",
+                "status": true,
+                "value": "Chính 8 MP & Phụ 2 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:00:58.663043",
+                "status": true,
+                "value": "Chính 50 MP & Phụ 8 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:01:35.271907",
+                "status": true,
+                "value": "Chính 50 MP & Phụ 12 MP, 10 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:02:13.903301",
+                "status": true,
+                "value": "Chính 12 MP & Phụ 12 MP, 8 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:02:19.739888",
+                "status": true,
+                "value": "Chính 50 MP & Phụ 13 MP, 5 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:02:28.379771",
+                "status": true,
+                "value": "Chính 108 MP & Phụ 2 MP, 2 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:02:43.382240",
+                "status": true,
+                "value": "Chính 48 MP & Phụ 8 MP, 5 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:02:46.845288",
+                "status": true,
+                "value": "Chính 100 MP & Phụ 2 MP, 2 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:02.719598",
+                "status": true,
+                "value": "Chính 64 MP & Phụ 8 MP, 2 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:13.527070",
+                "status": true,
+                "value": "Chính 108 MP & Phụ 8 MP, 2 MP, 2 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:50.312039",
+                "status": true,
+                "value": "Chính 50 MP & Phụ 0.3 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:54.192672",
+                "status": true,
+                "value": "Chính 13 MP & Phụ 2 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:04:18.100950",
+                "status": true,
+                "value": "Chính 50 MP & Phụ 2 MP, 2 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:04:28.090742",
+                "status": true,
+                "value": "8 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T16:04:36.558881",
+                "status": true,
+                "value": "Chính 8 MP & Phụ QVGA (248 x 328 Pixels)"
+            }
+        ],
+        "status": true
+    },
+    {
+        "createDatetime": "2023-11-24T15:54:20.307026",
+        "name": "Camera trước:",
+        "productSpecCharValueDTOS": [
+            {
+                "createDatetime": "2023-11-24T15:54:20.291401",
+                "status": true,
+                "value": "12 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:31.768925",
+                "status": true,
+                "value": "50 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:11.391486",
+                "status": true,
+                "value": "8 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:51.565295",
+                "status": true,
+                "value": "13 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:18.294932",
+                "status": true,
+                "value": "20 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:38.720434",
+                "status": true,
+                "value": "16 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:23.497096",
+                "status": true,
+                "value": "32 MP"
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:47.019336",
+                "status": true,
+                "value": "5 MP"
+            }
+        ],
+        "status": true
+    },
+    {
+        "createDatetime": "2023-11-24T15:54:20.353900",
+        "name": "Chip:",
+        "productSpecCharValueDTOS": [
+            {
+                "createDatetime": "2023-11-24T15:54:20.322651",
+                "status": true,
+                "value": "Apple A17 Pro 6 nhân"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:24.044193",
+                "status": true,
+                "value": "Apple A16 Bionic"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:31.796924",
+                "status": true,
+                "value": "Snapdragon 695 5G"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:11.423582",
+                "status": true,
+                "value": "Unisoc Tiger T612"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:51.612844",
+                "status": true,
+                "value": "MediaTek Helio G99"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:13.335779",
+                "status": true,
+                "value": "MediaTek Helio G88"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:18.334026",
+                "status": true,
+                "value": "MediaTek Dimensity 8200-Ultra"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:34.537557",
+                "status": true,
+                "value": "Apple A13 Bionic"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:38.764437",
+                "status": true,
+                "value": "Snapdragon 680"
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:26.987846",
+                "status": true,
+                "value": "Snapdragon 685 8 nhân"
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:47.063339",
+                "status": true,
+                "value": "MediaTek Helio G85"
+            },
+            {
+                "createDatetime": "2023-11-24T16:00:43.939233",
+                "status": true,
+                "value": "Apple A15 Bionic"
+            },
+            {
+                "createDatetime": "2023-11-24T16:00:58.820217",
+                "status": true,
+                "value": "MediaTek Dimensity 9000+ 8 nhân"
+            },
+            {
+                "createDatetime": "2023-11-24T16:01:35.342321",
+                "status": true,
+                "value": "Snapdragon 8 Gen 2 for Galaxy"
+            },
+            {
+                "createDatetime": "2023-11-24T16:02:13.987168",
+                "status": true,
+                "value": "Exynos 2100"
+            },
+            {
+                "createDatetime": "2023-11-24T16:02:19.840926",
+                "status": true,
+                "value": "Snapdragon 8 Gen 1"
+            },
+            {
+                "createDatetime": "2023-11-24T16:02:43.443243",
+                "status": true,
+                "value": "MediaTek Dimensity 1080 8 nhân"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:02.779450",
+                "status": true,
+                "value": "MediaTek Dimensity 900 5G"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:05.486603",
+                "status": true,
+                "value": "Exynos 1280"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:13.586518",
+                "status": true,
+                "value": "Snapdragon 732G"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:48.922863",
+                "status": true,
+                "value": "Exynos 850"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:50.367428",
+                "status": true,
+                "value": "MediaTek Helio G35"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:54.250406",
+                "status": true,
+                "value": "MediaTek Helio P35"
+            },
+            {
+                "createDatetime": "2023-11-24T16:04:28.155408",
+                "status": true,
+                "value": "Unisoc SC9863A1"
+            },
+            {
+                "createDatetime": "2023-11-24T16:04:36.635235",
+                "status": true,
+                "value": "MediaTek Helio G36 8 nhân"
+            }
+        ],
+        "status": true
+    },
+    {
+        "createDatetime": "2023-11-24T15:54:20.432026",
+        "name": "RAM:",
+        "productSpecCharValueDTOS": [
+            {
+                "createDatetime": "2023-11-24T15:54:20.369525",
+                "status": true,
+                "value": "8 GB"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:24.075468",
+                "status": true,
+                "value": "6 GB"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:13.363024",
+                "status": true,
+                "value": "4 GB"
+            },
+            {
+                "createDatetime": "2023-11-24T16:04:28.184708",
+                "status": true,
+                "value": "3 GB"
+            },
+            {
+                "createDatetime": "2023-11-24T16:04:36.706487",
+                "status": true,
+                "value": "2 GB"
+            }
+        ],
+        "status": true
+    },
+    {
+        "createDatetime": "2023-11-24T15:54:20.478901",
+        "name": "Dung lượng lưu trữ:",
+        "productSpecCharValueDTOS": [
+            {
+                "createDatetime": "2023-11-24T15:54:20.447650",
+                "status": true,
+                "value": "256 GB"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:22.505508",
+                "status": true,
+                "value": "128 GB"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:34.657599",
+                "status": true,
+                "value": "64 GB"
+            },
+            {
+                "createDatetime": "2023-11-24T16:04:36.743680",
+                "status": true,
+                "value": "32 GB"
+            }
+        ],
+        "status": true
+    },
+    {
+        "createDatetime": "2023-11-24T15:54:20.541434",
+        "name": "SIM:",
+        "productSpecCharValueDTOS": [
+            {
+                "createDatetime": "2023-11-24T15:54:20.494525",
+                "status": true,
+                "value": "1 Nano SIM & 1 eSIM"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:20.510153",
+                "status": true,
+                "value": "Hỗ trợ 5G"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:31.877910",
+                "status": true,
+                "value": "2 Nano SIM"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:11.590289",
+                "status": true,
+                "value": "Hỗ trợ 4G"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:13.465017",
+                "status": true,
+                "value": "2 Nano SIM (SIM 2 chung khe thẻ nhớ)"
+            },
+            {
+                "createDatetime": "2023-11-24T16:01:35.429319",
+                "status": true,
+                "value": "2 Nano SIM hoặc 1 Nano SIM + 1 eSIM"
+            }
+        ],
+        "status": true
+    },
+    {
+        "createDatetime": "2023-11-24T15:54:20.603900",
+        "name": "Pin, Sạc:",
+        "productSpecCharValueDTOS": [
+            {
+                "createDatetime": "2023-11-24T15:54:20.557025",
+                "status": true,
+                "value": "4422 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:20.572650",
+                "status": true,
+                "value": "20 W"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:22.640390",
+                "status": true,
+                "value": "3274 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:24.213403",
+                "status": true,
+                "value": "4383 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:26.436425",
+                "status": true,
+                "value": "3349 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:31.946278",
+                "status": true,
+                "value": "4800 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:31.957393",
+                "status": true,
+                "value": "44 W"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:11.624379",
+                "status": true,
+                "value": "5000 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:11.640988",
+                "status": true,
+                "value": "33 W"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:47.954084",
+                "status": true,
+                "value": "4323 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:51.795789",
+                "status": true,
+                "value": "25 W"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:13.520710",
+                "status": true,
+                "value": "18 W"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:18.532487",
+                "status": true,
+                "value": "67 W"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:34.772252",
+                "status": true,
+                "value": "3110 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:23.709429",
+                "status": true,
+                "value": "4600 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:23.720429",
+                "status": true,
+                "value": "66 W"
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:47.269336",
+                "status": true,
+                "value": "10 W"
+            },
+            {
+                "createDatetime": "2023-11-24T16:00:12.900093",
+                "status": true,
+                "value": "3200 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T16:00:44.142056",
+                "status": true,
+                "value": "4325 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T16:00:47.354906",
+                "status": true,
+                "value": "3279 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T16:00:58.983108",
+                "status": true,
+                "value": "4300 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T16:01:33.797564",
+                "status": true,
+                "value": "3240 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T16:01:35.505320",
+                "status": true,
+                "value": "3900 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T16:02:14.231063",
+                "status": true,
+                "value": "4500 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:05.643853",
+                "status": true,
+                "value": "6000 mAh"
+            },
+            {
+                "createDatetime": "2023-11-24T16:03:44.323941",
+                "status": true,
+                "value": "15 W"
+            }
+        ],
+        "status": true
+    },
+    {
+        "createDatetime": "2023-11-24T15:54:20.635150",
+        "name": "Hãng",
+        "productSpecCharValueDTOS": [
+            {
+                "createDatetime": "2023-11-24T15:54:20.619525",
+                "status": true,
+                "value": "Apple"
+            },
+            {
+                "createDatetime": "2023-11-24T15:54:31.984113",
+                "status": true,
+                "value": "vivo"
+            },
+            {
+                "createDatetime": "2023-11-24T15:57:51.838354",
+                "status": true,
+                "value": "Samsung"
+            },
+            {
+                "createDatetime": "2023-11-24T15:58:13.541982",
+                "status": true,
+                "value": "Xiaomi"
+            },
+            {
+                "createDatetime": "2023-11-24T15:59:47.298335",
+                "status": true,
+                "value": "OPPO"
+            }
+        ],
+        "status": true
+    }
+]
