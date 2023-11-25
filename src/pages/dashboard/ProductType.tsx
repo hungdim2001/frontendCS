@@ -49,9 +49,10 @@ import useSettings from 'src/hooks/useSettings';
 import { deleteProductChars, getProductChars } from 'src/redux/slices/product-char';
 import ProductTypeHead from 'src/sections/@dashboard/e-commerce/product-type/ProductTypeHead';
 import ProductTypeToolbar from 'src/sections/@dashboard/e-commerce/product-type/ProductTypeToolbar';
-import { RHFUploadSingleFile } from 'src/components/hook-form';
+import { RHFUploadAvatar, RHFUploadSingleFile } from 'src/components/hook-form';
 import { styled } from '@mui/material/styles';
 import { getproductTypes } from 'src/redux/slices/product-type';
+import { productTypeApi } from 'src/service/app-apis/product-type';
 
 // ----------------------------------------------------------------------
 
@@ -239,38 +240,18 @@ export default function ProductTypeView() {
 
   const isNotFound = !filteredUsers.length && Boolean(filterName);
   const onSubmit = async (data: FormValuesProps) => {
-    console.log('sfdsf');
 
     try {
       console.log(data);
-      // if (!isEdit) {
-      //   const productChar: ProductChar = {
-      //     id: null,
-      //     status: data.status === 'Active' ? true : false,
-      //     createDatetime: new Date(),
-      //     updateDatetime: null,
-      //     createUser: user?.id || null,
-      //     updateUser: null,
-      //     description: data.description,
-      //     name: data.name,
-      //     productSpecCharValueDTOS: productCharValues,
-      //   };
-      //   await productSpecCharApi.createProductSpecChar(productChar);
-      //   reset();
-      //   setproductCharValues([]);
-      // } else {
-      //   const updateProductChar = {
-      //     ...productChar,
-      //     status: data.status === 'Active' ? true : false,
-      //     updateDatetime: new Date(),
-      //     updateUser: user?.id || undefined,
-      //     description: data.description,
-      //     name: data.name,
-      //     productSpecCharValueDTOS: productCharValues,
-      //   };
-      //   await productSpecCharApi.createProductSpecChar(updateProductChar as ProductChar);
-      // }
+      const formData = new FormData();
+      formData.append('name',data.name)
+      formData.append('description', data.description)
+      formData.append('status', data?.status ==='Active'? '1':'0')
+      formData.append('icon', data.icon)
+      await productTypeApi.createProductType(formData)
+      dispatch(getproductTypes());
     } catch (error) {
+      console.log("error");
       console.log(error);
       if (isMountedRef.current) {
         setError('afterSubmit', { type: 'custom', message: error.message });
@@ -324,7 +305,7 @@ export default function ProductTypeView() {
                   <option>InActive</option>
                 </RHFSelect>
                 <RHFTextField name="description" label="Description" />
-                <RHFUploadSingleFile
+                <RHFUploadAvatar
                   name="icon"
                   accept="image/*"
                   maxSize={3145728}
@@ -344,101 +325,111 @@ export default function ProductTypeView() {
                 onFilterName={handleFilterByName}
                 onDeleteProducts={() => handleDeleteProducts(selected)}
               />
+              <Scrollbar>
+                <TableContainer sx={{ minWidth: 800 }}>
+                  <Table>
+                    <ProductTypeHead
+                      order={order}
+                      orderBy={orderBy}
+                      headLabel={TABLE_HEAD}
+                      rowCount={productTypeList.length}
+                      numSelected={selected.length}
+                      onRequestSort={handleRequestSort}
+                      onSelectAllClick={handleSelectAllClick}
+                    />
+                    <TableBody>
+                      {filteredUsers
+                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        .map((row) => {
+                          const { id, icon, name, status, description } = row;
+                          const isItemSelected = selected.indexOf(id) !== -1;
+
+                          return (
+                            <TableRow
+                              hover
+                              key={id}
+                              tabIndex={-1}
+                              role="checkbox"
+                              selected={isItemSelected}
+                              aria-checked={isItemSelected}
+                            >
+                              <TableCell padding="checkbox">
+                                <Checkbox
+                                  checked={isItemSelected}
+                                  onClick={() => handleClick(id)}
+                                />
+                              </TableCell>
+                              <TableCell align="left">{id}</TableCell>
+                              <TableCell align="left" sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Avatar
+                                  alt={name}
+                                  src={icon}
+                                  sx={{ mr: 2 }}
+                                />
+                                <Typography variant="subtitle2" noWrap >
+                                  {name}
+                                </Typography>
+                              </TableCell>
+                              <TableCell align="left">
+                                <Label
+                                  variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
+                                  color={(status === false && 'error') || 'success'}
+                                >
+                                  {sentenceCase(status === true ? 'active' : 'inactive')}
+                                </Label>
+                              </TableCell>
+                              <TableCell align="left">{description}</TableCell>
+
+                              <TableCell align="center">
+                                <Button
+                                  onClick={() => handleEditProductChar(id)}
+                                  startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
+                                />
+                              </TableCell>
+                              <TableCell align="center">
+                                <Button
+                                  sx={{ color: 'error.main' }}
+                                  onClick={() => handleDeleteProductChar(id)}
+                                  startIcon={
+                                    <Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />
+                                  }
+                                />
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      {emptyRows > 0 && (
+                        <TableRow style={{ height: 53 * emptyRows }}>
+                          <TableCell colSpan={6} />
+                        </TableRow>
+                      )}
+                    </TableBody>
+                    {isNotFound && (
+                      <TableBody>
+                        <TableRow>
+                          <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                            <SearchNotFound searchQuery={filterName} />
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    )}
+                  </Table>
+                </TableContainer>
+              </Scrollbar>
+
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={productTypeList.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={(e, page) => setPage(page)}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
             </Card>
           </Grid>
         </Grid>
       </FormProvider>
-      <Scrollbar>
-        <TableContainer sx={{ minWidth: 800 }}>
-          <Table>
-            <ProductTypeHead
-              order={order}
-              orderBy={orderBy}
-              headLabel={TABLE_HEAD}
-              rowCount={productTypeList.length}
-              numSelected={selected.length}
-              onRequestSort={handleRequestSort}
-              onSelectAllClick={handleSelectAllClick}
-            />
-            <TableBody>
-              {filteredUsers
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => {
-                  const { id,icon, name, status, description } = row;
-                  const isItemSelected = selected.indexOf(id) !== -1;
-
-                  return (
-                    <TableRow
-                      hover
-                      key={id}
-                      tabIndex={-1}
-                      role="checkbox"
-                      selected={isItemSelected}
-                      aria-checked={isItemSelected}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox checked={isItemSelected} onClick={() => handleClick(id)} />
-                      </TableCell>
-                      <TableCell align="left">{id}</TableCell>
-                      <TableCell align="left" > 
-                      <Avatar alt={name} src={icon} sx={{ display: 'flex', alignItems: 'center' }} />
-                            <Typography variant="subtitle2" noWrap>
-                              {name}
-                            </Typography></TableCell>
-                      <TableCell align="left">
-                        <Label
-                          variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
-                          color={(status === false && 'error') || 'success'}
-                        >
-                          {sentenceCase(status === true ? 'active' : 'inactive')}
-                        </Label>
-                      </TableCell>
-                      <TableCell align="left">{description}</TableCell>
-
-                      <TableCell align="center">
-                        <Button
-                          onClick={() => handleEditProductChar(id)}
-                          startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        <Button
-                          sx={{ color: 'error.main' }}
-                          onClick={() => handleDeleteProductChar(id)}
-                          startIcon={<Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-            {isNotFound && (
-              <TableBody>
-                <TableRow>
-                  <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                    <SearchNotFound searchQuery={filterName} />
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            )}
-          </Table>
-        </TableContainer>
-      </Scrollbar>
-
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={productTypeList.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={(e, page) => setPage(page)}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
     </>
   );
 }

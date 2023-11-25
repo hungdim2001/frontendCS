@@ -2,7 +2,10 @@ import { BaseApi } from './base-api';
 import { UserAccount } from 'src/@types/user';
 import { OrNull } from 'src/@types/common';
 import { Verify } from 'crypto';
+import { deleteUser } from 'firebase/auth';
+import { BaseFormDataApi } from './base-form-data-api';
 const authApiIns = new BaseApi('/api/auth');
+const productTypeIns = new BaseFormDataApi('/api/product-type')
 const tokenApiIns = new BaseApi('/api/token');
 export type LoginRequestBody = {
   account: string;
@@ -68,15 +71,18 @@ type SessionParams = {
 } | null;
 const setSession = (sessionParams: SessionParams) => {
   const apiInstance = authApiIns.getApiInstance();
+  const apiFormDataIns = productTypeIns.getApiInstance();
 
   if (sessionParams === null) {
     delete apiInstance.defaults.headers.common.Authorization;
+    delete apiFormDataIns.defaults.headers.common.Authorization ;
     return;
   }
 
   const { accessToken } = sessionParams;
 
   apiInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+  apiFormDataIns.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 };
 export type VerifyRequestBody = {
   code: String;
