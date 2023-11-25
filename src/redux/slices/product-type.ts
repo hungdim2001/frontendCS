@@ -3,6 +3,7 @@ import { ProductChar, ProductTypeState } from 'src/@types/product';
 import { dispatch } from '../store';
 import axios from '../../utils/axios';
 import { productSpecCharApi } from 'src/service/app-apis/product-char';
+import { productTypeApi } from 'src/service/app-apis/product-type';
 
 const initialState: ProductTypeState = {
   productTypes: [],
@@ -24,17 +25,12 @@ const slice = createSlice({
 export default slice.reducer;
 export const { getproductTypesSucess } = slice.actions;
 
-export function getproductTypes(id: number | null) {
+export function getproductTypes() {
   return async () => {
     try {
-      const response = await productSpecCharApi.getProductSpecChars(id);
-      if (id) {
-        // dispatch(slice.actions.getproductTypesucess(response[0]));
-      }else{
+      const response = await productTypeApi.getProductTypes();
+      console.log(response)
         dispatch(slice.actions.getproductTypesSucess(response));
-        // dispatch(slice.actions.getproductTypesucess({} as ProductChar));
-
-      }
     } catch (error) {
       console.log(error);
     }

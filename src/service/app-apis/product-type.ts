@@ -3,14 +3,17 @@ import { ProductType } from '../../@types/product';
 import { HOST_API } from 'src/config';
 import axios from 'src/utils/axios';
 // import axios from 'axios';
+const productTypeIns = new BaseApi('/api/product-type');
+const productTypeFormIns = HOST_API+'/api/product-type';
 
-
-const productTypeIns = HOST_API+'/api/product-type';
+const getProductTypes = () => {
+  return productTypeIns.get<ProductType[]>('');
+};
 
 const createProductType = async (formData: FormData) =>
 {
     try {
-        const response = await axios.post(productTypeIns, formData, {
+        const response = await axios.post(productTypeFormIns, formData, {
           headers: {
             'Content-Type': 'multipart/form-data', 
           }
@@ -21,7 +24,7 @@ const createProductType = async (formData: FormData) =>
 }
 
 const productTypeApi = {
-    createProductType,
+    createProductType,getProductTypes
 };
 
 Object.freeze(productTypeApi);

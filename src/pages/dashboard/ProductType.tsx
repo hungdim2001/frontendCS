@@ -9,6 +9,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
 import {
   Alert,
+  Avatar,
   Box,
   Button,
   Card,
@@ -50,6 +51,7 @@ import ProductTypeHead from 'src/sections/@dashboard/e-commerce/product-type/Pro
 import ProductTypeToolbar from 'src/sections/@dashboard/e-commerce/product-type/ProductTypeToolbar';
 import { RHFUploadSingleFile } from 'src/components/hook-form';
 import { styled } from '@mui/material/styles';
+import { getproductTypes } from 'src/redux/slices/product-type';
 
 // ----------------------------------------------------------------------
 
@@ -62,16 +64,6 @@ interface FormValuesProps {
   status: string;
   afterSubmit?: string;
 }
-
-type Props = {
-  isEdit: boolean;
-  productChar?: ProductChar;
-};
-const LabelStyle = styled(Typography)(({ theme }) => ({
-  ...theme.typography.subtitle2,
-  color: theme.palette.text.secondary,
-  marginBottom: theme.spacing(1),
-}));
 
 const TABLE_HEAD = [
   { id: 'id', label: 'ID', alignRight: false },
@@ -168,7 +160,7 @@ export default function ProductTypeView() {
   };
 
   useEffect(() => {
-    dispatch(getProductChars(null));
+    dispatch(getproductTypes());
   }, [dispatch]);
 
   useEffect(() => {
@@ -332,12 +324,12 @@ export default function ProductTypeView() {
                   <option>InActive</option>
                 </RHFSelect>
                 <RHFTextField name="description" label="Description" />
-                  <RHFUploadSingleFile
-                    name="icon"
-                    accept="image/*"
-                    maxSize={3145728}
-                    onDrop={handleDrop}
-                  />
+                <RHFUploadSingleFile
+                  name="icon"
+                  accept="image/*"
+                  maxSize={3145728}
+                  onDrop={handleDrop}
+                />
               </Box>
 
               <Stack alignItems="flex-end" sx={{ mt: 3 }}>
@@ -356,7 +348,7 @@ export default function ProductTypeView() {
           </Grid>
         </Grid>
       </FormProvider>
-      {/* <Scrollbar>
+      <Scrollbar>
         <TableContainer sx={{ minWidth: 800 }}>
           <Table>
             <ProductTypeHead
@@ -372,7 +364,7 @@ export default function ProductTypeView() {
               {filteredUsers
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
-                  const { id, name, status, description } = row;
+                  const { id,icon, name, status, description } = row;
                   const isItemSelected = selected.indexOf(id) !== -1;
 
                   return (
@@ -388,7 +380,11 @@ export default function ProductTypeView() {
                         <Checkbox checked={isItemSelected} onClick={() => handleClick(id)} />
                       </TableCell>
                       <TableCell align="left">{id}</TableCell>
-                      <TableCell align="left">{name}</TableCell>
+                      <TableCell align="left" > 
+                      <Avatar alt={name} src={icon} sx={{ display: 'flex', alignItems: 'center' }} />
+                            <Typography variant="subtitle2" noWrap>
+                              {name}
+                            </Typography></TableCell>
                       <TableCell align="left">
                         <Label
                           variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
@@ -442,7 +438,7 @@ export default function ProductTypeView() {
         page={page}
         onPageChange={(e, page) => setPage(page)}
         onRowsPerPageChange={handleChangeRowsPerPage}
-      /> */}
+      />
     </>
   );
 }
