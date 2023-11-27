@@ -38,10 +38,7 @@ type Props = {
 
 export default function ProductCharNewForm({ isEdit, productChar }: Props) {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [productCharValues, setproductCharValues] = useState<ProductCharValue[]>([]);
-  const { enqueueSnackbar } = useSnackbar();
   const setProductCharValues = (productCharValueCodes: any) => {
     setproductCharValues(productCharValueCodes);
   };

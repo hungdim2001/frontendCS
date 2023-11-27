@@ -26,6 +26,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import { productSpecCharApi } from '../../../../service/app-apis/product-char';
 import useAuth from '../../../../hooks/useAuth';
+import { useSelector } from 'src/redux/store';
 // hooks
 // components
 
@@ -93,6 +94,9 @@ export default function ProductCharValueDialog({
 
   const { user } = useAuth();
 
+
+  const { productChar } = useSelector((state) => state.productChars);
+
   const productcharValueSchema = Yup.object().shape({
     valueCharValue: Yup.string().required('Value is required'),
     statusCharValue: Yup.string().required('Status is required'),
@@ -126,7 +130,8 @@ export default function ProductCharValueDialog({
       // Check if the data.codeCharValue is unique
 
       if (isEdit) {
-        const isDuplicate = await productSpecCharApi.checkDuplicateCode(data.valueCharValue);
+        const isDuplicate = await productSpecCharApi.checkDuplicateCode(data.valueCharValue,productCharValue.id, productChar.id);
+        console.log(isDuplicate)
         if (isDuplicate && data.valueCharValue !== productCharValue?.value) {
           throw new Error('Code is not unique');
         }
@@ -154,7 +159,7 @@ export default function ProductCharValueDialog({
         const newProductCharValues = [...deleteProductCharValues, newProductCharValue];
         setProductCharValues(newProductCharValues);
       } else {
-        const isDuplicate = await productSpecCharApi.checkDuplicateCode(data.valueCharValue);
+        const isDuplicate = await productSpecCharApi.checkDuplicateCode(data.valueCharValue,productCharValue.id, productChar.id);
         const isCodeUnique = !productCharValues.some(
           (productCharValue) => productCharValue.value === data.valueCharValue
         );

@@ -28,7 +28,7 @@ import ProductCharValueToolbar from './ProductCharValueToolbar';
 import ProductCharValueHead from './ProductCharValueHead';
 import ProductCharValueDialog from './ProductCharValueDialog';
 import { useDispatch, useSelector } from 'src/redux/store';
-import { deleteProductCharValue } from 'src/redux/slices/product-char';
+import productChar, { deleteProductCharValue } from 'src/redux/slices/product-char';
 
 // ----------------------------------------------------------------------
 

@@ -4,7 +4,12 @@ import { ProductChar } from '../../@types/product';
 const productSpecCharIns = new BaseApi('/api/product/char');
 const productSpecCharValuedIns = new BaseApi('/api/product/char/value');
 
-const checkDuplicateCode = (code: string) => productSpecCharValuedIns.post<boolean>(`/${code}`);
+const checkDuplicateCode = (value: string, productSpecCharId:number|null, charValueId:number|null  ) => productSpecCharValuedIns.post<boolean>('',{
+  productSpecCharId:productSpecCharId,
+  value:value,
+  charValueId: charValueId
+
+});
 const deleteProductSpecCharValue = (ids: number[]) =>
   productSpecCharValuedIns.delete<ProductChar[]>('', { data: ids });
 
