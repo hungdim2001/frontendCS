@@ -59,7 +59,15 @@ const navConfig = [
         ],
       },
       {
-        title: 'Product Characteristic',
+        title: 'Product',
+        path: PATH_DASHBOARD.product.root,
+        icon: ICONS.ecommerce,
+        children: [
+          { title: 'Product type', path: PATH_DASHBOARD.product.productTypes },
+        ],
+      },
+      {
+        title: 'Product characteristic',
         path: PATH_DASHBOARD.productChar.root,
         icon: ICONS.kanban,
         children: [

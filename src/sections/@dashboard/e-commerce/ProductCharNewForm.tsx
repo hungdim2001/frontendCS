@@ -76,7 +76,6 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
   const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
-    console.log(productChar)
     reset(defaultValues);
     setProductCharValues(
       productChar?.productSpecCharValueDTOS ? productChar.productSpecCharValueDTOS : []
@@ -86,7 +85,6 @@ export default function ProductCharNewForm({ isEdit, productChar }: Props) {
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
-      console.log("sfsf")
       if(!isEdit){
         const productChar: ProductChar = {
           id: null,

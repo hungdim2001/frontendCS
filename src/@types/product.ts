@@ -34,11 +34,18 @@ export type ProductChar = BaseDTO & {
   name: string;
   productSpecCharValueDTOS: ProductCharValue[]|null;
 };
+export type ProductType = BaseDTO & {
+  icon: string;
+  name: string;
+};
 export type ProductCharState  = {
   productChars :ProductChar[]|[]
   productChar: ProductChar
 };
 
+export type ProductTypeState  = {
+  productTypes: ProductType[]
+}
 
 export type ProductCharValue  = BaseDTO &{
   value: string;

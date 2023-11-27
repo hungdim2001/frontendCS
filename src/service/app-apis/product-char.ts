@@ -13,7 +13,6 @@ const createProductSpecChar = (productSpecChars: ProductChar) =>
 
 const getProductSpecChars = (id: number | null) => {
   const path = id ? `/${id}` : '';
-
   return productSpecCharIns.get<ProductChar[]>(`/${path}`);
 };
 
