@@ -16,6 +16,11 @@ const slice = createSlice({
     getproductTypesSucess(state, action) {
       state.productTypes = action.payload;
     },
+    deleteProductType(state, action) {
+      console.log(action.payload)
+      const updateProductType = state.productTypes.filter((item) => action.payload.find((item1: number) => item1 !== item.id!));
+      state.productTypes = updateProductType;
+    },
     // getproductTypesucess(state, action) {
     //   state.productChar = action.payload;
     // },
@@ -23,13 +28,12 @@ const slice = createSlice({
 });
 
 export default slice.reducer;
-export const { getproductTypesSucess } = slice.actions;
+export const { getproductTypesSucess,deleteProductType } = slice.actions;
 
-export function getproductTypes() {
+export function getProductTypes() {
   return async () => {
     try {
       const response = await productTypeApi.getProductTypes();
-      console.log(response)
         dispatch(slice.actions.getproductTypesSucess(response));
     } catch (error) {
       console.log(error);
@@ -37,24 +41,14 @@ export function getproductTypes() {
   };
 }
 
-export function deleteproductTypes(productCharIds: number[]) {
+export function deleteProductTypes(ids: number[]) {
   return async () => {
     try {
-      const response = await productSpecCharApi.deleteProductSpecChars(productCharIds);
-      dispatch(slice.actions.getproductTypesSucess(response));
+      await productTypeApi.deleteproductTypes(ids);
+      dispatch(slice.actions.deleteProductType(ids))
     } catch (error) {
       console.log(error);
     }
   };
   
 }
-export function deleteProductCharValue(productCharValueIds: number[]) {
-  return async () => {
-    try {
-      const response = await productSpecCharApi.deleteProductSpecCharValue(productCharValueIds);
-      dispatch(slice.actions.getproductTypesSucess(response));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-};

@@ -1,10 +1,9 @@
-import * as Yup from 'yup';
-import { useSnackbar } from 'notistack';
-import { useNavigate } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import * as Yup from 'yup';
 // form
-import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm } from 'react-hook-form';
 // @mui
 import { LoadingButton } from '@mui/lab';
 import {
@@ -28,31 +27,23 @@ import {
 // routes
 // @types
 // components
-import { useDispatch, useSelector } from '../../redux/store';
-import { el } from 'date-fns/locale';
-import { ProductChar, ProductCharValue, ProductType } from 'src/@types/product';
-import useAuth from 'src/hooks/useAuth';
-import useIsMountedRef from 'src/hooks/useIsMountedRef';
-import { productSpecCharApi } from 'src/service/app-apis/product-char';
-import RHFTextField from 'src/components/hook-form/RHFTextField';
-import RHFSelect from 'src/components/hook-form/RHFSelect';
-import FormProvider from 'src/components/hook-form/FormProvider';
+import { sentenceCase } from 'change-case';
+import { ProductType } from 'src/@types/product';
+import Iconify from 'src/components/Iconify';
+import Label from 'src/components/Label';
 import Scrollbar from 'src/components/Scrollbar';
 import SearchNotFound from 'src/components/SearchNotFound';
-import Label from 'src/components/Label';
-import ProductCharListHead from 'src/sections/@dashboard/e-commerce/product-char/ProductCharListHead';
-import ProductCharToolbar from 'src/sections/@dashboard/e-commerce/product-char/ProductCharToolbar';
-import { sentenceCase } from 'change-case';
-import Iconify from 'src/components/Iconify';
-import { PATH_DASHBOARD } from 'src/routes/paths';
-import useSettings from 'src/hooks/useSettings';
-import { deleteProductChars, getProductChars } from 'src/redux/slices/product-char';
+import { RHFUploadAvatar } from 'src/components/hook-form';
+import FormProvider from 'src/components/hook-form/FormProvider';
+import RHFSelect from 'src/components/hook-form/RHFSelect';
+import RHFTextField from 'src/components/hook-form/RHFTextField';
+import useAuth from 'src/hooks/useAuth';
+import useIsMountedRef from 'src/hooks/useIsMountedRef';
+import { deleteProductTypes, getProductTypes } from 'src/redux/slices/product-type';
 import ProductTypeHead from 'src/sections/@dashboard/e-commerce/product-type/ProductTypeHead';
 import ProductTypeToolbar from 'src/sections/@dashboard/e-commerce/product-type/ProductTypeToolbar';
-import { RHFUploadAvatar, RHFUploadSingleFile } from 'src/components/hook-form';
-import { styled } from '@mui/material/styles';
-import { getproductTypes } from 'src/redux/slices/product-type';
 import { productTypeApi } from 'src/service/app-apis/product-type';
+import { useDispatch, useSelector } from '../../redux/store';
 
 // ----------------------------------------------------------------------
 
@@ -60,8 +51,9 @@ import { productTypeApi } from 'src/service/app-apis/product-type';
 
 interface FormValuesProps {
   name: string;
+  id: any;
   description: string;
-  icon: string | any;
+  icon: File | any;
   status: string;
   afterSubmit?: string;
 }
@@ -79,32 +71,20 @@ export default function ProductTypeView() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [productCharValues, setproductCharValues] = useState<ProductCharValue[]>([]);
-  // const [productType, setproductCharValues] = useState<ProductCharValue[]>([]);
-
-  const { enqueueSnackbar } = useSnackbar();
-  const setProductCharValues = (productCharValueCodes: any) => {
-    setproductCharValues(productCharValueCodes);
-  };
+  const [productType, setproductType] = useState<ProductType>({} as ProductType);
   const NewProductSchema = Yup.object().shape({
     icon: Yup.mixed().required('Icon is required'),
     name: Yup.string().required('Name is required'),
   });
   const defaultValues = useMemo(
-    // () => ({
-    //   name: productChar?.name || '',
-    //   status: productChar?.status ? (productChar.status ? 'Active' : 'InActive') : 'Active',
-    //   icon:null,
-    //   description: productChar?.description || '',
-    // }),
-    // [productChar]
     () => ({
-      name: '',
-      status: 'Active',
-      icon: null,
-      description: '',
+      id: productType?.id || null,
+      name: productType?.name || '',
+      status: productType?.status ? (productType.status ? 'Active' : 'InActive') : 'Active',
+      icon: productType.icon,
+      description: productType?.description || '',
     }),
-    []
+    [productType]
   );
 
   const methods = useForm<FormValuesProps>({
@@ -121,16 +101,7 @@ export default function ProductTypeView() {
     formState: { errors, isSubmitting },
   } = methods;
 
-  const values = watch();
   const isMountedRef = useIsMountedRef();
-
-  // useEffect(() => {
-  //   console.log(productChar);
-  //   reset(defaultValues);
-  //   setProductCharValues(
-  //     productChar?.productSpecCharValueDTOS ? productChar.productSpecCharValueDTOS : []
-  //   );
-  // }, [productChar]);
 
   const ICON = {
     mr: 2,
@@ -140,7 +111,7 @@ export default function ProductTypeView() {
 
   const theme = useTheme();
 
-  const [productTypeList, setProductTypeList] = useState<ProductType[]>([]);
+  // const [productTypeList, setProductTypeList] = useState<ProductType[]>([]);
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
@@ -161,14 +132,12 @@ export default function ProductTypeView() {
   };
 
   useEffect(() => {
-    dispatch(getproductTypes());
+    dispatch(getProductTypes());
   }, [dispatch]);
 
   useEffect(() => {
-    if (productTypes.length) {
-      setProductTypeList(productTypes);
-    }
-  }, [productTypes]);
+    reset(defaultValues);
+  }, [productType]);
 
   const handleSelectAllClick = (checked: boolean) => {
     if (checked) {
@@ -202,56 +171,53 @@ export default function ProductTypeView() {
     setPage(0);
   };
 
-  const handleFilterByName = (filterName: string) => {
+  const handleFilterByName  = (filterName: string) => {
     setFilterName(filterName);
     setPage(0);
   };
 
-  const handleDeleteProductChar = (id: number | null) => {
-    // if (id) {
-    //   const ids = [id];
-    //   dispatch(deleteProductChars(ids));
-    //   const deleteProduct = productTypeList.filter((product) => product.id !== id);
-    //   setSelected([]);
-    //   setProductTypeList(deleteProduct);
-    // }
-  };
-
-  const handleEditProductChar = (id: number | null) => {
+  const handleDeleteProductType = async (id: number | null) => {
     if (id) {
-      console.log(`${PATH_DASHBOARD.productChar.edit}/${id}`);
-      navigate(`${PATH_DASHBOARD.productChar.edit}/${id}`, { replace: true });
+      const ids = [id];
+     await dispatch(deleteProductTypes(ids));
+      setSelected([]);
     }
   };
 
-  const handleDeleteProducts = (ids: (number | null)[]) => {
-    // const validIds = ids.filter((id) => id !== null) as number[];
-    // if (validIds.length > 0) {
-    //   dispatch(deleteProductChars(validIds));
-    //   const deleteProducts = productTypeList.filter((product) => !ids.includes(product.id));
-    //   setSelected([]);
-    //   setProductTypeList(deleteProducts);
-    // }
+  const handleDeleteProducts = async (ids: (number | null)[]) => {
+    const validIds = ids.filter((id) => id !== null) as number[];
+    if (validIds.length > 0) {
+      await dispatch(deleteProductTypes(validIds));
+      setSelected([]);
+    }
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productTypeList.length) : 0;
+  const handleEditProductType = (id: number | null) => {
+    if (id) {
+      const itemEdit = productTypes.find((item) => item.id === id);
+      setproductType(itemEdit!);
+    }
+  };
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productTypes.length) : 0;
 
-  const filteredUsers = applySortFilter(productTypeList, getComparator(order, orderBy), filterName);
+  const filteredUsers = applySortFilter(productTypes, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && Boolean(filterName);
   const onSubmit = async (data: FormValuesProps) => {
-
     try {
       console.log(data);
       const formData = new FormData();
-      formData.append('name',data.name)
-      formData.append('description', data.description)
-      formData.append('status', data?.status ==='Active'? '1':'0')
-      formData.append('icon', data.icon)
-      await productTypeApi.createProductType(formData)
-      dispatch(getproductTypes());
+      if (data.id) {
+        formData.append('id', data.id);
+      }
+      formData.append('name', data.name);
+      formData.append('description', data.description);
+      formData.append('status', data?.status === 'Active' ? '1' : '0');
+      formData.append('icon', data.icon);
+      await productTypeApi.createProductType(formData);
+      dispatch(getProductTypes());
     } catch (error) {
-      console.log("error");
+      console.log('error');
       console.log(error);
       if (isMountedRef.current) {
         setError('afterSubmit', { type: 'custom', message: error.message });
@@ -332,7 +298,7 @@ export default function ProductTypeView() {
                       order={order}
                       orderBy={orderBy}
                       headLabel={TABLE_HEAD}
-                      rowCount={productTypeList.length}
+                      rowCount={productTypes.length}
                       numSelected={selected.length}
                       onRequestSort={handleRequestSort}
                       onSelectAllClick={handleSelectAllClick}
@@ -360,13 +326,12 @@ export default function ProductTypeView() {
                                 />
                               </TableCell>
                               <TableCell align="left">{id}</TableCell>
-                              <TableCell align="left" sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Avatar
-                                  alt={name}
-                                  src={icon}
-                                  sx={{ mr: 2 }}
-                                />
-                                <Typography variant="subtitle2" noWrap >
+                              <TableCell
+                                align="left"
+                                sx={{ display: 'flex', alignItems: 'center' }}
+                              >
+                                <Avatar alt={name} src={icon} sx={{ mr: 2 }} />
+                                <Typography variant="subtitle2" noWrap>
                                   {name}
                                 </Typography>
                               </TableCell>
@@ -382,14 +347,14 @@ export default function ProductTypeView() {
 
                               <TableCell align="center">
                                 <Button
-                                  onClick={() => handleEditProductChar(id)}
+                                  onClick={() => handleEditProductType(id)}
                                   startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
                                 />
                               </TableCell>
                               <TableCell align="center">
                                 <Button
                                   sx={{ color: 'error.main' }}
-                                  onClick={() => handleDeleteProductChar(id)}
+                                  onClick={() => handleDeleteProductType(id)}
                                   startIcon={
                                     <Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />
                                   }
@@ -420,7 +385,7 @@ export default function ProductTypeView() {
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
-                count={productTypeList.length}
+                count={productTypes.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={(e, page) => setPage(page)}

@@ -11,11 +11,17 @@ const getProductTypes = () => {
   return productTypeIns.get<ProductType[]>('');
 };
 
+const deleteproductTypes = (ids:number[]) => {
+  return productTypeIns.delete<ProductType[]>('',{ data: ids });
+};
+
+
 const createProductType = (formData: FormData) => {
   return productTypeFormIns.post<ProductType>('',formData);
 };
 
 const productTypeApi = {
+  deleteproductTypes,
   createProductType,
   getProductTypes,
 };
