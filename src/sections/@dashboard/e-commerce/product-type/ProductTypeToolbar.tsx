@@ -50,7 +50,7 @@ export default function ProductTypeToolbar({
           stretchStart={240}
           value={filterName}
           onChange={(event) => onFilterName(event.target.value)}
-          placeholder="Search product Characteristic ..."
+          placeholder="Search product Type ..."
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

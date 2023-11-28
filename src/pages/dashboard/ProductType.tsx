@@ -13,6 +13,7 @@ import {
   Button,
   Card,
   Checkbox,
+  Container,
   Grid,
   Stack,
   Table,
@@ -44,6 +45,10 @@ import ProductTypeHead from 'src/sections/@dashboard/e-commerce/product-type/Pro
 import ProductTypeToolbar from 'src/sections/@dashboard/e-commerce/product-type/ProductTypeToolbar';
 import { productTypeApi } from 'src/service/app-apis/product-type';
 import { useDispatch, useSelector } from '../../redux/store';
+import Page from 'src/components/Page';
+import HeaderBreadcrumbs from 'src/components/HeaderBreadcrumbs';
+import useSettings from 'src/hooks/useSettings';
+import { PATH_DASHBOARD } from 'src/routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -184,7 +189,7 @@ export default function ProductTypeView() {
     }
   };
 
-  const handleDeleteProducts = async (ids: (number | null)[]) => {
+  const handleDeleteProductTypes = async (ids: (number | null)[]) => {
     const validIds = ids.filter((id) => id !== null) as number[];
     if (validIds.length > 0) {
       await dispatch(deleteProductTypes(validIds));
@@ -205,7 +210,6 @@ export default function ProductTypeView() {
   const isNotFound = !filteredUsers.length && Boolean(filterName);
   const onSubmit = async (data: FormValuesProps) => {
     try {
-      console.log(data);
       const formData = new FormData();
       if (data.id) {
         formData.append('id', data.id);
@@ -215,6 +219,7 @@ export default function ProductTypeView() {
       formData.append('status', data?.status === 'Active' ? '1' : '0');
       formData.append('icon', data.icon);
       await productTypeApi.createProductType(formData);
+      reset();
       dispatch(getProductTypes());
     } catch (error) {
       console.log('error');
@@ -229,6 +234,7 @@ export default function ProductTypeView() {
     const selectedValue = e.target.value;
     setValue(field, selectedValue, { shouldValidate: true });
   };
+  const { themeStretch } = useSettings();
 
   const handleDrop = useCallback(
     (acceptedFiles) => {
@@ -248,7 +254,20 @@ export default function ProductTypeView() {
 
   return (
     <>
-      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+      
+
+
+      <Page title="Product Types">
+      <Container maxWidth={themeStretch ? false : 'lg'}>
+        <HeaderBreadcrumbs
+          heading="Product Types"
+          links={[
+            { name: 'Dashboard', href: PATH_DASHBOARD.root },
+            { name: 'Product Types' },
+          ]}
+          
+        />
+<FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
         {!!errors.afterSubmit && <Alert severity="error">{errors.afterSubmit.message}</Alert>}
         <Grid container spacing={3}>
           <Grid item xs={12} md={12}>
@@ -289,7 +308,7 @@ export default function ProductTypeView() {
                 numSelected={selected.length}
                 filterName={filterName}
                 onFilterName={handleFilterByName}
-                onDeleteProducts={() => handleDeleteProducts(selected)}
+                onDeleteProducts={() => handleDeleteProductTypes(selected)}
               />
               <Scrollbar>
                 <TableContainer sx={{ minWidth: 800 }}>
@@ -395,6 +414,9 @@ export default function ProductTypeView() {
           </Grid>
         </Grid>
       </FormProvider>
+        
+      </Container>
+    </Page>
     </>
   );
 }

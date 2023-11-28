@@ -18,12 +18,10 @@ const slice = createSlice({
     },
     deleteProductType(state, action) {
       console.log(action.payload)
-      const updateProductType = state.productTypes.filter((item) => action.payload.find((item1: number) => item1 !== item.id!));
+      const updateProductType = state.productTypes.filter(item => !action.payload.includes(item.id));
+      console.log(updateProductType);
       state.productTypes = updateProductType;
     },
-    // getproductTypesucess(state, action) {
-    //   state.productChar = action.payload;
-    // },
   },
 });
 
