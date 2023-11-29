@@ -34,7 +34,7 @@ const rootReducer = combineReducers({
   kanban: kanbanReducer,
   product: persistReducer(productPersistConfig, productReducer),
   productChars:productCharsReducer,
-  productTypes:productTypeReducer,
+  productType:productTypeReducer,
 
 });
 
