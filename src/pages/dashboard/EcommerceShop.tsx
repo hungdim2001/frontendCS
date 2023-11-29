@@ -190,17 +190,17 @@ function applyFilter(products: Product[], sortBy: string | null, filters: Produc
     products = orderBy(products, ['price'], ['asc']);
   }
   // FILTER PRODUCTS
-  if (filters.gender.length > 0) {
-    products = products.filter((product) => filters.gender.includes(product.gender));
-  }
-  if (filters.category !== 'All') {
-    products = products.filter((product) => product.category === filters.category);
-  }
-  if (filters.colors.length > 0) {
-    products = products.filter((product) =>
-      product.colors.some((color) => filters.colors.includes(color))
-    );
-  }
+  // if (filters.gender.length > 0) {
+  //   products = products.filter((product) => filters.gender.includes(product.gender));
+  // }
+  // if (filters.category !== 'All') {
+  //   products = products.filter((product) => product.category === filters.category);
+  // }
+  // if (filters.colors.length > 0) {
+  //   products = products.filter((product) =>
+  //     product.colors.some((color) => filters.colors.includes(color))
+  //   );
+  // }
   if (filters.priceRange) {
     products = products.filter((product) => {
       if (filters.priceRange === 'below') {
@@ -220,7 +220,7 @@ function applyFilter(products: Product[], sortBy: string | null, filters: Produc
         if (value === 'up2Star') return 2;
         return 1;
       };
-      return product.totalRating > convertRating(filters.rating);
+      // return product.totalRating > convertRating(filters.rating);
     });
   }
   return products;

@@ -34,7 +34,7 @@ export default function CheckoutCart() {
 
   const isEmptyCart = cart.length === 0;
 
-  const handleDeleteCart = (productId: string) => {
+  const handleDeleteCart = (productId: number|null) => {
     dispatch(deleteCart(productId));
   };
 
@@ -42,11 +42,11 @@ export default function CheckoutCart() {
     dispatch(onNextStep());
   };
 
-  const handleIncreaseQuantity = (productId: string) => {
+  const handleIncreaseQuantity = (productId: number|null) => {
     dispatch(increaseQuantity(productId));
   };
 
-  const handleDecreaseQuantity = (productId: string) => {
+  const handleDecreaseQuantity = (productId: number|null) => {
     dispatch(decreaseQuantity(productId));
   };
 

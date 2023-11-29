@@ -20,7 +20,7 @@ type Props = {
 };
 
 export default function ShopProductCard({ product }: Props) {
-  const { name, cover, price, colors, status, priceSale } = product;
+  const { name, thumbnail, price, status } = product;
 
   const linkTo = `${PATH_DASHBOARD.eCommerce.root}/product/${paramCase(name)}`;
 
@@ -30,7 +30,7 @@ export default function ShopProductCard({ product }: Props) {
         {status && (
           <Label
             variant="filled"
-            color={(status === 'sale' && 'error') || 'info'}
+            // color={(status === 'sale' && 'error') || 'info'}
             sx={{
               top: 16,
               right: 16,
@@ -42,7 +42,7 @@ export default function ShopProductCard({ product }: Props) {
             {status}
           </Label>
         )}
-        <Image alt={name} src={cover} ratio="1/1" />
+        <Image alt={name} src={thumbnail} ratio="1/1" />
       </Box>
 
       <Stack spacing={2} sx={{ p: 3 }}>
@@ -53,17 +53,17 @@ export default function ShopProductCard({ product }: Props) {
         </Link>
 
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <ColorPreview colors={colors} />
+          {/* <ColorPreview colors={colors} /> */}
 
           <Stack direction="row" spacing={0.5}>
-            {priceSale && (
+            {/* {priceSale && (
               <Typography
                 component="span"
                 sx={{ color: 'text.disabled', textDecoration: 'line-through' }}
               >
                 {fCurrency(priceSale)}
               </Typography>
-            )}
+            )} */}
 
             <Typography variant="subtitle1">{fCurrency(price)}</Typography>
           </Stack>

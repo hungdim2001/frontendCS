@@ -16,15 +16,15 @@ type Props = {
 };
 
 export default function ProductDetailsReviewList({ product }: Props) {
-  const { reviews } = product;
+  // const { reviews } = product;
 
   return (
     <Box sx={{ pt: 3, px: 2, pb: 5 }}>
-      <List disablePadding>
+      {/* <List disablePadding>
         {reviews.map((review) => (
           <ReviewItem key={review.id} review={review} />
         ))}
-      </List>
+      </List> */}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Pagination count={10} color="primary" />
       </Box>

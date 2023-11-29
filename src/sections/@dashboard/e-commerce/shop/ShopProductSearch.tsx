@@ -95,15 +95,15 @@ export default function ShopProductSearch() {
         />
       )}
       renderOption={(props, product, { inputValue }) => {
-        const { name, cover } = product;
+        const { name, thumbnail } = product;
         const matches = match(name, inputValue);
         const parts = parse(name, matches);
 
         return (
           <li {...props}>
             <Image
-              alt={cover}
-              src={cover}
+              alt={thumbnail}
+              src={thumbnail}
               sx={{ width: 48, height: 48, borderRadius: 1, flexShrink: 0, mr: 1.5 }}
             />
             <Link underline="none" onClick={() => handleClick(name)}>

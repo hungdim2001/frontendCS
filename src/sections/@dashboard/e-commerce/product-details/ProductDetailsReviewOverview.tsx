@@ -37,10 +37,9 @@ type Props = {
 };
 
 export default function ProductDetailsReviewOverview({ product, onOpen }: Props) {
-  const { totalRating, totalReview, ratings } = product;
+  // const { totalRating, totalReview, ratings } = product;
 
-  const total = sumBy(ratings, (star) => star.starCount);
-
+  // const total = sumBy(ratings, (star) => star.starCount);
   return (
     <Grid container>
       <GridStyle item xs={12} md={4}>
@@ -48,23 +47,23 @@ export default function ProductDetailsReviewOverview({ product, onOpen }: Props)
           Average rating
         </Typography>
         <Typography variant="h2" gutterBottom sx={{ color: 'error.main' }}>
-          {totalRating}/5
+          {/* {totalRating}/5 */}
         </Typography>
-        <RatingStyle readOnly value={totalRating} precision={0.1} />
+        {/* <RatingStyle readOnly value={totalRating} precision={0.1} /> */}
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          ({fShortenNumber(totalReview)}
+          {/* ({fShortenNumber(totalReview)} */}
           &nbsp;reviews)
         </Typography>
       </GridStyle>
 
       <GridStyle item xs={12} md={4}>
         <Stack spacing={1.5} sx={{ width: 1 }}>
-          {ratings
+          {/* {ratings
             .slice(0)
             .reverse()
             .map((rating) => (
               <ProgressItem key={rating.name} star={rating} total={total} />
-            ))}
+            ))} */}
         </Stack>
       </GridStyle>
 

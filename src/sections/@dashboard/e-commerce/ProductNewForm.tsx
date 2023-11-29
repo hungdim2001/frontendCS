@@ -32,6 +32,7 @@ import {
   RHFRadioGroup,
   RHFUploadMultiFile,
   RHFUploadSingleFile,
+  RHFUploadAvatar,
 } from '../../../components/hook-form';
 
 // ----------------------------------------------------------------------
@@ -68,9 +69,15 @@ const LabelStyle = styled(Typography)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-interface FormValuesProps extends Partial<Product> {
-  taxes: boolean;
-  inStock: boolean;
+interface FormValuesProps {
+  thumbnail: File|string;
+  images: string[];
+  name: string;
+  price: number;
+  // code: string;
+  quantity: number;
+  // productType:ProductType;
+  // productChar:ProductChar[];
 }
 
 type Props = {
@@ -95,15 +102,15 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
       name: currentProduct?.name || '',
       description: currentProduct?.description || '',
       images: currentProduct?.images || [],
-      code: currentProduct?.code || '',
-      sku: currentProduct?.sku || '',
+      // code: currentProduct?.code || '',
+      // sku: currentProduct?.sku || '',
       price: currentProduct?.price || 0,
-      priceSale: currentProduct?.priceSale || 0,
-      tags: currentProduct?.tags || [TAGS_OPTION[0]],
+      // priceSale: currentProduct?.priceSale || 0,
+      // tags: currentProduct?.tags || [TAGS_OPTION[0]],
       inStock: true,
       taxes: true,
-      gender: currentProduct?.gender || GENDER_OPTION[2],
-      category: currentProduct?.category || CATEGORY_OPTION[0].classify[1],
+      // gender: currentProduct?.gender || GENDER_OPTION[2],
+      // category: currentProduct?.category || CATEGORY_OPTION[0].classify[1],
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentProduct]
@@ -160,6 +167,21 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     },
     [setValue]
   );
+  const handleDrop2 = useCallback(
+    (acceptedFiles) => {
+      const file = acceptedFiles[0];
+
+      if (file) {
+        setValue(
+          'thumbnail',
+          Object.assign(file, {
+            preview: URL.createObjectURL(file),
+          })
+        );
+      }
+    },
+    [setValue]
+  );
 
   const handleRemoveAll = () => {
     setValue('images', []);
@@ -177,15 +199,15 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
           <Card sx={{ p: 3 }}>
             <Stack spacing={3}>
               <RHFTextField name="name" label="Product Name" />
-              <div>
+              {/* <div>
                   <LabelStyle>Thumbnail</LabelStyle>
                   <RHFUploadSingleFile
                     name="thumbnail"
                     accept="image/*"
                     maxSize={3145728}
-                    onDrop={handleDrop}
+                    onDrop={handleDrop2}
                   />
-                </div>
+                </div> */}
                 <div>
                 <LabelStyle>Images</LabelStyle>
                 <RHFUploadMultiFile
@@ -211,6 +233,12 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         <Grid item xs={12} md={4}>
           <Stack spacing={3}>
             <Card sx={{ p: 3 }}>
+            <RHFUploadAvatar
+                  name="thumbnail"
+                  accept="image/*"
+                  maxSize={3145728}
+                  onDrop={handleDrop2}
+                />
               <RHFSwitch name="inStock" label="In stock" />
 
               <Stack spacing={3} mt={2}>
@@ -240,7 +268,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                   ))}
                 </RHFSelect>
 
-                <Controller
+                {/* <Controller
                   name="tags"
                   control={control}
                   render={({ field }) => (
@@ -263,7 +291,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                       renderInput={(params) => <TextField label="Tags" {...params} />}
                     />
                   )}
-                />
+                /> */}
               </Stack>
             </Card>
 
@@ -282,7 +310,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                   }}
                 />
 
-                <RHFTextField
+                {/* <RHFTextField
                   name="priceSale"
                   label="Sale Price"
                   placeholder="0.00"
@@ -293,7 +321,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                     type: 'number',
                   }}
-                />
+                /> */}
               </Stack>
 
               <RHFSwitch name="taxes" label="Price includes taxes" />

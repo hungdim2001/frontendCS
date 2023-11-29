@@ -131,7 +131,7 @@ export default function EcommerceProductList() {
     setFilterName(filterName);
   };
 
-  const handleDeleteProduct = (productId: string) => {
+  const handleDeleteProduct = (productId: number|null) => {
     const deleteProduct = productList.filter((product) => product.id !== productId);
     setSelected([]);
     setProductList(deleteProduct);
@@ -199,7 +199,9 @@ export default function EcommerceProductList() {
                   {filteredProducts
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row) => {
-                      const { id, name, cover, price, createdAt, inventoryType } = row;
+                      // const { id, name, thumbnail, price, createdAt, inventoryType } = row;
+                      const { id, name, thumbnail, price,  } = row;
+
 
                       const isItemSelected = selected.indexOf(name) !== -1;
 
@@ -219,14 +221,14 @@ export default function EcommerceProductList() {
                             <Image
                               disabledEffect
                               alt={name}
-                              src={cover}
+                              src={thumbnail}
                               sx={{ borderRadius: 1.5, width: 64, height: 64, mr: 2 }}
                             />
                             <Typography variant="subtitle2" noWrap>
                               {name}
                             </Typography>
                           </TableCell>
-                          <TableCell style={{ minWidth: 160 }}>{fDate(createdAt)}</TableCell>
+                          {/* <TableCell style={{ minWidth: 160 }}>{fDate(createdAt)}</TableCell>
                           <TableCell style={{ minWidth: 160 }}>
                             <Label
                               variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
@@ -238,7 +240,7 @@ export default function EcommerceProductList() {
                             >
                               {inventoryType ? sentenceCase(inventoryType) : ''}
                             </Label>
-                          </TableCell>
+                          </TableCell> */}
                           <TableCell align="right">{fCurrency(price)}</TableCell>
                           <TableCell align="right">
                             <ProductMoreMenu

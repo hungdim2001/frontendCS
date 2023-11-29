@@ -52,36 +52,36 @@ export default function ProductDetailsSummary({
   const {
     id,
     name,
-    sizes,
+    // sizes,
     price,
-    cover,
+    thumbnail,
     status,
-    colors,
-    available,
-    priceSale,
-    totalRating,
-    totalReview,
-    inventoryType,
+    // colors,
+    // available,
+    // priceSale,
+    // totalRating,
+    // totalReview,
+    // inventoryType,
   } = product;
 
   const alreadyProduct = cart.map((item) => item.id).includes(id);
 
-  const isMaxQuantity =
-    cart.filter((item) => item.id === id).map((item) => item.quantity)[0] >= available;
+  // const isMaxQuantity =
+  //   cart.filter((item) => item.id === id).map((item) => item.quantity)[0] >= available;
 
   const defaultValues = {
     id,
     name,
-    cover,
-    available,
+    // cover,
+    // available,
     price,
-    color: colors[0],
-    size: sizes[4],
-    quantity: available < 1 ? 0 : 1,
+    // color: colors[0],
+    // size: sizes[4],
+    // quantity: available < 1 ? 0 : 1,
   };
 
   const methods = useForm<FormValuesProps>({
-    defaultValues,
+    // defaultValues,
   });
 
   const { watch, control, setValue, handleSubmit } = methods;
@@ -116,7 +116,7 @@ export default function ProductDetailsSummary({
 
   return (
     <RootStyle {...other}>
-      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+      {/* <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
         <Label
           variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
           color={inventoryType === 'in_stock' ? 'success' : 'error'}
@@ -255,7 +255,7 @@ export default function ProductDetailsSummary({
         <Stack alignItems="center" sx={{ mt: 3 }}>
           <SocialsButton initialColor />
         </Stack>
-      </FormProvider>
+      </FormProvider> */}
     </RootStyle>
   );
 }

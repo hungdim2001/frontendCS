@@ -50,34 +50,35 @@ export type ProductTypeState  = {
 export type ProductCharValue  = BaseDTO &{
   value: string;
 };
-export type Product = {
-  id: string;
-  cover: string;
+export type Product = BaseDTO &{
+  thumbnail: string;
   images: string[];
   name: string;
   price: number;
-  code: string;
-  sku: string;
-  tags: string[];
-  priceSale: number | null;
-  totalRating: number;
-  totalReview: number;
-  ratings: ProductRating[];
-  reviews: ProductReview[];
-  colors: string[];
-  status: ProductStatus;
-  inventoryType: ProductInventoryType;
-  sizes: string[];
-  available: number;
-  description: string;
-  sold: number;
-  createdAt: Date | string | number;
-  category: ProductCategory;
-  gender: ProductGender;
+  // code: string;
+  quantity: number;
+  productType:ProductType;
+  productChar:ProductChar[];
+  
+  // tags: string[];
+  // priceSale: number | null;
+  // totalRating: number;
+  // totalReview: number;
+  // ratings: ProductRating[];
+  // reviews: ProductReview[];
+  // colors: string[];
+  // status: ProductStatus;
+  // inventoryType: ProductInventoryType;
+  // sizes: string[];
+ 
+  // sold: number;
+  // createdAt: Date | string | number;
+  // category: ProductCategory;
+  // gender: ProductGender;
 };
 
 export type CartItem = {
-  id: string;
+  id: number|null;
   name: string;
   cover: string;
   available: number;

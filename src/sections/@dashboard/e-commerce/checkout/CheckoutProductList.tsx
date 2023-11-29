@@ -37,9 +37,9 @@ const IncrementerStyle = styled('div')(({ theme }) => ({
 
 type Props = {
   products: CartItem[];
-  onDelete: (id: string) => void;
-  onDecreaseQuantity: (id: string) => void;
-  onIncreaseQuantity: (id: string) => void;
+  onDelete: (id: number|null) => void;
+  onDecreaseQuantity: (id: number|null) => void;
+  onIncreaseQuantity: (id: number|null) => void;
 };
 
 export default function CheckoutProductList({
