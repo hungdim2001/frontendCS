@@ -128,7 +128,7 @@ export default function ProductTypeView() {
   const [filterName, setFilterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const { productTypes } = useSelector((state) => state.productType);
+  const { productTypes } = useSelector((state) => state.productTypes);
 
   const handleRequestSort = (property: string) => {
     const isAsc = orderBy === property && order === 'asc';
