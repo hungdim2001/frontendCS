@@ -72,7 +72,7 @@ export default function ProductCharList() {
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
-  const [selected, setSelected] = useState<(number|null)[]>([]);
+  const [selected, setSelected] = useState<(number | null)[]>([]);
 
   const [orderBy, setOrderBy] = useState('name');
 
@@ -106,9 +106,9 @@ export default function ProductCharList() {
     setSelected([]);
   };
 
-  const handleClick = (id:number|null) => {
+  const handleClick = (id: number | null) => {
     const selectedIndex = selected.indexOf(id);
-    let newSelected: (number|null)[] = [];
+    let newSelected: (number | null)[] = [];
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
     } else if (selectedIndex === 0) {
@@ -146,14 +146,14 @@ export default function ProductCharList() {
 
   const handleEditProductChar = (id: number | null) => {
     if (id) {
-      console.log(`${PATH_DASHBOARD.productChar.edit}/${id}`)
+      console.log(`${PATH_DASHBOARD.productChar.edit}/${id}`);
       navigate(`${PATH_DASHBOARD.productChar.edit}/${id}`, { replace: true });
     }
   };
 
   const handleDeleteProducts = (ids: (number | null)[]) => {
-    const validIds = ids.filter(id => id !== null) as number[];
-    
+    const validIds = ids.filter((id) => id !== null) as number[];
+
     if (validIds.length > 0) {
       dispatch(deleteProductChars(validIds));
       const deleteProducts = productCharList.filter((product) => !ids.includes(product.id));
@@ -161,7 +161,7 @@ export default function ProductCharList() {
       setProductCharList(deleteProducts);
     }
   };
-  
+
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productCharList.length) : 0;
 
   const filteredUsers = applySortFilter(productCharList, getComparator(order, orderBy), filterName);
@@ -192,6 +192,7 @@ export default function ProductCharList() {
 
         <Card>
           <ProductCharToolbar
+            isCreateProduct={false}
             numSelected={selected.length}
             filterName={filterName}
             onFilterName={handleFilterByName}
@@ -202,7 +203,6 @@ export default function ProductCharList() {
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
                 <ProductCharListHead
-                  isCreateProduct= {false}
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}

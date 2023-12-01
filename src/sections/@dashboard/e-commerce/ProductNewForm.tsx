@@ -8,7 +8,9 @@ import { useForm } from 'react-hook-form';
 // @mui
 import { LoadingButton } from '@mui/lab';
 import {
+  Button,
   Card,
+  Checkbox,
   Grid,
   InputAdornment,
   Stack,
@@ -18,7 +20,7 @@ import {
   TableContainer,
   TablePagination,
   TableRow,
-  Typography
+  Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 // routes
@@ -37,20 +39,18 @@ import {
   RHFSelect,
   RHFTextField,
   RHFUploadAvatar,
-  RHFUploadMultiFile
+  RHFUploadMultiFile,
 } from '../../../components/hook-form';
 import { getProductChars } from 'src/redux/slices/product-char';
 import ProductCharListHead from './product-char/ProductCharListHead';
 import ProductCharToolbar from './product-char/ProductCharToolbar';
+import Iconify from 'src/components/Iconify';
 
 // ----------------------------------------------------------------------
 
 const STATUS_OPTION = ['Active', 'InActive'];
 
-const TABLE_HEAD = [
-  { id: 'name', label: 'Name', alignRight: false },
-  { id: 'select' },
-];
+const TABLE_HEAD = [{ id: 'name', label: 'Name', alignRight: false }, { id: 'select' }];
 const CATEGORY_OPTION = [
   { group: 'Clothing', classify: ['Shirts', 'T-shirts', 'Jeans', 'Leather'] },
   { group: 'Tailored', classify: ['Suits', 'Blazers', 'Trousers', 'Waistcoats'] },
@@ -98,6 +98,11 @@ type Props = {
 };
 
 export default function ProductNewForm({ isEdit, currentProduct }: Props) {
+  const ICON = {
+    mr: 2,
+    width: 30,
+    height: 30,
+  };
   const navigate = useNavigate();
 
   const { enqueueSnackbar } = useSnackbar();
@@ -106,7 +111,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   useEffect(() => {
     dispatch(getProductTypes());
     dispatch(getProductChars(null));
-
   }, [dispatch]);
 
   const NewProductSchema = Yup.object().shape({
@@ -248,6 +252,24 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
+  const handleClick = (id: number | null) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected: (number | null)[] = [];
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+    setSelected(newSelected);
+  };
+
   const handleSelectAllClick = (checked: boolean) => {
     if (checked) {
       const newSelecteds = productChars.map((n) => n.id);
@@ -294,79 +316,174 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                 <RHFEditor simple name="description" />
               </div>
             </Stack>
-
-        
           </Card>
-          <Card>
-          <ProductCharToolbar
-            numSelected={selected.length}
-            filterName={filterName}
-            onFilterName={handleFilterByName}
-            onDeleteProducts={() => {}}
-          />
 
-          <Scrollbar>
-              <TableContainer sx={{ minWidth: 800 }}>
-                <Table>
-                  <ProductCharListHead
-                  isCreateProduct = {true}
-                  order={order}
-                  orderBy={orderBy}
-                  headLabel={TABLE_HEAD}
-                  rowCount={productChars.length}
-                  numSelected={selected.length}
-                  onRequestSort={handleRequestSort}
-                  onSelectAllClick={handleSelectAllClick}
-                />
-                  <TableBody>
-                    {filteredUsers.filter(item=>item.status)
-                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row) => {
-                        const { id, name, status, description } = row;
-                        const isItemSelected = selected.indexOf(id) !== -1;
+          <Grid item xs={12} md={12} sx={{ mt: 3 }}>
+            <Card sx={{ p: 3 }}>
+              <Stack
+                justifyContent="space-between"
+                direction="row"
+                spacing={1}
+                flexShrink={0}
+                sx={{ my: 1 }}
+              >
+                <div>
+                  <LabelStyle>Product character</LabelStyle>
+                  <ProductCharToolbar
+                    isCreateProduct={true}
+                    numSelected={selected.length}
+                    filterName={filterName}
+                    onFilterName={handleFilterByName}
+                    onDeleteProducts={() => {}}
+                  />
+                  <Scrollbar>
+                    <TableContainer>
+                      <Table>
+                        <ProductCharListHead
+                          order={order}
+                          orderBy={orderBy}
+                          headLabel={TABLE_HEAD}
+                          rowCount={productChars.length}
+                          numSelected={selected.length}
+                          onRequestSort={handleRequestSort}
+                          onSelectAllClick={handleSelectAllClick}
+                        />
+                        <TableBody>
+                          {filteredUsers
+                            .filter((item) => item.status)
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((row) => {
+                              const { id, name, status, description } = row;
+                              const isItemSelected = selected.indexOf(id) !== -1;
 
-                        return (
-                          <TableRow
-                            hover
-                            key={id}
-                            tabIndex={-1}
-                            role="checkbox"
-                            selected={isItemSelected}
-                            aria-checked={isItemSelected}
-                          >
-                       
-                            <TableCell align="left">{name}</TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    {emptyRows > 0 && (
-                      <TableRow style={{ height: 53 * emptyRows }}>
-                        <TableCell colSpan={6} />
-                      </TableRow>
-                    )}
-                  </TableBody>
-                  {isNotFound && (
-                    <TableBody>
-                      <TableRow>
-                        <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                          <SearchNotFound searchQuery={filterName} />
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  )}
-                </Table>
-              </TableContainer>
-            </Scrollbar>
-            <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={productChars.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={(e, page) => setPage(page)}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-          </Card>
+                              return (
+                                <TableRow
+                                  hover
+                                  key={id}
+                                  tabIndex={-1}
+                                  role="checkbox"
+                                  selected={isItemSelected}
+                                  aria-checked={isItemSelected}
+                                >
+                                  <TableCell padding="checkbox">
+                                    <Checkbox
+                                      checked={isItemSelected}
+                                      onClick={() => handleClick(id)}
+                                    />
+                                  </TableCell>
+                                  <TableCell align="left">{name}</TableCell>
+                                  <TableCell align="center">
+                                    <Button
+                                      onClick={() => {}}
+                                      startIcon={
+                                        <Iconify icon={'ei:arrow-right'} sx={{ ...ICON }} />
+                                      }
+                                    />
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          {emptyRows > 0 && (
+                            <TableRow style={{ height: 53 * emptyRows }}>
+                              <TableCell colSpan={6} />
+                            </TableRow>
+                          )}
+                        </TableBody>
+                        {isNotFound && (
+                          <TableBody>
+                            <TableRow>
+                              <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                <SearchNotFound searchQuery={filterName} />
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                        )}
+                      </Table>
+                    </TableContainer>
+                    <TablePagination
+                      rowsPerPageOptions={[5, 10, 25]}
+                      component="div"
+                      count={productChars.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      onPageChange={(e, page) => setPage(page)}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                  </Scrollbar>
+                </div>
+                <div>
+                  <LabelStyle>Product character value</LabelStyle>
+                  <ProductCharToolbar
+                    isCreateProduct={true}
+                    numSelected={selected.length}
+                    filterName={filterName}
+                    onFilterName={handleFilterByName}
+                    onDeleteProducts={() => {}}
+                  />
+                  <Scrollbar>
+                    <TableContainer>
+                      <Table>
+                        <ProductCharListHead
+                          order={order}
+                          orderBy={orderBy}
+                          headLabel={TABLE_HEAD}
+                          rowCount={productChars.length}
+                          numSelected={selected.length}
+                          onRequestSort={handleRequestSort}
+                          onSelectAllClick={handleSelectAllClick}
+                        />
+                        <TableBody>
+                          {filteredUsers
+                            .filter((item) => item.status)
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((row) => {
+                              const { id, name, status, description } = row;
+                              const isItemSelected = selected.indexOf(id) !== -1;
+
+                              return (
+                                <TableRow
+                                  hover
+                                  key={id}
+                                  tabIndex={-1}
+                                  role="checkbox"
+                                  selected={isItemSelected}
+                                  aria-checked={isItemSelected}
+                                >
+                                  <TableCell align="left">{name}</TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          {emptyRows > 0 && (
+                            <TableRow style={{ height: 53 * emptyRows }}>
+                              <TableCell colSpan={6} />
+                            </TableRow>
+                          )}
+                        </TableBody>
+                        {isNotFound && (
+                          <TableBody>
+                            <TableRow>
+                              <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                <SearchNotFound searchQuery={filterName} />
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                        )}
+                      </Table>
+                    </TableContainer>
+                    <TablePagination
+                      rowsPerPageOptions={[5, 10, 25]}
+                      component="div"
+                      count={productChars.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      onPageChange={(e, page) => setPage(page)}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                  </Scrollbar>
+                </div>
+              </Stack>
+            </Card>
+          </Grid>
         </Grid>
 
         <Grid item xs={12} md={4}>

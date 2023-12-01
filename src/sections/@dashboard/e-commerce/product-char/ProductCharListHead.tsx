@@ -16,7 +16,6 @@ const visuallyHidden = {
 } as const;
 
 type Props = {
-  isCreateProduct:boolean;
   order: 'asc' | 'desc';
   orderBy: string;
   rowCount: number;
@@ -27,7 +26,6 @@ type Props = {
 };
 
 export default function ProductCharListHead({
-  isCreateProduct,
   order,
   orderBy,
   rowCount,
@@ -39,7 +37,7 @@ export default function ProductCharListHead({
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox" sx={{ display: isCreateProduct ? 'none' : 'initial' }}>
+        <TableCell padding="checkbox">
           <Checkbox
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}

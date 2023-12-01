@@ -17,6 +17,7 @@ const RootStyle = styled(Toolbar)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 type Props = {
+  isCreateProduct:boolean;
   numSelected: number;
   filterName: string;
   onFilterName: (value: string) => void;
@@ -24,6 +25,7 @@ type Props = {
 };
 
 export default function ProductCharToolbar({
+  isCreateProduct,
   numSelected,
   filterName,
   onFilterName,
@@ -50,7 +52,7 @@ export default function ProductCharToolbar({
           stretchStart={240}
           value={filterName}
           onChange={(event) => onFilterName(event.target.value)}
-          placeholder="Search product Characteristic ..."
+          placeholder="Search character..."
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
