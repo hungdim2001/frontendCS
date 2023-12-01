@@ -70,12 +70,12 @@ export default function ProductCharToolbar({
             <Iconify icon={'eva:trash-2-outline'} />
           </IconButton>
         </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <Iconify icon={'ic:round-filter-list'} />
-          </IconButton>
-        </Tooltip>
+      ): (<></>
+        // <Tooltip title="Filter list">
+        //   <IconButton>
+        //     <Iconify icon={'ic:round-filter-list'} />
+        //   </IconButton>
+        // </Tooltip>
       )}
     </RootStyle>
   );

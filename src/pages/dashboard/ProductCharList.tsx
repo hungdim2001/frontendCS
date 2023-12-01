@@ -202,6 +202,7 @@ export default function ProductCharList() {
             <TableContainer sx={{ minWidth: 800 }}>
               <Table>
                 <ProductCharListHead
+                  isCreateProduct= {false}
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
