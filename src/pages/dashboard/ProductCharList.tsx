@@ -146,7 +146,6 @@ export default function ProductCharList() {
 
   const handleEditProductChar = (id: number | null) => {
     if (id) {
-      console.log(`${PATH_DASHBOARD.productChar.edit}/${id}`);
       navigate(`${PATH_DASHBOARD.productChar.edit}/${id}`, { replace: true });
     }
   };
@@ -192,7 +191,6 @@ export default function ProductCharList() {
 
         <Card>
           <ProductCharToolbar
-            isCreateProduct={false}
             numSelected={selected.length}
             filterName={filterName}
             onFilterName={handleFilterByName}

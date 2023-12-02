@@ -45,6 +45,8 @@ import { getProductChars } from 'src/redux/slices/product-char';
 import ProductCharListHead from './product-char/ProductCharListHead';
 import ProductCharToolbar from './product-char/ProductCharToolbar';
 import Iconify from 'src/components/Iconify';
+import { id } from 'date-fns/locale';
+import CharList from './ProductNewForm/CharList';
 
 // ----------------------------------------------------------------------
 
@@ -241,10 +243,14 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     setPage(0);
   };
   const { productChars } = useSelector((state) => state.productChars);
+  const [charsSelected, setCharSelected] = useState<ProductChar[]>([]);
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productChars.length) : 0;
 
   const filteredUsers = applySortFilter(productChars, getComparator(order, orderBy), filterName);
+
+  const filteredCharsSelected = applySortFilter(productChars, getComparator(order, orderBy), filterName);
+
 
   const isNotFound = !filteredUsers.length && Boolean(filterName);
   const handleRequestSort = (property: string) => {
@@ -283,6 +289,20 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     setFilterName(filterName);
     setPage(0);
   };
+
+  const handleSelectChar = (id:number) => {
+    const newCharsSeleteds =  [...charsSelected, ...productChars.filter(item=> item.id ===id)]
+    console.log(newCharsSeleteds);
+    setCharSelected(newCharsSeleteds);
+    // const validIds = ids.filter((id) => id !== null) as number[];
+
+    // if (validIds.length > 0) {
+    //   dispatch(deleteProductChars(validIds));
+    //   const deleteProducts = productCharList.filter((product) => !ids.includes(product.id));
+    //   setSelected([]);
+    //   setProductCharList(deleteProducts);
+    // }
+  };
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={3}>
@@ -320,168 +340,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
           <Grid item xs={12} md={12} sx={{ mt: 3 }}>
             <Card sx={{ p: 3 }}>
-              <Stack
-                justifyContent="space-between"
-                direction="row"
-                spacing={1}
-                flexShrink={0}
-                sx={{ my: 1 }}
-              >
-                <div>
-                  <LabelStyle>Product character</LabelStyle>
-                  <ProductCharToolbar
-                    isCreateProduct={true}
-                    numSelected={selected.length}
-                    filterName={filterName}
-                    onFilterName={handleFilterByName}
-                    onDeleteProducts={() => {}}
-                  />
-                  <Scrollbar>
-                    <TableContainer>
-                      <Table>
-                        <ProductCharListHead
-                          order={order}
-                          orderBy={orderBy}
-                          headLabel={TABLE_HEAD}
-                          rowCount={productChars.length}
-                          numSelected={selected.length}
-                          onRequestSort={handleRequestSort}
-                          onSelectAllClick={handleSelectAllClick}
-                        />
-                        <TableBody>
-                          {filteredUsers
-                            .filter((item) => item.status)
-                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((row) => {
-                              const { id, name, status, description } = row;
-                              const isItemSelected = selected.indexOf(id) !== -1;
-
-                              return (
-                                <TableRow
-                                  hover
-                                  key={id}
-                                  tabIndex={-1}
-                                  role="checkbox"
-                                  selected={isItemSelected}
-                                  aria-checked={isItemSelected}
-                                >
-                                  <TableCell padding="checkbox">
-                                    <Checkbox
-                                      checked={isItemSelected}
-                                      onClick={() => handleClick(id)}
-                                    />
-                                  </TableCell>
-                                  <TableCell align="left">{name}</TableCell>
-                                  <TableCell align="center">
-                                    <Button
-                                      onClick={() => {}}
-                                      startIcon={
-                                        <Iconify icon={'ei:arrow-right'} sx={{ ...ICON }} />
-                                      }
-                                    />
-                                  </TableCell>
-                                </TableRow>
-                              );
-                            })}
-                          {emptyRows > 0 && (
-                            <TableRow style={{ height: 53 * emptyRows }}>
-                              <TableCell colSpan={6} />
-                            </TableRow>
-                          )}
-                        </TableBody>
-                        {isNotFound && (
-                          <TableBody>
-                            <TableRow>
-                              <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                                <SearchNotFound searchQuery={filterName} />
-                              </TableCell>
-                            </TableRow>
-                          </TableBody>
-                        )}
-                      </Table>
-                    </TableContainer>
-                    <TablePagination
-                      rowsPerPageOptions={[5, 10, 25]}
-                      component="div"
-                      count={productChars.length}
-                      rowsPerPage={rowsPerPage}
-                      page={page}
-                      onPageChange={(e, page) => setPage(page)}
-                      onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
-                  </Scrollbar>
-                </div>
-                <div>
-                  <LabelStyle>Product character value</LabelStyle>
-                  <ProductCharToolbar
-                    isCreateProduct={true}
-                    numSelected={selected.length}
-                    filterName={filterName}
-                    onFilterName={handleFilterByName}
-                    onDeleteProducts={() => {}}
-                  />
-                  <Scrollbar>
-                    <TableContainer>
-                      <Table>
-                        <ProductCharListHead
-                          order={order}
-                          orderBy={orderBy}
-                          headLabel={TABLE_HEAD}
-                          rowCount={productChars.length}
-                          numSelected={selected.length}
-                          onRequestSort={handleRequestSort}
-                          onSelectAllClick={handleSelectAllClick}
-                        />
-                        <TableBody>
-                          {filteredUsers
-                            .filter((item) => item.status)
-                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((row) => {
-                              const { id, name, status, description } = row;
-                              const isItemSelected = selected.indexOf(id) !== -1;
-
-                              return (
-                                <TableRow
-                                  hover
-                                  key={id}
-                                  tabIndex={-1}
-                                  role="checkbox"
-                                  selected={isItemSelected}
-                                  aria-checked={isItemSelected}
-                                >
-                                  <TableCell align="left">{name}</TableCell>
-                                </TableRow>
-                              );
-                            })}
-                          {emptyRows > 0 && (
-                            <TableRow style={{ height: 53 * emptyRows }}>
-                              <TableCell colSpan={6} />
-                            </TableRow>
-                          )}
-                        </TableBody>
-                        {isNotFound && (
-                          <TableBody>
-                            <TableRow>
-                              <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                                <SearchNotFound searchQuery={filterName} />
-                              </TableCell>
-                            </TableRow>
-                          </TableBody>
-                        )}
-                      </Table>
-                    </TableContainer>
-                    <TablePagination
-                      rowsPerPageOptions={[5, 10, 25]}
-                      component="div"
-                      count={productChars.length}
-                      rowsPerPage={rowsPerPage}
-                      page={page}
-                      onPageChange={(e, page) => setPage(page)}
-                      onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
-                  </Scrollbar>
-                </div>
-              </Stack>
+            <CharList/>
             </Card>
           </Grid>
         </Grid>
