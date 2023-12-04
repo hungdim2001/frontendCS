@@ -38,7 +38,7 @@ import Label from 'src/components/Label';
 import Iconify from 'src/components/Iconify';
 import SearchNotFound from 'src/components/SearchNotFound';
 import InputStyle from 'src/components/InputStyle';
-import RFHCheckMark from 'src/components/hook-form/RHFCheckMark';
+import RHFCheckMark from 'src/components/hook-form/RHFCheckMark';
 
 // ----------------------------------------------------------------------
 
@@ -385,7 +385,7 @@ export default function CharList() {
                           </TableCell>
                           <TableCell align="left">{name}</TableCell>
                           <TableCell align="left">
-                          <RFHCheckMark name='values' items={undefined} label={''}  />
+                          {/* <RHFCheckMark name='values' items={undefined} label={''}  /> */}
                           </TableCell>
                           <TableCell align="center">
                             <Button

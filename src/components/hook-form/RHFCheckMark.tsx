@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 interface Props extends Omit<FormControlLabelProps, 'control'> {
   name: string;
+  id:string;
   items: any;
 }
 const ITEM_HEIGHT = 48;
@@ -22,7 +23,7 @@ const MenuProps = {
     },
   },
 };
-export default function RFHCheckMark({ name, label, items, ...other }: Props) {
+export default function RHFCheckMark({ id,name, label, items, ...other }: Props) {
   const { control } = useFormContext();
 
   return (
@@ -31,44 +32,54 @@ export default function RFHCheckMark({ name, label, items, ...other }: Props) {
       name={name}
       render={({ field, ...otherOptions }) => {
         return (
-          <Select
-            {...field}
-            style={{ width: '100%' }}
-            multiple
-            // value={field.value}
-            // error={!!error}
-            MenuProps={MenuProps}
-            renderValue={(selected) => selected.map((item: any) => item.value).join(', ')}
-            // renderValue={(selected: any) => {
-            //   return (
-            //     selected?.map((option: { value: string }) => option.value).join(', ') ||
-            //     'Select some options'
-            //   );
-            // }}
-            // defaultValue={[]}
-          >
-            <MenuItem key={'-1'} value={'-1'}>
-              <Checkbox
-                checked={
-                  field.value &&
-                  field.value
-                    
-                    .includes('-1')
+          <FormControl>
+            <InputLabel id={id}>{label}</InputLabel>
+            <Select
+              {...field}
+              style={{ width: '100%' }}
+              multiple
+              label={label}
+              // value={field.value}
+              // error={!!error}
+              MenuProps={MenuProps}
+              renderValue={(selected) => {
+                if (selected.includes('-1')) {
+                  console.log(selected);
+                  return 'All';
                 }
-              />
-              <ListItemText primary={'Select All'} />
-            </MenuItem>
-            {items.map((option: any) => (
-              <MenuItem key={option.id} value={option}>
-                <Checkbox
-                  checked={
-                    field.value && field.value.map((item: any) => item.value).includes(option.value)
-                  }
-                />
-                <ListItemText primary={option.value} />
+                return selected.map((item:any) => item.value).join(', ');
+              }}
+              // renderValue={(selected: any) => {
+              //   return (
+              //     selected?.map((option: { value: string }) => option.value).join(', ') ||
+              //     'Select some options'
+              //   );
+              // }}
+              // defaultValue={[]}
+            >
+              <MenuItem key={'-1'} value={'-1'}>
+                <Checkbox checked={field.value && field.value.includes('-1')} />
+                <ListItemText primary={'Select All'} />
               </MenuItem>
-            ))}
-          </Select>
+              {items.map((option: any) => (
+                <MenuItem
+                  key={option.id}
+                  value={option}
+                  disabled={field.value && field.value.includes('-1')}
+                >
+                  <Checkbox
+                    disabled={field.value && field.value.includes('-1')}
+                    checked={
+                      field.value &&
+                      field.value.map((item: any) => item.value).includes(option.value) &&
+                      !field.value.includes('-1')
+                    }
+                  />
+                  <ListItemText primary={option.value} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         );
       }}
     />

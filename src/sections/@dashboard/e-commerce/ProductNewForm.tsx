@@ -4,16 +4,21 @@ import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 // form
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 // @mui
 import { LoadingButton } from '@mui/lab';
 import {
   Button,
   Card,
   Checkbox,
+  FormControl,
   Grid,
   IconButton,
   InputAdornment,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  Select,
   Stack,
   Table,
   TableBody,
@@ -52,7 +57,7 @@ import Scrollbar from 'src/components/Scrollbar';
 import ProductCharListHead from './product-char/ProductCharListHead';
 import SearchNotFound from 'src/components/SearchNotFound';
 import ProductCharToolbar from './product-char/ProductCharToolbar';
-import RFHCheckMark from 'src/components/hook-form/RHFCheckMark';
+import RHFCheckMark from 'src/components/hook-form/RHFCheckMark';
 
 // ----------------------------------------------------------------------
 
@@ -60,25 +65,9 @@ const STATUS_OPTION = ['Active', 'InActive'];
 
 const TABLE_HEAD_CHAR = [{ id: 'name', label: 'Name', alignRight: false }, { id: 'select' }];
 const TABLE_HEAD_VALUE = [
+  { id: 'delelte' },
   { id: 'name', label: 'Name', alignRight: false },
   { id: 'value', label: 'Value', alignRight: false },
-  { id: 'delelte' },
-];
-
-const TAGS_OPTION = [
-  'Toy Story 3',
-  'Logan',
-  'Full Metal Jacket',
-  'Dangal',
-  'The Sting',
-  '2001: A Space Odyssey',
-  "Singin' in the Rain",
-  'Toy Story',
-  'Bicycle Thieves',
-  'The Kid',
-  'Inglourious Basterds',
-  'Snatch',
-  '3 Idiots',
 ];
 
 const LabelStyle = styled(Typography)(({ theme }) => ({
@@ -91,14 +80,14 @@ const LabelStyle = styled(Typography)(({ theme }) => ({
 
 interface FormValuesProps {
   thumbnail: File | string;
-  images: string[];
+  images: (File | string)[];
   name: string;
   price: number;
   // code: string;
-  value:any[];
+  charValues: any[];
   quantity: number;
   productType: number;
-  // productChar:ProductChar[];
+  // productChar:(ProductChar[];
 }
 
 type Props = {
@@ -117,7 +106,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     width: 20,
     height: 20,
   };
-  const navigate = useNavigate();
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -130,37 +118,27 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const NewProductSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     description: Yup.string().required('Description is required'),
-    productType: Yup.string().required('Description is required'),
+    productType: Yup.string().required('Product Type is required'),
     images: Yup.array().min(1, 'Images is required'),
     price: Yup.number().moreThan(0, 'Price should not be $0.00'),
-    thumblnai: Yup.mixed().required('Thumbnail is required'),
+    thumbnail: Yup.mixed().required('Thumbnail is required'),
   });
 
-  useEffect(() => {
-    console.log(currentProduct);
-  }, [currentProduct]);
   const defaultValues = useMemo(
     () => ({
-      value:[],
+      charValues: [],
       name: currentProduct?.name || '',
       description: currentProduct?.description || '',
       images: currentProduct?.images || [],
-      thumbmail: currentProduct?.thumbnail || '',
-      // code: currentProduct?.code || '',
-      // sku: currentProduct?.sku || '',
+      thumbnail: currentProduct?.thumbnail,
       price: currentProduct?.price || 0,
-      // priceSale: currentProduct?.priceSale || 0,
-      // tags: currentProduct?.tags || [TAGS_OPTION[0]],
       productType: currentProduct?.productType.id!,
-      // taxes: true,
       status: currentProduct?.status
         ? STATUS_OPTION[0]
         : currentProduct
         ? STATUS_OPTION[1] || STATUS_OPTION[0]
         : STATUS_OPTION[0],
-      // category: currentProduct?.category || CATEGORY_OPTION[0].classify[1],
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentProduct]
   );
 
@@ -193,10 +171,11 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
+      console.log(data);
       await new Promise((resolve) => setTimeout(resolve, 500));
-      reset();
+      // reset();
       enqueueSnackbar(!isEdit ? 'Create success!' : 'Update success!');
-      navigate(PATH_DASHBOARD.eCommerce.list);
+      // navigate(PATH_DASHBOARD.eCommerce.list);
     } catch (error) {
       console.error(error);
     }
@@ -561,7 +540,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                 pageValue * rowsPerPageValue + rowsPerPageValue
                               )
                               .map((row) => {
-                                const { id, name,productSpecCharValueDTOS } = row;
+                                const { id, name, productSpecCharValueDTOS } = row;
                                 const isItemSelected = valueSelected.indexOf(id!) !== -1;
 
                                 return (
@@ -579,18 +558,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                         onClick={() => handleClickValue(id!)}
                                       />
                                     </TableCell>
-                                    <TableCell align="left">{name}</TableCell>
-                                    <TableCell align="left">
-                                      <RFHCheckMark name='value' items={productSpecCharValueDTOS} label={''}  />
-                                      {/* <RHFMultiCheckbox
-                                    
-                                        name="gender"
-                                        options={productSpecCharValueDTOS?.map(
-                                          (item) => item.value!
-                                        )!}
-                                        sx={{ width: 1 }}
-                                      /> */}
-                                    </TableCell>
                                     <TableCell align="center">
                                       <Button
                                         sx={{ color: 'error.main' }}
@@ -599,6 +566,76 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                           <Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />
                                         }
                                       />
+                                    </TableCell>
+                                    <TableCell align="left">{name}</TableCell>
+                                    <TableCell align="left">
+                                      {/* <RHFCheckMark id={id?.toString()!} name='value' items={productSpecCharValueDTOS} label={'Char Values'}  /> */}
+
+                                      <Controller
+                                        control={control}
+                                        name="charValues"
+                                        render={({ field }) => (
+                                          <FormControl>
+                                            <InputLabel id={id?.toString()}>Char Values</InputLabel>
+                                            <Select
+                                              {...field}
+                                              style={{ width: '100%' }}
+                                              multiple
+                                              label="Char Values"
+                                              renderValue={(selected) => {
+                                                if (selected.includes('-1')) {
+                                                  console.log(selected);
+                                                  return 'All';
+                                                }
+                                                return selected
+                                                  .map((item: any) => item.value)
+                                                  .join(', ');
+                                              }}
+                                            >
+                                              <MenuItem key={'-1'} value={'-1'}>
+                                                <Checkbox
+                                                  checked={
+                                                    field.value && field.value.includes('-1')
+                                                  }
+                                                />
+                                                <ListItemText primary={'Select All'} />
+                                              </MenuItem>
+                                              {productSpecCharValueDTOS?.map((option: any) => (
+                                                <MenuItem
+                                                  key={option.id}
+                                                  value={option}
+                                                  disabled={
+                                                    field.value && field.value.includes('-1')
+                                                  }
+                                                >
+                                                  <Checkbox
+                                                    disabled={
+                                                      field.value && field.value.includes('-1')
+                                                    }
+                                                    checked={
+                                                      field.value &&
+                                                      field.value
+                                                        .map((item: any) => item.value)
+                                                        .includes(option.value) &&
+                                                      !field.value.includes('-1')
+                                                    }
+                                                  />
+                                                  <ListItemText primary={option.value} />
+                                                </MenuItem>
+                                              ))}
+                                            </Select>
+                                          </FormControl>
+                                        )}
+                                      />
+
+                                      {/* <RHFMultiCheckbox
+                                    
+                                        name="gender"
+                                        options={productSpecCharValueDTOS?.map(
+                                          (item) => item.value!
+                                        )!}
+                                        sx={{ width: 1 }}
+                                      /> */}
                                     </TableCell>
                                   </TableRow>
                                 );
