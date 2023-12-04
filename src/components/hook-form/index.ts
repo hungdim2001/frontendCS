@@ -8,3 +8,5 @@ export { default as RHFSelect } from './RHFSelect';
 export { default as RHFEditor } from './RHFEditor';
 export { default as RHFTextField } from './RHFTextField';
 export { default as RHFRadioGroup } from './RHFRadioGroup';
+export { default as RHFCheckMark } from './RHFCheckMark';
+

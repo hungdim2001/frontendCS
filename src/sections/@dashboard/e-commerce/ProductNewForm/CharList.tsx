@@ -38,6 +38,7 @@ import Label from 'src/components/Label';
 import Iconify from 'src/components/Iconify';
 import SearchNotFound from 'src/components/SearchNotFound';
 import InputStyle from 'src/components/InputStyle';
+import RFHCheckMark from 'src/components/hook-form/RHFCheckMark';
 
 // ----------------------------------------------------------------------
 
@@ -69,15 +70,11 @@ const RootStyle = styled(Toolbar)(({ theme }) => ({
 export default function CharList() {
   const ICON = {
     mr: 2,
-    width: 20,
-    height: 20,
+    width: 35,
+    height: 35,
   };
   const theme = useTheme();
   const isLight = theme.palette.mode === 'light';
-
-  const { themeStretch } = useSettings();
-
-  const [productCharList, setProductCharList] = useState<ProductChar[]>([]);
   const dispatch = useDispatch();
   const [pageChar, setPageChar] = useState(0);
   const [pageValue, setPageValue] = useState(0);
@@ -116,11 +113,6 @@ export default function CharList() {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-
-  useEffect(() => {
-    dispatch(getProductChars(null));
-  }, [dispatch]);
-
 
   const handleCharSelectAllClick = (checked: boolean) => {
     if (checked) {
@@ -392,7 +384,9 @@ export default function CharList() {
                             />
                           </TableCell>
                           <TableCell align="left">{name}</TableCell>
-                          <TableCell align="left">1</TableCell>
+                          <TableCell align="left">
+                          <RFHCheckMark name='values' items={undefined} label={''}  />
+                          </TableCell>
                           <TableCell align="center">
                             <Button
                               sx={{ color: 'error.main' }}
@@ -409,7 +403,7 @@ export default function CharList() {
                     </TableRow>
                   )}
                 </TableBody>
-                {isNotFoundProductChar && (
+                {isNotFoundProductValue && (
                   <TableBody>
                     <TableRow>
                       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>

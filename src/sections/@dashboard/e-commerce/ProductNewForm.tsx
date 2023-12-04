@@ -12,6 +12,7 @@ import {
   Card,
   Checkbox,
   Grid,
+  IconButton,
   InputAdornment,
   Stack,
   Table,
@@ -20,7 +21,10 @@ import {
   TableContainer,
   TablePagination,
   TableRow,
+  Toolbar,
+  Tooltip,
   Typography,
+  useTheme,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 // routes
@@ -28,35 +32,37 @@ import { PATH_DASHBOARD } from '../../../routes/paths';
 // @types
 import { Product, ProductChar } from '../../../@types/product';
 // components
-import Scrollbar from 'src/components/Scrollbar';
-import SearchNotFound from 'src/components/SearchNotFound';
+import { deleteProductChars, getProductChars } from 'src/redux/slices/product-char';
 import { getProductTypes } from 'src/redux/slices/product-type';
 import { dispatch, useSelector } from 'src/redux/store';
 import {
   FormProvider,
   RHFEditor,
+  RHFMultiCheckbox,
   RHFRadioGroup,
   RHFSelect,
   RHFTextField,
   RHFUploadAvatar,
   RHFUploadMultiFile,
 } from '../../../components/hook-form';
-import { getProductChars } from 'src/redux/slices/product-char';
-import ProductCharListHead from './product-char/ProductCharListHead';
-import ProductCharToolbar from './product-char/ProductCharToolbar';
-import Iconify from 'src/components/Iconify';
-import { id } from 'date-fns/locale';
 import CharList from './ProductNewForm/CharList';
+import InputStyle from 'src/components/InputStyle';
+import Iconify from 'src/components/Iconify';
+import Scrollbar from 'src/components/Scrollbar';
+import ProductCharListHead from './product-char/ProductCharListHead';
+import SearchNotFound from 'src/components/SearchNotFound';
+import ProductCharToolbar from './product-char/ProductCharToolbar';
+import RFHCheckMark from 'src/components/hook-form/RHFCheckMark';
 
 // ----------------------------------------------------------------------
 
 const STATUS_OPTION = ['Active', 'InActive'];
 
-const TABLE_HEAD = [{ id: 'name', label: 'Name', alignRight: false }, { id: 'select' }];
-const CATEGORY_OPTION = [
-  { group: 'Clothing', classify: ['Shirts', 'T-shirts', 'Jeans', 'Leather'] },
-  { group: 'Tailored', classify: ['Suits', 'Blazers', 'Trousers', 'Waistcoats'] },
-  { group: 'Accessories', classify: ['Shoes', 'Backpacks and bags', 'Bracelets', 'Face masks'] },
+const TABLE_HEAD_CHAR = [{ id: 'name', label: 'Name', alignRight: false }, { id: 'select' }];
+const TABLE_HEAD_VALUE = [
+  { id: 'name', label: 'Name', alignRight: false },
+  { id: 'value', label: 'Value', alignRight: false },
+  { id: 'delelte' },
 ];
 
 const TAGS_OPTION = [
@@ -89,6 +95,7 @@ interface FormValuesProps {
   name: string;
   price: number;
   // code: string;
+  value:any[];
   quantity: number;
   productType: number;
   // productChar:ProductChar[];
@@ -98,12 +105,17 @@ type Props = {
   isEdit: boolean;
   currentProduct?: Product;
 };
-
+const RootStyle = styled(Toolbar)(({ theme }) => ({
+  height: 96,
+  display: 'flex',
+  justifyContent: 'space-between',
+  padding: theme.spacing(0, 1, 0, 3),
+}));
 export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const ICON = {
     mr: 2,
-    width: 30,
-    height: 30,
+    width: 20,
+    height: 20,
   };
   const navigate = useNavigate();
 
@@ -129,6 +141,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   }, [currentProduct]);
   const defaultValues = useMemo(
     () => ({
+      value:[],
       name: currentProduct?.name || '',
       description: currentProduct?.description || '',
       images: currentProduct?.images || [],
@@ -188,19 +201,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
       console.error(error);
     }
   };
-
-  const [page, setPage] = useState(0);
-
-  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
-
-  const [selected, setSelected] = useState<(number | null)[]>([]);
-
-  const [orderBy, setOrderBy] = useState('name');
-
-  const [filterName, setFilterName] = useState('');
-
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
   const handleDrop = useCallback(
     (acceptedFiles) => {
       setValue(
@@ -238,71 +238,150 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     const filteredItems = values.images?.filter((_file) => _file !== file);
     setValue('images', filteredItems);
   };
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  //----------------------------------------------------------------------------------------------------------
+  const theme = useTheme();
+  const isLight = theme.palette.mode === 'light';
+  const [pageChar, setPageChar] = useState(0);
+  const [pageValue, setPageValue] = useState(0);
+
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+
+  const [charSelected, setCharSelected] = useState<number[]>([]);
+  const [valueSelected, setValueSelected] = useState<number[]>([]);
+
   const { productChars } = useSelector((state) => state.productChars);
-  const [charsSelected, setCharSelected] = useState<ProductChar[]>([]);
+  const [charsSelected, setCharsSelected] = useState<ProductChar[]>([]);
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productChars.length) : 0;
+  const [orderBy, setOrderBy] = useState('name');
 
-  const filteredUsers = applySortFilter(productChars, getComparator(order, orderBy), filterName);
+  const [valueFilterName, setValueFilterName] = useState('');
 
-  const filteredCharsSelected = applySortFilter(productChars, getComparator(order, orderBy), filterName);
+  const [charFilterName, setCharFilterName] = useState('');
 
+  const [rowsPerPageChar, setRowsPerPageChar] = useState(5);
+  const [rowsPerPageValue, setRowsPerPageValue] = useState(5);
 
-  const isNotFound = !filteredUsers.length && Boolean(filterName);
+  const handleSelectChar = (ids: number[]) => {
+    const newCharsSeleteds = [
+      ...charsSelected,
+      ...productChars.filter(
+        (item) => ids.includes(item.id!) && !charsSelected.find((c) => ids.includes(c.id!))
+      ),
+    ];
+    setCharsSelected(newCharsSeleteds);
+  };
+
   const handleRequestSort = (property: string) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-  const handleClick = (id: number | null) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected: (number | null)[] = [];
+
+  const handleCharSelectAllClick = (checked: boolean) => {
+    if (checked) {
+      const newSelecteds = productChars.map((n) => n.id!);
+      setCharSelected(newSelecteds);
+      return;
+    }
+    setCharSelected([]);
+  };
+
+  const handleClickChar = (id: number) => {
+    const selectedIndex = charSelected.indexOf(id);
+    let newSelected: number[] = [];
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
+      newSelected = newSelected.concat(charSelected, id);
     } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
+      newSelected = newSelected.concat(charSelected.slice(1));
+    } else if (selectedIndex === charSelected.length - 1) {
+      newSelected = newSelected.concat(charSelected.slice(0, -1));
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
+        charSelected.slice(0, selectedIndex),
+        charSelected.slice(selectedIndex + 1)
       );
     }
-    setSelected(newSelected);
+    setCharSelected(newSelected);
+  };
+
+  const handleClickValue = (id: number) => {
+    const selectedIndex = valueSelected.indexOf(id);
+    let newSelected: number[] = [];
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(valueSelected, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(valueSelected.slice(1));
+    } else if (selectedIndex === valueSelected.length - 1) {
+      newSelected = newSelected.concat(valueSelected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        valueSelected.slice(0, selectedIndex),
+        valueSelected.slice(selectedIndex + 1)
+      );
+    }
+    setValueSelected(newSelected);
   };
 
   const handleSelectAllClick = (checked: boolean) => {
     if (checked) {
-      const newSelecteds = productChars.map((n) => n.id);
-      setSelected(newSelecteds);
+      const newSelecteds = productChars.map((n) => n.id!);
+      setValueSelected(newSelecteds);
       return;
     }
-    setSelected([]);
+    setValueSelected([]);
   };
 
-  const handleFilterByName = (filterName: string) => {
-    setFilterName(filterName);
-    setPage(0);
+  const handleChangeRowsPerPageChar = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPageChar(parseInt(event.target.value, 10));
+    setPageChar(0);
   };
 
-  const handleSelectChar = (id:number) => {
-    const newCharsSeleteds =  [...charsSelected, ...productChars.filter(item=> item.id ===id)]
-    console.log(newCharsSeleteds);
-    setCharSelected(newCharsSeleteds);
-    // const validIds = ids.filter((id) => id !== null) as number[];
-
-    // if (validIds.length > 0) {
-    //   dispatch(deleteProductChars(validIds));
-    //   const deleteProducts = productCharList.filter((product) => !ids.includes(product.id));
-    //   setSelected([]);
-    //   setProductCharList(deleteProducts);
-    // }
+  const handleChangeRowsPerPageValue = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPageValue(parseInt(event.target.value, 10));
+    setPageValue(0);
   };
+
+  const handleValueFilterByName = (filterName: string) => {
+    setValueFilterName(filterName);
+    setPageValue(0);
+  };
+  const handleCharFilterByName = (filterName: string) => {
+    setCharFilterName(filterName);
+    setPageChar(0);
+  };
+
+  const handleDeleteValue = (id: number | null) => {
+    if (id) {
+      const deleteProduct = charsSelected.filter((product) => product.id !== id);
+      setCharsSelected(deleteProduct);
+    }
+  };
+
+  const handleDeleteValues = (ids: (number | null)[]) => {
+    const validIds = ids.filter((id) => id !== null) as number[];
+
+    if (validIds.length > 0) {
+      const deleteProducts = charsSelected.filter((product) => !ids.includes(product.id));
+      setCharSelected([]);
+      setCharsSelected(deleteProducts);
+    }
+  };
+
+  const emptyRowsChar =
+    pageChar > 0 ? Math.max(0, (1 + pageChar) * rowsPerPageChar - productChars.length) : 0;
+  const emptyRowsValue =
+    pageValue > 0 ? Math.max(0, (1 + pageValue) * rowsPerPageValue - productChars.length) : 0;
+
+  const filtereProductChars = applySortFilter(
+    productChars,
+    getComparator(order, orderBy),
+    charFilterName
+  );
+
+  const isNotFoundProductChar = !filtereProductChars.length && Boolean(charFilterName);
+  const isNotFoundProductValue = !filtereProductChars.length && Boolean(valueFilterName);
+  //-----------------------------------------------------------------------------------------------------------
+
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={3}>
@@ -310,15 +389,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
           <Card sx={{ p: 3 }}>
             <Stack spacing={3}>
               <RHFTextField name="name" label="Product Name" />
-              {/* <div>
-                  <LabelStyle>Thumbnail</LabelStyle>
-                  <RHFUploadSingleFile
-                    name="thumbnail"
-                    accept="image/*"
-                    maxSize={3145728}
-                    onDrop={handleDrop2}
-                  />
-                </div> */}
               <div>
                 <LabelStyle>Images</LabelStyle>
                 <RHFUploadMultiFile
@@ -340,7 +410,229 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
           <Grid item xs={12} md={12} sx={{ mt: 3 }}>
             <Card sx={{ p: 3 }}>
-            <CharList/>
+              <Grid container justifyContent="space-between">
+                <Grid item xs={6}>
+                  <div>
+                    <LabelStyle>Product character</LabelStyle>
+                    <RootStyle
+                      sx={{
+                        ...(charSelected.length > 0 && {
+                          color: isLight ? 'primary.main' : 'text.primary',
+                          bgcolor: isLight ? 'primary.lighter' : 'primary.dark',
+                        }),
+                      }}
+                    >
+                      {charSelected.length > 0 ? (
+                        <Typography component="div" variant="subtitle1">
+                          {charSelected.length} selected
+                        </Typography>
+                      ) : (
+                        <InputStyle
+                          stretchStart={240}
+                          value={charFilterName}
+                          onChange={(event) => handleCharFilterByName(event.target.value)}
+                          placeholder="Search character..."
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <Iconify
+                                  icon={'eva:search-fill'}
+                                  sx={{ color: 'text.disabled', width: 20, height: 20 }}
+                                />
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      )}
+
+                      {charSelected.length > 0 ? (
+                        <Tooltip title="Select">
+                          <IconButton onClick={() => handleSelectChar(charSelected)}>
+                            <Iconify icon={'ei:arrow-right'} />
+                          </IconButton>
+                        </Tooltip>
+                      ) : (
+                        <></>
+                      )}
+                    </RootStyle>
+                    <Scrollbar>
+                      <TableContainer>
+                        <Table>
+                          <ProductCharListHead
+                            order={order}
+                            orderBy={orderBy}
+                            headLabel={TABLE_HEAD_CHAR}
+                            rowCount={productChars.length}
+                            numSelected={charSelected.length}
+                            onRequestSort={handleRequestSort}
+                            onSelectAllClick={handleCharSelectAllClick}
+                          />
+                          <TableBody>
+                            {filtereProductChars
+                              .filter((item) => item.status)
+                              .slice(
+                                pageChar * rowsPerPageChar,
+                                pageChar * rowsPerPageChar + rowsPerPageChar
+                              )
+                              .map((row) => {
+                                const { id, name, status, description } = row;
+                                const isItemSelected = charSelected.indexOf(id!) !== -1;
+
+                                return (
+                                  <TableRow
+                                    hover
+                                    key={id}
+                                    tabIndex={-1}
+                                    role="checkbox"
+                                    selected={isItemSelected}
+                                    aria-checked={isItemSelected}
+                                  >
+                                    <TableCell padding="checkbox">
+                                      <Checkbox
+                                        checked={isItemSelected}
+                                        onClick={() => handleClickChar(id!)}
+                                      />
+                                    </TableCell>
+                                    <TableCell align="left">{name}</TableCell>
+                                    <TableCell align="center">
+                                      <Tooltip title="Select">
+                                        <IconButton onClick={() => handleSelectChar([id!])}>
+                                          <Iconify icon={'ei:arrow-right'} />
+                                        </IconButton>
+                                      </Tooltip>
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })}
+                            {emptyRowsChar > 0 && (
+                              <TableRow style={{ height: 53 * emptyRowsChar }}>
+                                <TableCell colSpan={6} />
+                              </TableRow>
+                            )}
+                          </TableBody>
+                          {isNotFoundProductChar && (
+                            <TableBody>
+                              <TableRow>
+                                <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                  <SearchNotFound searchQuery={charFilterName} />
+                                </TableCell>
+                              </TableRow>
+                            </TableBody>
+                          )}
+                        </Table>
+                      </TableContainer>
+                      <TablePagination
+                        rowsPerPageOptions={[5, 10, 25]}
+                        component="div"
+                        count={productChars.length}
+                        rowsPerPage={rowsPerPageChar}
+                        page={pageChar}
+                        onPageChange={(e, page) => setPageChar(page)}
+                        onRowsPerPageChange={handleChangeRowsPerPageChar}
+                      />
+                    </Scrollbar>
+                  </div>
+                </Grid>
+                <Grid item xs={6}>
+                  <div>
+                    <LabelStyle>Product character value</LabelStyle>
+                    <ProductCharToolbar
+                      numSelected={valueSelected.length}
+                      filterName={valueFilterName}
+                      onFilterName={handleValueFilterByName}
+                      onDeleteProducts={() => handleDeleteValues(valueSelected)}
+                    />
+                    <Scrollbar>
+                      <TableContainer>
+                        <Table>
+                          <ProductCharListHead
+                            order={order}
+                            orderBy={orderBy}
+                            headLabel={TABLE_HEAD_VALUE}
+                            rowCount={productChars.length}
+                            numSelected={valueSelected.length}
+                            onRequestSort={handleRequestSort}
+                            onSelectAllClick={handleSelectAllClick}
+                          />
+                          <TableBody>
+                            {charsSelected
+                              .slice(
+                                pageValue * rowsPerPageValue,
+                                pageValue * rowsPerPageValue + rowsPerPageValue
+                              )
+                              .map((row) => {
+                                const { id, name,productSpecCharValueDTOS } = row;
+                                const isItemSelected = valueSelected.indexOf(id!) !== -1;
+
+                                return (
+                                  <TableRow
+                                    hover
+                                    key={id}
+                                    tabIndex={-1}
+                                    role="checkbox"
+                                    selected={isItemSelected}
+                                    aria-checked={isItemSelected}
+                                  >
+                                    <TableCell padding="checkbox">
+                                      <Checkbox
+                                        checked={isItemSelected}
+                                        onClick={() => handleClickValue(id!)}
+                                      />
+                                    </TableCell>
+                                    <TableCell align="left">{name}</TableCell>
+                                    <TableCell align="left">
+                                      <RFHCheckMark name='value' items={productSpecCharValueDTOS} label={''}  />
+                                      {/* <RHFMultiCheckbox
+                                    
+                                        name="gender"
+                                        options={productSpecCharValueDTOS?.map(
+                                          (item) => item.value!
+                                        )!}
+                                        sx={{ width: 1 }}
+                                      /> */}
+                                    </TableCell>
+                                    <TableCell align="center">
+                                      <Button
+                                        sx={{ color: 'error.main' }}
+                                        onClick={() => handleDeleteValue(id)}
+                                        startIcon={
+                                          <Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />
+                                        }
+                                      />
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })}
+                            {emptyRowsValue > 0 && (
+                              <TableRow style={{ height: 53 * emptyRowsValue }}>
+                                <TableCell colSpan={6} />
+                              </TableRow>
+                            )}
+                          </TableBody>
+                          {isNotFoundProductValue && (
+                            <TableBody>
+                              <TableRow>
+                                <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                  <SearchNotFound searchQuery={valueFilterName} />
+                                </TableCell>
+                              </TableRow>
+                            </TableBody>
+                          )}
+                        </Table>
+                      </TableContainer>
+                      <TablePagination
+                        rowsPerPageOptions={[5, 10, 25]}
+                        component="div"
+                        count={charsSelected.length}
+                        rowsPerPage={rowsPerPageValue}
+                        page={pageValue}
+                        onPageChange={(e, page) => setPageValue(page)}
+                        onRowsPerPageChange={handleChangeRowsPerPageValue}
+                      />
+                    </Scrollbar>
+                  </div>
+                </Grid>
+              </Grid>{' '}
             </Card>
           </Grid>
         </Grid>
@@ -449,6 +741,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     </FormProvider>
   );
 }
+
 type Anonymous = Record<string | number, string>;
 
 function descendingComparator(a: Anonymous, b: Anonymous, orderBy: string) {
