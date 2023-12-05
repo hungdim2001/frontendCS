@@ -85,7 +85,7 @@ interface FormValuesProps {
   price: number;
   quantity: number;
   productType: number;
-  productCharsSelected: ProductChar[];
+  productCharsSelected: (ProductCharValue | number)[];
 }
 
 type Props = {
@@ -358,6 +358,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const isNotFoundProductChar = !filtereProductChars.length && Boolean(charFilterName);
   const isNotFoundProductValue = !filtereProductChars.length && Boolean(valueFilterName);
   //-----------------------------------------------------------------------------------------------------------
+  const valueSelectAll: ProductCharValue = { id: -1 } as ProductCharValue;
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -546,7 +547,16 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                   .map((row) => {
                                     const { id, name, productSpecCharValueDTOS } = row;
                                     const isItemSelected = valueSelected.indexOf(id!) !== -1;
-
+                                    const handleSelectAll = (
+                                      checked: boolean,
+                                      field: any
+                                    ) => {
+                                      const allValues = productSpecCharValueDTOS?.map(
+                                        (item) => item
+                                      );
+                                      const newValue = checked ? allValues : [];
+                                      field.onChange(newValue);
+                                    };
                                     return (
                                       <TableRow
                                         hover
@@ -586,59 +596,54 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                               label="Char Values"
                                               renderValue={(selected) => {
                                                 console.log(selected);
-                                                if (selected.find((item) => item.id !== -1)) {
-                                                  console.log(selected);
+                                                if (selected.includes(-1)) {
                                                   return 'All';
                                                 }
                                                 return selected
+                                                  .filter((item: any) => {
+                                                    // Kiểm tra xem item.value.id có tồn tại trong row.charvalue.id không
+                                                    return row.productSpecCharValueDTOS?.some(
+                                                      (char: any) => char.id === item.id
+                                                    );
+                                                  })
                                                   .map((item: any) => item.value)
                                                   .join(', ');
                                               }}
                                             >
-                                              <MenuItem key={-1} value={-1}>
+                                              {/* <MenuItem key={-1} value={valueSelectAll as any}> */}
+                                              <MenuItem key={row.id} value={-1}>
                                                 <Checkbox
-                                                  checked={
-                                                    field.value &&
-                                                    field.value.some((item) => item.id !== -1)
+                                                  onChange={(e) =>
+                                                    handleSelectAll(e.target.checked, field)
                                                   }
+                                                  checked={field.value && field.value.includes(-1)}
                                                 />
+
                                                 <ListItemText primary={'Select All'} />
                                               </MenuItem>
 
-                                              {productSpecCharValueDTOS?.map(
-                                                (option: any) => 
-                                                  // let value:ProductChar = { ...row }
-                                                  // value.productSpecCharValueDTOS = [...value.productSpecCharValueDTOS];
+                                              {productSpecCharValueDTOS?.map((option: any) => (
+                                                <MenuItem
+                                                  key={option.id}
+                                                  value={option}
+                                                  disabled={field.value && field.value.includes(-1)}
+                                                >
+                                                  <Checkbox
+                                                    disabled={
+                                                      field.value && field.value.includes(-1)
+                                                    }
+                                                    checked={
+                                                      field.value &&
+                                                      field.value
+                                                        .map((item: any) => item.value)
+                                                        .includes(option.value) &&
+                                                      !field.value.includes(-1)
+                                                    }
+                                                  />
 
-                                                   (
-                                                    <MenuItem
-                                                      key={option.id}
-                                                      value={option}
-                                                      disabled={
-                                                        field.value &&
-                                                        field.value.some((item) => item.id !== -1)
-                                                      }
-                                                    >
-                                                      <Checkbox
-                                                        disabled={
-                                                          field.value &&
-                                                          field.value.some((item) => item.id !== -1)
-                                                        }
-                                                        checked={
-                                                          field.value &&
-                                                          field.value
-                                                            .map((item: any) => item.value)
-                                                            .includes(option?.value) &&
-                                                          !field.value.some(
-                                                            (item) => item.id !== -1
-                                                          )
-                                                        }
-                                                      />
-                                                      <ListItemText primary={option?.value} />
-                                                    </MenuItem>
-                                                  )
-                                                
-                                              )}
+                                                  <ListItemText primary={option.value} />
+                                                </MenuItem>
+                                              ))}
                                             </Select>
                                           </FormControl>
 
