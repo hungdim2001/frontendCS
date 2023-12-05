@@ -35,7 +35,7 @@ import { styled } from '@mui/material/styles';
 // routes
 import { PATH_DASHBOARD } from '../../../routes/paths';
 // @types
-import { Product, ProductChar } from '../../../@types/product';
+import { Product, ProductChar, ProductCharValue } from '../../../@types/product';
 // components
 import { deleteProductChars, getProductChars } from 'src/redux/slices/product-char';
 import { getProductTypes } from 'src/redux/slices/product-type';
@@ -83,11 +83,9 @@ interface FormValuesProps {
   images: (File | string)[];
   name: string;
   price: number;
-  // code: string;
-  charValues: any[];
   quantity: number;
   productType: number;
-  // productChar:(ProductChar[];
+  productCharsSelected: ProductChar[];
 }
 
 type Props = {
@@ -116,17 +114,17 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   }, [dispatch]);
 
   const NewProductSchema = Yup.object().shape({
-    name: Yup.string().required('Name is required'),
-    description: Yup.string().required('Description is required'),
-    productType: Yup.string().required('Product Type is required'),
-    images: Yup.array().min(1, 'Images is required'),
-    price: Yup.number().moreThan(0, 'Price should not be $0.00'),
-    thumbnail: Yup.mixed().required('Thumbnail is required'),
+    // name: Yup.string().required('Name is required'),
+    // description: Yup.string().required('Description is required'),
+    // productType: Yup.string().required('Product Type is required'),
+    // images: Yup.array().min(1, 'Images is required'),
+    // price: Yup.number().moreThan(0, 'Price should not be $0.00'),
+    // thumbnail: Yup.mixed().required('Thumbnail is required'),
   });
 
   const defaultValues = useMemo(
     () => ({
-      charValues: [],
+      productCharsSelected: [],
       name: currentProduct?.name || '',
       description: currentProduct?.description || '',
       images: currentProduct?.images || [],
@@ -523,58 +521,62 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                     />
                     <Scrollbar>
                       <TableContainer>
-                        <Table>
-                          <ProductCharListHead
-                            order={order}
-                            orderBy={orderBy}
-                            headLabel={TABLE_HEAD_VALUE}
-                            rowCount={productChars.length}
-                            numSelected={valueSelected.length}
-                            onRequestSort={handleRequestSort}
-                            onSelectAllClick={handleSelectAllClick}
-                          />
-                          <TableBody>
-                            {charsSelected
-                              .slice(
-                                pageValue * rowsPerPageValue,
-                                pageValue * rowsPerPageValue + rowsPerPageValue
-                              )
-                              .map((row) => {
-                                const { id, name, productSpecCharValueDTOS } = row;
-                                const isItemSelected = valueSelected.indexOf(id!) !== -1;
+                        {' '}
+                        <Controller
+                          control={control}
+                          name="productCharsSelected"
+                          render={({ field }) => (
+                            <Table>
+                              <ProductCharListHead
+                                order={order}
+                                orderBy={orderBy}
+                                headLabel={TABLE_HEAD_VALUE}
+                                rowCount={productChars.length}
+                                numSelected={valueSelected.length}
+                                onRequestSort={handleRequestSort}
+                                onSelectAllClick={handleSelectAllClick}
+                              />
 
-                                return (
-                                  <TableRow
-                                    hover
-                                    key={id}
-                                    tabIndex={-1}
-                                    role="checkbox"
-                                    selected={isItemSelected}
-                                    aria-checked={isItemSelected}
-                                  >
-                                    <TableCell padding="checkbox">
-                                      <Checkbox
-                                        checked={isItemSelected}
-                                        onClick={() => handleClickValue(id!)}
-                                      />
-                                    </TableCell>
-                                    <TableCell align="center">
-                                      <Button
-                                        sx={{ color: 'error.main' }}
-                                        onClick={() => handleDeleteValue(id)}
-                                        startIcon={
-                                          <Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />
-                                        }
-                                      />
-                                    </TableCell>
-                                    <TableCell align="left">{name}</TableCell>
-                                    <TableCell align="left">
-                                      {/* <RHFCheckMark id={id?.toString()!} name='value' items={productSpecCharValueDTOS} label={'Char Values'}  /> */}
+                              <TableBody>
+                                {charsSelected
+                                  .slice(
+                                    pageValue * rowsPerPageValue,
+                                    pageValue * rowsPerPageValue + rowsPerPageValue
+                                  )
+                                  .map((row) => {
+                                    const { id, name, productSpecCharValueDTOS } = row;
+                                    const isItemSelected = valueSelected.indexOf(id!) !== -1;
 
-                                      <Controller
-                                        control={control}
-                                        name="charValues"
-                                        render={({ field }) => (
+                                    return (
+                                      <TableRow
+                                        hover
+                                        key={id}
+                                        tabIndex={-1}
+                                        role="checkbox"
+                                        selected={isItemSelected}
+                                        aria-checked={isItemSelected}
+                                      >
+                                        <TableCell padding="checkbox">
+                                          <Checkbox
+                                            checked={isItemSelected}
+                                            onClick={() => handleClickValue(id!)}
+                                          />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                          <Button
+                                            sx={{ color: 'error.main' }}
+                                            onClick={() => handleDeleteValue(id)}
+                                            startIcon={
+                                              <Iconify
+                                                icon={'eva:trash-2-outline'}
+                                                sx={{ ...ICON }}
+                                              />
+                                            }
+                                          />
+                                        </TableCell>
+                                        <TableCell align="left">{name}</TableCell>
+                                        <TableCell align="left">
+                                          {/* <RHFCheckMark id={id?.toString()!} name='value' items={productSpecCharValueDTOS} label={'Char Values'}  /> */}
                                           <FormControl>
                                             <InputLabel id={id?.toString()}>Char Values</InputLabel>
                                             <Select
@@ -583,7 +585,8 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                               multiple
                                               label="Char Values"
                                               renderValue={(selected) => {
-                                                if (selected.includes('-1')) {
+                                                console.log(selected);
+                                                if (selected.find((item) => item.id !== -1)) {
                                                   console.log(selected);
                                                   return 'All';
                                                 }
@@ -592,43 +595,54 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                   .join(', ');
                                               }}
                                             >
-                                              <MenuItem key={'-1'} value={'-1'}>
+                                              <MenuItem key={-1} value={-1}>
                                                 <Checkbox
                                                   checked={
-                                                    field.value && field.value.includes('-1')
+                                                    field.value &&
+                                                    field.value.some((item) => item.id !== -1)
                                                   }
                                                 />
                                                 <ListItemText primary={'Select All'} />
                                               </MenuItem>
-                                              {productSpecCharValueDTOS?.map((option: any) => (
-                                                <MenuItem
-                                                  key={option.id}
-                                                  value={option}
-                                                  disabled={
-                                                    field.value && field.value.includes('-1')
-                                                  }
-                                                >
-                                                  <Checkbox
-                                                    disabled={
-                                                      field.value && field.value.includes('-1')
-                                                    }
-                                                    checked={
-                                                      field.value &&
-                                                      field.value
-                                                        .map((item: any) => item.value)
-                                                        .includes(option.value) &&
-                                                      !field.value.includes('-1')
-                                                    }
-                                                  />
-                                                  <ListItemText primary={option.value} />
-                                                </MenuItem>
-                                              ))}
+
+                                              {productSpecCharValueDTOS?.map(
+                                                (option: any) => 
+                                                  // let value:ProductChar = { ...row }
+                                                  // value.productSpecCharValueDTOS = [...value.productSpecCharValueDTOS];
+
+                                                   (
+                                                    <MenuItem
+                                                      key={option.id}
+                                                      value={option}
+                                                      disabled={
+                                                        field.value &&
+                                                        field.value.some((item) => item.id !== -1)
+                                                      }
+                                                    >
+                                                      <Checkbox
+                                                        disabled={
+                                                          field.value &&
+                                                          field.value.some((item) => item.id !== -1)
+                                                        }
+                                                        checked={
+                                                          field.value &&
+                                                          field.value
+                                                            .map((item: any) => item.value)
+                                                            .includes(option?.value) &&
+                                                          !field.value.some(
+                                                            (item) => item.id !== -1
+                                                          )
+                                                        }
+                                                      />
+                                                      <ListItemText primary={option?.value} />
+                                                    </MenuItem>
+                                                  )
+                                                
+                                              )}
                                             </Select>
                                           </FormControl>
-                                        )}
-                                      />
 
-                                      {/* <RHFMultiCheckbox
+                                          {/* <RHFMultiCheckbox
                                     
                                         name="gender"
                                         options={productSpecCharValueDTOS?.map(
@@ -636,26 +650,29 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                         )!}
                                         sx={{ width: 1 }}
                                       /> */}
+                                        </TableCell>
+                                      </TableRow>
+                                    );
+                                  })}
+                                {emptyRowsValue > 0 && (
+                                  <TableRow style={{ height: 53 * emptyRowsValue }}>
+                                    <TableCell colSpan={6} />
+                                  </TableRow>
+                                )}
+                              </TableBody>
+
+                              {isNotFoundProductValue && (
+                                <TableBody>
+                                  <TableRow>
+                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                      <SearchNotFound searchQuery={valueFilterName} />
                                     </TableCell>
                                   </TableRow>
-                                );
-                              })}
-                            {emptyRowsValue > 0 && (
-                              <TableRow style={{ height: 53 * emptyRowsValue }}>
-                                <TableCell colSpan={6} />
-                              </TableRow>
-                            )}
-                          </TableBody>
-                          {isNotFoundProductValue && (
-                            <TableBody>
-                              <TableRow>
-                                <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                                  <SearchNotFound searchQuery={valueFilterName} />
-                                </TableCell>
-                              </TableRow>
-                            </TableBody>
+                                </TableBody>
+                              )}
+                            </Table>
                           )}
-                        </Table>
+                        />
                       </TableContainer>
                       <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
