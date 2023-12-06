@@ -59,7 +59,7 @@ export type Product = BaseDTO &{
   quantity: number;
   productType:ProductType;
   productChar:ProductChar[];
-  charSelected:ProductChar[];
+  valueSelected:(ProductCharValue|number)[];
   // tags: string[];
   // priceSale: number | null;
   // totalRating: number;

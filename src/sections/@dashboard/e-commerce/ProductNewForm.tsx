@@ -58,6 +58,7 @@ import ProductCharListHead from './product-char/ProductCharListHead';
 import SearchNotFound from 'src/components/SearchNotFound';
 import ProductCharToolbar from './product-char/ProductCharToolbar';
 import RHFCheckMark from 'src/components/hook-form/RHFCheckMark';
+import { fi } from 'date-fns/locale';
 
 // ----------------------------------------------------------------------
 
@@ -135,7 +136,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
   const defaultValues = useMemo(
     () => ({
-      productCharsSelected: [],
+      productCharsSelected: currentProduct?.valueSelected || [],
       name: currentProduct?.name || '',
       description: currentProduct?.description || '',
       images: currentProduct?.images || [],
@@ -535,21 +536,20 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                     <Scrollbar>
                       <TableContainer>
                         {' '}
-                        <Controller
-                          control={control}
-                          name="productCharsSelected"
-                          render={({ field }) => (
-                            <Table>
-                              <ProductCharListHead
-                                order={order}
-                                orderBy={orderBy}
-                                headLabel={TABLE_HEAD_VALUE}
-                                rowCount={productChars.length}
-                                numSelected={valueSelected.length}
-                                onRequestSort={handleRequestSort}
-                                onSelectAllClick={handleSelectAllClick}
-                              />
-
+                        <Table>
+                          <ProductCharListHead
+                            order={order}
+                            orderBy={orderBy}
+                            headLabel={TABLE_HEAD_VALUE}
+                            rowCount={productChars.length}
+                            numSelected={valueSelected.length}
+                            onRequestSort={handleRequestSort}
+                            onSelectAllClick={handleSelectAllClick}
+                          />
+                          <Controller
+                            control={control}
+                            name="productCharsSelected"
+                            render={({ field }) => (
                               <TableBody>
                                 {charsSelected
                                   .slice(
@@ -559,31 +559,31 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                   .map((row) => {
                                     const { id, name, productSpecCharValueDTOS } = row;
                                     const isItemSelected = valueSelected.indexOf(id!) !== -1;
-                                    const handleSelectAll = (checked: boolean, field: any) => {
-                                      const allValues = productSpecCharValueDTOS?.map(
-                                        (item) => item
-                                      );
-                                      const newValue = checked
-                                        ? [...field.value, ...allValues!, id!]
-                                        : [...field.value]
-                                            .filter(
-                                              (item) =>
-                                                //  row.productSpecCharValueDTOS?.some(
-                                                // (item2) => item2.id !== item.id
-                                                item !== id
-                                            )
-                                            .filter((item) => {
-                                              console.log(
-                                                row.productSpecCharValueDTOS?.some(
-                                                  (item2) => item2.id !== item.id
-                                                )
-                                              );
-                                              row.productSpecCharValueDTOS?.some(
-                                                (item2) => item2.id !== item.id
-                                              );
+                                    const handleSelectAll = (e: any, field: any) => {
+                                      console.log(e.target.value);
+                                      // field.onChange([...e.target.value]);
+                                      if (e.target.value.includes(id)) {
+                                        // const checked = values.productCharsSelected.includes(id!);
+                                        // if (!checked) {
+                                        const newValue = e.target.value.filter(
+                                          (item: any) => {
+                                            return !productSpecCharValueDTOS?.some((item2) => {
+                                              const itemWithId = item as {
+                                                id: number | null;
+                                                // other properties
+                                              };
+
+                                              return item2.id === itemWithId.id;
                                             });
-                                      console.log(newValue);
-                                      field.onChange(newValue);
+                                          }
+                                        );
+                                        // console.log([...newValue, id!]);
+                                        // setValue('productCharsSelected', [id!]);
+                                        field.onChange([...newValue]); // Use field.onChange to update state
+                                        // }
+                                      } else {
+                                        field.onChange([...e.target.value]);
+                                      }
                                     };
                                     const handleSelectAllChange: React.ChangeEventHandler<
                                       HTMLInputElement
@@ -591,7 +591,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                       console.log(event.target.checked);
                                       const newValue = event.target.checked
                                         ? [...field.value, id].filter((item) => {
-                                          console.log(item)
+                                            console.log(item);
                                             return row.productSpecCharValueDTOS?.some((item2) => {
                                               return (
                                                 typeof item === 'object' && item2.id !== item!.id
@@ -639,7 +639,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                               style={{ width: '100%' }}
                                               multiple
                                               label="Char Values"
-                                              // onChange={(e: any) => handleSelectsth(e, field)}
+                                              onChange={(e: any) => handleSelectAll(e, field)}
                                               renderValue={(selected) => {
                                                 if (selected.includes(id!)) {
                                                   return 'All';
@@ -655,17 +655,62 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                               }}
                                             >
                                               {/* <MenuItem key={-1} value={valueSelectAll as any}> */}
-                                              <MenuItem key={row.id} value={id!}>
+                                              <MenuItem
+                                                key={row.id}
+                                                value={id!}
+                                                // onClick={(e: React.MouseEvent<HTMLLIElement>) => {
+                                                //   const currentValues = field.value || []; // Lấy giá trị hiện tại của trường
+                                                //   if (typeof id === 'number') {
+                                                //     // Kiểm tra xem id đã có trong mảng hay chưa
+                                                //     const index = currentValues.indexOf(id);
+                                                //     field.onChange(id);
+                                                //     // if (index === -1) {
+                                                //     //   // Nếu id chưa tồn tại trong mảng, thêm id mới vào mảng
+                                                //     //   const newValues = [...currentValues, id];
+                                                //     //   field.onChange(newValues); // Cập nhật trường với giá trị mới
+                                                //     // } else {
+                                                //     //   // Nếu id đã tồn tại trong mảng, xóa id đó khỏi mảng
+                                                //     //   const newValues = [
+                                                //     //     ...currentValues.slice(0, index),
+                                                //     //     ...currentValues.slice(index + 1),
+                                                //     //   ];
+                                                //     //   field.onChange(newValues); // Cập nhật trường với giá trị mới
+                                                //     // }
+                                                //   }
+                                                //   // const checked =
+                                                //   //   values.productCharsSelected.includes(id!);
+
+                                                //   // if (!checked) {
+                                                //   //   const newValue =
+                                                //   //     values.productCharsSelected.filter(
+                                                //   //       (item: any) => {
+                                                //   //         return !productSpecCharValueDTOS?.some(
+                                                //   //           (item2) => {
+                                                //   //             const itemWithId = item as {
+                                                //   //               id: number | null;
+                                                //   //               // other properties
+                                                //   //             };
+
+                                                //   //             return item2.id === itemWithId.id;
+                                                //   //           }
+                                                //   //         );
+                                                //   //       }
+                                                //   //     );
+                                                //   //   console.log([...newValue, id!]);
+                                                //   //   // setValue('productCharsSelected', [id!]);
+                                                //   //   field.onChange([id!]); // Use field.onChange to update state
+                                                //   // }
+                                                // }}
+                                              >
                                                 <Checkbox
                                                   id={id!.toString()}
                                                   inputRef={checkboxRef}
-                                                  onChange={handleSelectAllChange}
+                                                  // onChange={handleSelectAllChange}
                                                   checked={field.value && field.value.includes(id!)}
                                                 />
                                                 {/* <label htmlFor={id!.toString()}>Select All</label> */}
                                                 <ListItemText primary={'Select All'} />
                                               </MenuItem>
-
                                               {productSpecCharValueDTOS?.map((option: any) => (
                                                 <MenuItem
                                                   key={option.id}
@@ -675,15 +720,22 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                   }
                                                 >
                                                   <Checkbox
-                                                    // disabled={
-                                                    //   !!field.value
-                                                    //   //  && field.value.includes(-1)
-                                                    // }
-                                                    checked={field.value
-                                                      .map((item: any) => {
-                                                        return item.value;
-                                                      })
-                                                      .includes(option.value)}
+                                                    onChange={(e) => {
+                                                      console.log('e');
+
+                                                      console.log(e);
+                                                    }}
+                                                    disabled={
+                                                      !!field.value && field.value.includes(id!)
+                                                    }
+                                                    checked={
+                                                      field.value
+                                                        .map((item: any) => {
+                                                          return item.value;
+                                                        })
+                                                        .includes(option.value) &&
+                                                      !field.value.includes(id!)
+                                                    }
                                                   />
 
                                                   <ListItemText primary={option.value} />
@@ -710,19 +762,18 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                   </TableRow>
                                 )}
                               </TableBody>
-
-                              {isNotFoundProductValue && (
-                                <TableBody>
-                                  <TableRow>
-                                    <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                                      <SearchNotFound searchQuery={valueFilterName} />
-                                    </TableCell>
-                                  </TableRow>
-                                </TableBody>
-                              )}
-                            </Table>
+                            )}
+                          />
+                          {isNotFoundProductValue && (
+                            <TableBody>
+                              <TableRow>
+                                <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                  <SearchNotFound searchQuery={valueFilterName} />
+                                </TableCell>
+                              </TableRow>
+                            </TableBody>
                           )}
-                        />
+                        </Table>
                       </TableContainer>
                       <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
