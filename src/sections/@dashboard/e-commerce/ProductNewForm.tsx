@@ -1,6 +1,5 @@
 import { useSnackbar } from 'notistack';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import * as Yup from 'yup';
 // form
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -35,32 +34,40 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 // routes
-import { PATH_DASHBOARD } from '../../../routes/paths';
 // @types
 import { Product, ProductChar, ProductCharValue } from '../../../@types/product';
 // components
-import { deleteProductChars, getProductChars } from 'src/redux/slices/product-char';
+import Iconify from 'src/components/Iconify';
+import InputStyle from 'src/components/InputStyle';
+import Scrollbar from 'src/components/Scrollbar';
+import SearchNotFound from 'src/components/SearchNotFound';
+import { getProductChars } from 'src/redux/slices/product-char';
 import { getProductTypes } from 'src/redux/slices/product-type';
 import { dispatch, useSelector } from 'src/redux/store';
 import {
   FormProvider,
   RHFEditor,
-  RHFMultiCheckbox,
   RHFRadioGroup,
   RHFSelect,
   RHFTextField,
   RHFUploadAvatar,
-  RHFUploadMultiFile,
+  RHFUploadMultiFile
 } from '../../../components/hook-form';
-import InputStyle from 'src/components/InputStyle';
-import Iconify from 'src/components/Iconify';
-import Scrollbar from 'src/components/Scrollbar';
 import ProductCharListHead from './product-char/ProductCharListHead';
-import SearchNotFound from 'src/components/SearchNotFound';
 import ProductCharToolbar from './product-char/ProductCharToolbar';
 
 // ----------------------------------------------------------------------
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 const STATUS_OPTION = ['Active', 'InActive'];
 
 const TABLE_HEAD_CHAR = [{ id: 'name', label: 'Name', alignRight: false }, { id: 'select' }];
@@ -363,20 +370,10 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const isNotFoundProductChar = !filtereProductChars.length && Boolean(charFilterName);
   const isNotFoundProductValue = !filtereProductValue.length && Boolean(valueFilterName);
   const [searchText, setSearchText] = useState<string>("");
-  const handleSearchChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
-    ev.stopPropagation();
-    const newSearchText = ev.target.value;
-
-    setSearchText(newSearchText);
-
-    // setFilteredNames(
-    //   newSearchText
-    //     ? options.filter((name) =>
-    //         name.toLowerCase().includes(newSearchText.toLowerCase())
-    //       )
-    //     : options
-    // );
-  };
+  useEffect(()=>{
+    console.log(searchText)
+  },[searchText])
+  
   const handleMenuOpen = () => {
     setSearchText("");
   };
@@ -567,6 +564,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                   )
                                   .map((row) => {
                                     const { id, name, productSpecCharValueDTOS } = row;
+
                                     const isItemSelected = valueSelected.indexOf(id!) !== -1;
                                     const handleSelectAll = (event: any, field: any) => {
                                       const value = event.target.value;
@@ -586,7 +584,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                             });
                                           }).length !== productSpecCharValueDTOS?.length
                                         ) {
-                                          const newValue = productSpecCharValueDTOS?.filter(
+                                          const newValue = productSpecCharValueDTOS?.filter(item=> item.value.indexOf(searchText)>-1).filter(
                                             (item: ProductCharValue) => {
                                               return !field.value.some(
                                                 (item2: ProductCharValue) => {
@@ -635,6 +633,20 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                         }
                                       }
                                     };
+                                    const handleSearchChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
+                                      ev.stopPropagation();
+                                      const newSearchText = ev.target.value;
+                                  
+                                      setSearchText(newSearchText);
+                                  
+                                      // setFilteredNames(
+                                      //   newSearchText
+                                      //     ? options.filter((name) =>
+                                      //         name.toLowerCase().includes(newSearchText.toLowerCase())
+                                      //       )
+                                      //     : options
+                                      // );
+                                    };
 
                                     return (
                                       <TableRow
@@ -669,6 +681,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                           <FormControl>
                                             <InputLabel id={id?.toString()}>Char Values</InputLabel>
                                             <Select
+                                            MenuProps={MenuProps}
                                               {...field}
                                               onOpen={handleMenuOpen}
                                               style={{ width: '100%' }}
@@ -716,13 +729,16 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                         }
                                                       );
                                                     }).length ===
-                                                      productSpecCharValueDTOS?.length &&
+                                                      productSpecCharValueDTOS  ?.filter(
+                                                        (item) =>
+                                                          item.value.indexOf(searchText) > -1
+                                                      )?.length &&
                                                     productSpecCharValueDTOS?.length !== 0
                                                   }
                                                 />
                                                 <TextField
                                                   type="text"
-                                                  placeholder="Search users"
+                                                  placeholder="Search Values"
                                                   value={searchText}
                                                   onChange={handleSearchChange}
                                                   onClickCapture={(e) => e.stopPropagation()}
@@ -739,7 +755,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                 />
                                                 {/* <ListItemText primary={'Select All'} /> */}
                                               </MenuItem>
-                                              {productSpecCharValueDTOS?.map((option: any) => (
+                                              {productSpecCharValueDTOS?.filter(item=> item.value.indexOf(searchText)>-1).map((option: any) => (
                                                 <MenuItem key={option.id} value={option}>
                                                   <Checkbox
                                                     checked={field.value
