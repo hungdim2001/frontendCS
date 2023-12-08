@@ -50,15 +50,12 @@ import {
   RHFUploadAvatar,
   RHFUploadMultiFile,
 } from '../../../components/hook-form';
-import CharList from './ProductNewForm/CharList';
 import InputStyle from 'src/components/InputStyle';
 import Iconify from 'src/components/Iconify';
 import Scrollbar from 'src/components/Scrollbar';
 import ProductCharListHead from './product-char/ProductCharListHead';
 import SearchNotFound from 'src/components/SearchNotFound';
 import ProductCharToolbar from './product-char/ProductCharToolbar';
-import RHFCheckMark from 'src/components/hook-form/RHFCheckMark';
-import { fi } from 'date-fns/locale';
 
 // ----------------------------------------------------------------------
 
@@ -100,17 +97,6 @@ const RootStyle = styled(Toolbar)(({ theme }) => ({
   padding: theme.spacing(0, 1, 0, 3),
 }));
 export default function ProductNewForm({ isEdit, currentProduct }: Props) {
-  const checkboxRef = useRef<HTMLInputElement>(null);
-
-  const handleTextClick = () => {
-    if (checkboxRef.current) {
-      // checkboxRef.current.checked = !checkboxRef.current.checked;
-      // Trigger the change event manually
-      // const event = new Event('change', { bubbles: true });
-      // checkboxRef.current.dispatchEvent(event);
-      checkboxRef.current.click();
-    }
-  };
   const ICON = {
     mr: 2,
     width: 20,
@@ -366,13 +352,10 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     getComparator(order, orderBy),
     charFilterName
   );
-  useEffect(() => {
-    console.log(getValues('productCharsSelected'));
-  }, [getValues('productCharsSelected')]);
+
   const isNotFoundProductChar = !filtereProductChars.length && Boolean(charFilterName);
   const isNotFoundProductValue = !filtereProductChars.length && Boolean(valueFilterName);
   //-----------------------------------------------------------------------------------------------------------
-  const [selecteds, setSelected] = useState<number[]>([]);
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -562,170 +545,68 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                     const isItemSelected = valueSelected.indexOf(id!) !== -1;
                                     const handleSelectAll = (event: any, field: any) => {
                                       const value = event.target.value;
-                                      if (
-                                        //và selected.length  bằng số phần từ được render => xóa hết ở check box và value
-                                        productSpecCharValueDTOS?.filter((item) => {
-                                          return value.some((fieldItem: ProductCharValue) => {
-                                            return (
-                                              typeof fieldItem === 'object' &&
-                                              fieldItem.id === item.id
-                                            );
-                                          });
-                                        }).length === productSpecCharValueDTOS?.length&&!selecteds.includes(id!)
-                                      ) {
-                                        field.onChange(value)
-
-                                        setSelected([...selecteds,id!])                             
-                                        return
-                                      }
-                                      if (!selecteds.includes(id!)) {
-                                        if(!value[value.length-1]&& value.length!=0){
-                                          // && productSpecCharValueDTOS?.filter((item) => {
-                                          //   return value.some((fieldItem: ProductCharValue) => {
-                                          //     return (
-                                          //       typeof fieldItem === 'object' &&
-                                          //       fieldItem.id === item.id
-                                          //     );
-                                          //   });
-                                          // }).length !== 0
+                                    
+                                      if (!value[value.length - 1] && value.length != 0 && productSpecCharValueDTOS?.length!==0) {
+                                        if (
+                                          productSpecCharValueDTOS?.filter((item) => {
+                                            return value.some((fieldItem: ProductCharValue) => {
+                                              return (
+                                                typeof fieldItem === 'object' &&
+                                                fieldItem.id === item.id
+                                              );
+                                            });
+                                          }).length !== productSpecCharValueDTOS?.length
+                                        ) {
                                           const newValue = productSpecCharValueDTOS?.filter(
                                             (item: ProductCharValue) => {
-                                              return !field.value.some((item2: ProductCharValue) => {
-                                                return item2.id === item.id;
-                                              });
+                                              return !field.value.some(
+                                                (item2: ProductCharValue) => {
+                                                  return item2.id === item.id;
+                                                }
+                                              );
                                             }
                                           );
                                           field.onChange([...field.value, ...newValue!]);
                                           return;
-                                        }
-                                        
-                                        if (
-                                          //và selected.length  bằng số phần từ được render => xóa hết ở check box và value
-                                          productSpecCharValueDTOS?.filter((item) => {
-                                            return value.some((fieldItem: ProductCharValue) => {
-                                              return (
-                                                typeof fieldItem === 'object' &&
-                                                fieldItem.id === item.id
-                                              );
-                                            });
-                                          }).length !== productSpecCharValueDTOS?.length
-                                        ) {
-                                          field.onChange(value)
-                                          return
-                                        }
-                                        
-                                      } else {
-                                        if(!value[value.length-1]) {
-                                        const newValue=  value.filter((item:ProductCharValue)=>{
-                                           productSpecCharValueDTOS?.filter((item2)=>{
-                                            return (
-                                              typeof item === 'object' &&
-                                              item2.id !== item.id
-                                            );
-                                           })
-                                          })
-                                          field.onChange(newValue)
-
-                                        }
-                                        if (
-                                          //và selected.length  bằng số phần từ được render => xóa hết ở check box và value
-                                          productSpecCharValueDTOS?.filter((item) => {
-                                            return value.some((fieldItem: ProductCharValue) => {
-                                              return (
-                                                typeof fieldItem === 'object' &&
-                                                fieldItem.id === item.id
-                                              );
-                                            });
-                                          }).length !== productSpecCharValueDTOS?.length
-                                        ) {
-
-                                          const newSelected = selecteds.filter(
-                                            (item) => item != id
+                                        } else {
+                                          const newValue = value.filter(
+                                            (item: any) => {
+                                              return !productSpecCharValueDTOS?.some((item2) => {
+                                                return (
+                                                   typeof item ==='undefined' ||  item2.id === item.id
+                                                );
+                                              });
+                                            }
                                           );
-                                          setSelected(newSelected);                            
-                                          field.onChange(value)
-                                          return
+                                          field.onChange(newValue);
+                                          return;
                                         }
-                                        // //nếu id không tồn tại trong selected thì
-                                        // console.log('not');
-                                        // if (
-                                        //   //và selected.length  bằng số phần từ được render => xóa hết ở check box và value
-                                        //   productSpecCharValueDTOS?.filter((item) => {
-                                        //     return value.some((fieldItem: ProductCharValue) => {
-                                        //       return (
-                                        //         typeof fieldItem === 'object' &&
-                                        //         fieldItem.id === item.id
-                                        //       );
-                                        //     });
-                                        //   }).length !== productSpecCharValueDTOS?.length
-                                        // ) {
-                                        //  const newSelect = selecteds.filter(item=> item!=id);
-                                        //  setSelected(newSelect)
-
-                                        //   const newValue = value?.filter(
-                                        //     (item: ProductCharValue) => {
-                                        //       return productSpecCharValueDTOS?.some(
-                                        //         (item2: ProductCharValue) => {
-                                        //           return item2.id !== item.id;
-                                        //         }
-                                        //       );
-                                        //     }
-                                        //   );
-                                        //   field.onChange([...newValue!]);
-                                        // } 
-                                        // else {
-                                        //   field.onChange(value);
-                                        // }
+                                      } else {
+                                        if (
+                                          productSpecCharValueDTOS?.filter((item) => {
+                                            return value.some((fieldItem: ProductCharValue) => {
+                                              return (
+                                                typeof fieldItem === 'object' &&
+                                                fieldItem.id === item.id
+                                              );
+                                            });
+                                          }).length === productSpecCharValueDTOS?.length
+                                        ) {
+                                          const newValue = productSpecCharValueDTOS?.filter(
+                                            (item: ProductCharValue) => {
+                                              return !field.value.some(
+                                                (item2: ProductCharValue) => {
+                                                  return item2.id === item.id;
+                                                }
+                                              );
+                                            }
+                                          );
+                                          field.onChange([...field.value, ...newValue!]);
+                                          return;
+                                        } else {
+                                          field.onChange(value);
+                                        }
                                       }
-
-                                      // const checked =
-                                      //   productSpecCharValueDTOS?.filter((item) =>
-                                      //     value.some(
-                                      //       (fieldItem: any) =>
-                                      //         typeof fieldItem === 'object' &&
-                                      //         fieldItem.id === item.id
-                                      //     )
-                                      //   ).length === productSpecCharValueDTOS?.length;
-                                      // console.log(value);
-                                      // if (value[value.length - 1] === id) {
-                                      //   // if (!checked) {
-                                      //   //   const newValue = event.target.value.filter(
-                                      //   //     (item: any) => {
-                                      //   //       return item !== id;
-                                      //   //     }
-                                      //   //   );
-                                      //   //   field.onChange([...newValue]);
-                                      //   //   return
-                                      //   // }
-                                      //   const newValue = productSpecCharValueDTOS?.filter(
-                                      //     (item: any) => {
-                                      //       return event.target.value
-                                      //         ?.filter((item2: any) => item.id)
-                                      //         .some((item2: ProductCharValue) => {
-                                      //           return item2.id !== item.id;
-                                      //         });
-                                      //     }
-                                      //   );
-                                      //   field.onChange([...event.target.value, ...newValue!]);
-                                      //   return;
-                                      // }
-
-                                      // if (checked) {
-                                      //   console.log('f2');
-
-                                      //   const newValue = event.target.value.filter((item: any) => {
-                                      //     return !productSpecCharValueDTOS?.some((item2) => {
-                                      //       const itemWithId = item as {
-                                      //         id: number | null;
-                                      //       };
-
-                                      //       return item2.id === itemWithId.id;
-                                      //     });
-                                      //   });
-                                      //   field.onChange([...newValue]);
-                                      //   return;
-                                      // }
-                                      // field.onChange([...value]);
                                     };
 
                                     return (
@@ -767,7 +648,19 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                               label="Char Values"
                                               onChange={(e: any) => handleSelectAll(e, field)}
                                               renderValue={(selected) => {
-                                                if (selecteds.includes(id!)) {
+                                                if (
+                                                  productSpecCharValueDTOS?.filter((item) => {
+                                                    return field.value.some(
+                                                      (fieldItem: ProductCharValue) => {
+                                                        return (
+                                                          typeof fieldItem === 'object' &&
+                                                          fieldItem.id === item.id
+                                                        );
+                                                      }
+                                                    );
+                                                  }).length === productSpecCharValueDTOS?.length &&
+                                                  productSpecCharValueDTOS?.length!==0
+                                                ) {
                                                   return 'All';
                                                 }
                                                 return selected
@@ -781,128 +674,36 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                   .join(', ');
                                               }}
                                             >
-                                              {/* <MenuItem key={-1} value={valueSelectAll as any}> */}
-                                              <MenuItem
-                                                key={row.id}
-                                                // value={id!}
-                                                onClick={(e) => {
-                                                  if (selecteds.includes(id!)) {
-                                                    const newSelected = selecteds.filter(
-                                                      (item) => item != id
-                                                    );
-                                                    setSelected(newSelected);
-                                                    // const newValue = field.value.filter(
-                                                    //   (item: any) => {
-                                                    //     return !productSpecCharValueDTOS?.some(
-                                                    //       (item2) => {
-                                                    //         const itemWithId = item as {
-                                                    //           id: number | null;
-                                                    //         };
-
-                                                    //         return item2.id === itemWithId.id;
-                                                    //       }
-                                                    //     );
-                                                    //   }
-                                                    // );
-                                                    // field.onChange([...newValue]);
-                                                    // return;
-                                                  } else {
-                                                    const newSelected = selecteds;
-                                                    setSelected([...newSelected!, id!]);
-
-                                                    // const newValue =
-                                                    //   productSpecCharValueDTOS?.filter(
-                                                    //     (item: ProductCharValue) => {
-
-                                                    //       return !field.value.some(
-                                                    //         (item2: ProductCharValue) => {
-                                                    //           return item2.id === item.id;
-                                                    //         }
-                                                    //       );
-                                                    //     }
-                                                    //   );
-                                                    // field.onChange([...field.value, ...newValue!]);
-                                                    // console.log(field);
-                                                  }
-                                                }}
-                                                // onClick={(e: React.MouseEvent<HTMLLIElement>) => {
-                                                //   const currentValues = field.value || []; // Lấy giá trị hiện tại của trường
-                                                //   if (typeof id === 'number') {
-                                                //     const index = currentValues.indexOf(id);
-                                                //     field.onChange(id);
-                                                //     // if (index === -1) {
-                                                //     //   // Nếu id chưa tồn tại trong mảng, thêm id mới vào mảng
-                                                //     //   const newValues = [...currentValues, id];
-                                                //     //   field.onChange(newValues); // Cập nhật trường với giá trị mới
-                                                //     // } else {
-                                                //     //   // Nếu id đã tồn tại trong mảng, xóa id đó khỏi mảng
-                                                //     //   const newValues = [
-                                                //     //     ...currentValues.slice(0, index),
-                                                //     //     ...currentValues.slice(index + 1),
-                                                //     //   ];
-                                                //     //   field.onChange(newValues); // Cập nhật trường với giá trị mới
-                                                //     // }
-                                                //   }
-                                                //   // const checked =
-                                                //   //   values.productCharsSelected.includes(id!);
-
-                                                //   // if (!checked) {
-                                                //   //   const newValue =
-                                                //   //     values.productCharsSelected.filter(
-                                                //   //       (item: any) => {
-                                                //   //         return !productSpecCharValueDTOS?.some(
-                                                //   //           (item2) => {
-                                                //   //             const itemWithId = item as {
-                                                //   //               id: number | null;
-                                                //   //               // other properties
-                                                //   //             };
-
-                                                //   //             return item2.id === itemWithId.id;
-                                                //   //           }
-                                                //   //         );
-                                                //   //       }
-                                                //   //     );
-                                                //   //   console.log([...newValue, id!]);
-                                                //   //   // setValue('productCharsSelected', [id!]);
-                                                //   //   field.onChange([id!]); // Use field.onChange to update state
-                                                //   // }
-                                                // }}
-                                              >
+                                              <MenuItem key={row.id}>
                                                 <Checkbox
                                                   id={id!.toString()}
                                                   checked={
-                                                    selecteds.includes(id!)
-                                                    // productSpecCharValueDTOS?.filter((item) =>
-                                                    //   field.value.some(
-                                                    //     (fieldItem) =>
-                                                    //       typeof fieldItem === 'object' &&
-                                                    //       fieldItem.id === item.id
-                                                    //   )
-                                                    // ).length === productSpecCharValueDTOS?.length
+                                                    productSpecCharValueDTOS?.filter((item) => {
+                                                      return field.value.some(
+                                                        (fieldItem: ProductCharValue) => {
+                                                          return (
+                                                            typeof fieldItem === 'object' &&
+                                                            fieldItem.id === item.id
+                                                          );
+                                                        }
+                                                      );
+                                                    }).length ===
+                                                      productSpecCharValueDTOS?.length &&
+                                                      productSpecCharValueDTOS?.length!==0
                                                   }
                                                 />
-                                                {/* <label htmlFor={id!.toString()}>Select All</label> */}
                                                 <ListItemText primary={'Select All'} />
                                               </MenuItem>
                                               {productSpecCharValueDTOS?.map((option: any) => (
-                                                <MenuItem
-                                                  key={option.id}
-                                                  value={option}
-                                                  // disabled={
-                                                  //   !!field.value && field.value.includes(id!)
-                                                  // }
-                                                >
+                                                <MenuItem key={option.id} value={option}>
                                                   <Checkbox
-                                                    checked={
-                                                      field.value
-                                                        .map((item: any) => {
-                                                          return (
-                                                            typeof item == 'object' && item.value
-                                                          );
-                                                        })
-                                                        .includes(option.value)
-                                                      //  &&!field.value.includes(id!)
-                                                    }
+                                                    checked={field.value
+                                                      .map((item: any) => {
+                                                        return (
+                                                          typeof item == 'object' && item.value
+                                                        );
+                                                      })
+                                                      .includes(option.value)}
                                                   />
 
                                                   <ListItemText primary={option.value} />
@@ -910,15 +711,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                               ))}
                                             </Select>
                                           </FormControl>
-
-                                          {/* <RHFMultiCheckbox
-                                    
-                                        name="gender"
-                                        options={productSpecCharValueDTOS?.map(
-                                          (item) => item.value!
-                                        )!}
-                                        sx={{ width: 1 }}
-                                      /> */}
                                         </TableCell>
                                       </TableRow>
                                     );
@@ -994,31 +786,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                       </option>
                     ))}
                 </RHFSelect>
-
-                {/* <Controller
-                  name="tags"
-                  control={control}
-                  render={({ field }) => (
-                    <Autocomplete
-                      {...field}
-                      multiple
-                      freeSolo
-                      onChange={(event, newValue) => field.onChange(newValue)}
-                      options={TAGS_OPTION.map((option) => option)}
-                      renderTags={(value, getTagProps) =>
-                        value.map((option, index) => (
-                          <Chip
-                            {...getTagProps({ index })}
-                            key={option}
-                            size="small"
-                            label={option}
-                          />
-                        ))
-                      }
-                      renderInput={(params) => <TextField label="Tags" {...params} />}
-                    />
-                  )}
-                /> */}
               </Stack>
             </Card>
 
@@ -1036,22 +803,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                     type: 'number',
                   }}
                 />
-
-                {/* <RHFTextField
-                  name="priceSale"
-                  label="Sale Price"
-                  placeholder="0.00"
-                  value={getValues('priceSale') === 0 ? '' : getValues('priceSale')}
-                  onChange={(event) => setValue('price', Number(event.target.value))}
-                  InputLabelProps={{ shrink: true }}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                    type: 'number',
-                  }}
-                /> */}
               </Stack>
-
-              {/* <RHFSwitch name="taxes" label="Price includes taxes" /> */}
             </Card>
 
             <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
