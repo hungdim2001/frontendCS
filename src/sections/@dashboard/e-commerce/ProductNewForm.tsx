@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Controller, useForm } from 'react-hook-form';
 // @mui
+import { Search } from "@mui/icons-material";
 import { LoadingButton } from '@mui/lab';
 import {
   Button,
@@ -26,6 +27,7 @@ import {
   TableContainer,
   TablePagination,
   TableRow,
+  TextField,
   Toolbar,
   Tooltip,
   Typography,
@@ -345,16 +347,39 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const emptyRowsChar =
     pageChar > 0 ? Math.max(0, (1 + pageChar) * rowsPerPageChar - productChars.length) : 0;
   const emptyRowsValue =
-    pageValue > 0 ? Math.max(0, (1 + pageValue) * rowsPerPageValue - productChars.length) : 0;
+    pageValue > 0 ? Math.max(0, (1 + pageValue) * rowsPerPageValue - charsSelected.length) : 0;
 
   const filtereProductChars = applySortFilter(
     productChars,
     getComparator(order, orderBy),
     charFilterName
   );
+  const filtereProductValue = applySortFilter(
+    charsSelected,
+    getComparator(order, orderBy),
+    valueFilterName
+  );
 
   const isNotFoundProductChar = !filtereProductChars.length && Boolean(charFilterName);
-  const isNotFoundProductValue = !filtereProductChars.length && Boolean(valueFilterName);
+  const isNotFoundProductValue = !filtereProductValue.length && Boolean(valueFilterName);
+  const [searchText, setSearchText] = useState<string>("");
+  const handleSearchChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
+    ev.stopPropagation();
+    const newSearchText = ev.target.value;
+
+    setSearchText(newSearchText);
+
+    // setFilteredNames(
+    //   newSearchText
+    //     ? options.filter((name) =>
+    //         name.toLowerCase().includes(newSearchText.toLowerCase())
+    //       )
+    //     : options
+    // );
+  };
+  const handleMenuOpen = () => {
+    setSearchText("");
+  };
   //-----------------------------------------------------------------------------------------------------------
 
   return (
@@ -525,7 +550,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                             order={order}
                             orderBy={orderBy}
                             headLabel={TABLE_HEAD_VALUE}
-                            rowCount={productChars.length}
+                            rowCount={charsSelected.length}
                             numSelected={valueSelected.length}
                             onRequestSort={handleRequestSort}
                             onSelectAllClick={handleSelectAllClick}
@@ -535,7 +560,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                             name="productCharsSelected"
                             render={({ field }) => (
                               <TableBody>
-                                {charsSelected
+                                {filtereProductValue
                                   .slice(
                                     pageValue * rowsPerPageValue,
                                     pageValue * rowsPerPageValue + rowsPerPageValue
@@ -545,8 +570,12 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                     const isItemSelected = valueSelected.indexOf(id!) !== -1;
                                     const handleSelectAll = (event: any, field: any) => {
                                       const value = event.target.value;
-                                    
-                                      if (!value[value.length - 1] && value.length != 0 && productSpecCharValueDTOS?.length!==0) {
+
+                                      if (
+                                        !value[value.length - 1] &&
+                                        value.length != 0 &&
+                                        productSpecCharValueDTOS?.length !== 0
+                                      ) {
                                         if (
                                           productSpecCharValueDTOS?.filter((item) => {
                                             return value.some((fieldItem: ProductCharValue) => {
@@ -569,15 +598,13 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                           field.onChange([...field.value, ...newValue!]);
                                           return;
                                         } else {
-                                          const newValue = value.filter(
-                                            (item: any) => {
-                                              return !productSpecCharValueDTOS?.some((item2) => {
-                                                return (
-                                                   typeof item ==='undefined' ||  item2.id === item.id
-                                                );
-                                              });
-                                            }
-                                          );
+                                          const newValue = value.filter((item: any) => {
+                                            return !productSpecCharValueDTOS?.some((item2) => {
+                                              return (
+                                                typeof item === 'undefined' || item2.id === item.id
+                                              );
+                                            });
+                                          });
                                           field.onChange(newValue);
                                           return;
                                         }
@@ -643,6 +670,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                             <InputLabel id={id?.toString()}>Char Values</InputLabel>
                                             <Select
                                               {...field}
+                                              onOpen={handleMenuOpen}
                                               style={{ width: '100%' }}
                                               multiple
                                               label="Char Values"
@@ -659,7 +687,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                       }
                                                     );
                                                   }).length === productSpecCharValueDTOS?.length &&
-                                                  productSpecCharValueDTOS?.length!==0
+                                                  productSpecCharValueDTOS?.length !== 0
                                                 ) {
                                                   return 'All';
                                                 }
@@ -689,10 +717,27 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                       );
                                                     }).length ===
                                                       productSpecCharValueDTOS?.length &&
-                                                      productSpecCharValueDTOS?.length!==0
+                                                    productSpecCharValueDTOS?.length !== 0
                                                   }
                                                 />
-                                                <ListItemText primary={'Select All'} />
+                                                <TextField
+                                                  type="text"
+                                                  placeholder="Search users"
+                                                  value={searchText}
+                                                  onChange={handleSearchChange}
+                                                  onClickCapture={(e) => e.stopPropagation()}
+                                                  onKeyDown={(e) => e.stopPropagation()}
+                                                  size="small"
+                                                  InputProps={{
+                                                    startAdornment: (
+                                                      <InputAdornment position="start">
+                                                        <Search />
+                                                      </InputAdornment>
+                                                    ),
+                                                  }}
+                                                  fullWidth
+                                                />
+                                                {/* <ListItemText primary={'Select All'} /> */}
                                               </MenuItem>
                                               {productSpecCharValueDTOS?.map((option: any) => (
                                                 <MenuItem key={option.id} value={option}>
