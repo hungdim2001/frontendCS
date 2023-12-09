@@ -60,14 +60,44 @@ import ProductCharToolbar from './product-char/ProductCharToolbar';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
-const MenuProps = {
+
+type MenuPropsType = {
+  PaperProps: {
+    style: {
+      maxHeight: number;
+      width: number;
+    };
+  };
+  anchorOrigin: {
+    vertical: number | "bottom" | "center" | "top";
+    horizontal: number | "center" | "right" | "left";
+  };
+  transformOrigin: {
+    vertical: number | "bottom" | "center" | "top";
+    horizontal: number | "center" | "right" | "left";
+
+  };
+  variant: "menu" | "selectedMenu" | undefined;
+};
+
+const MenuProps: MenuPropsType = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
+      width: 250
+    }
   },
+  anchorOrigin: {
+    vertical: "bottom",
+    horizontal: "center"
+  },
+  transformOrigin: {
+    vertical: "top",
+    horizontal: "center"
+  },
+  variant: "menu"
 };
+
 const STATUS_OPTION = ['Active', 'InActive'];
 
 const TABLE_HEAD_CHAR = [{ id: 'name', label: 'Name', alignRight: false }, { id: 'select' }];
@@ -121,12 +151,12 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   }, [dispatch]);
 
   const NewProductSchema = Yup.object().shape({
-    // name: Yup.string().required('Name is required'),
-    // description: Yup.string().required('Description is required'),
-    // productType: Yup.string().required('Product Type is required'),
-    // images: Yup.array().min(1, 'Images is required'),
-    // price: Yup.number().moreThan(0, 'Price should not be $0.00'),
-    // thumbnail: Yup.mixed().required('Thumbnail is required'),
+    name: Yup.string().required('Name is required'),
+    description: Yup.string().required('Description is required'),
+    productType: Yup.string().required('Product Type is required'),
+    images: Yup.array().min(1, 'Images is required'),
+    price: Yup.number().moreThan(0, 'Price should not be $0.00'),
+    thumbnail: Yup.mixed().required('Thumbnail is required'),
   });
 
   const defaultValues = useMemo(
@@ -636,16 +666,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                     const handleSearchChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
                                       ev.stopPropagation();
                                       const newSearchText = ev.target.value;
-                                  
                                       setSearchText(newSearchText);
-                                  
-                                      // setFilteredNames(
-                                      //   newSearchText
-                                      //     ? options.filter((name) =>
-                                      //         name.toLowerCase().includes(newSearchText.toLowerCase())
-                                      //       )
-                                      //     : options
-                                      // );
                                     };
 
                                     return (
@@ -677,14 +698,13 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                         </TableCell>
                                         <TableCell align="left">{name}</TableCell>
                                         <TableCell align="left">
-                                          {/* <RHFCheckMark id={id?.toString()!} name='value' items={productSpecCharValueDTOS} label={'Char Values'}  /> */}
                                           <FormControl>
                                             <InputLabel id={id?.toString()}>Char Values</InputLabel>
                                             <Select
                                             MenuProps={MenuProps}
                                               {...field}
                                               onOpen={handleMenuOpen}
-                                              style={{ width: '100%' }}
+                                              style={{ width: '100px' }}
                                               multiple
                                               label="Char Values"
                                               onChange={(e: any) => handleSelectAll(e, field)}
