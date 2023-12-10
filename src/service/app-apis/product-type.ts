@@ -1,7 +1,5 @@
 import { BaseApi } from './base-api';
 import { ProductType } from '../../@types/product';
-import { HOST_API } from 'src/config';
-import axios from 'src/utils/axios';
 import { BaseFormDataApi } from './base-form-data-api';
 // import axios from 'axios';
 const productTypeIns = new BaseApi('/api/product-type');

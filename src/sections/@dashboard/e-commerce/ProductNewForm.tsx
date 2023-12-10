@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Controller, useForm } from 'react-hook-form';
 // @mui
-import { Search } from "@mui/icons-material";
+import { Search } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
   Button,
@@ -51,10 +51,11 @@ import {
   RHFSelect,
   RHFTextField,
   RHFUploadAvatar,
-  RHFUploadMultiFile
+  RHFUploadMultiFile,
 } from '../../../components/hook-form';
 import ProductCharListHead from './product-char/ProductCharListHead';
 import ProductCharToolbar from './product-char/ProductCharToolbar';
+import { productApi } from 'src/service/app-apis/product';
 
 // ----------------------------------------------------------------------
 
@@ -69,33 +70,32 @@ type MenuPropsType = {
     };
   };
   anchorOrigin: {
-    vertical: number | "bottom" | "center" | "top";
-    horizontal: number | "center" | "right" | "left";
+    vertical: number | 'bottom' | 'center' | 'top';
+    horizontal: number | 'center' | 'right' | 'left';
   };
   transformOrigin: {
-    vertical: number | "bottom" | "center" | "top";
-    horizontal: number | "center" | "right" | "left";
-
+    vertical: number | 'bottom' | 'center' | 'top';
+    horizontal: number | 'center' | 'right' | 'left';
   };
-  variant: "menu" | "selectedMenu" | undefined;
+  variant: 'menu' | 'selectedMenu' | undefined;
 };
 
 const MenuProps: MenuPropsType = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250
-    }
+      width: 250,
+    },
   },
   anchorOrigin: {
-    vertical: "bottom",
-    horizontal: "center"
+    vertical: 'bottom',
+    horizontal: 'center',
   },
   transformOrigin: {
-    vertical: "top",
-    horizontal: "center"
+    vertical: 'top',
+    horizontal: 'center',
   },
-  variant: "menu"
+  variant: 'menu',
 };
 
 const STATUS_OPTION = ['Active', 'InActive'];
@@ -116,12 +116,16 @@ const LabelStyle = styled(Typography)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 interface FormValuesProps {
+  id: any;
   thumbnail: File | string;
   images: (File | string)[];
   name: string;
   price: number;
   quantity: number;
-  productType: number;
+  productTypeId: number;
+  status: string;
+  description: string;
+
   productCharsSelected: ProductCharValue[];
 }
 
@@ -153,21 +157,24 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const NewProductSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     description: Yup.string().required('Description is required'),
-    productType: Yup.string().required('Product Type is required'),
+    productTypeId: Yup.string().required('Product Type is required'),
     images: Yup.array().min(1, 'Images is required'),
-    price: Yup.number().moreThan(0, 'Price should not be $0.00'),
+    price: Yup.number().moreThan(0, 'Price should not be ₫0.00'),
+    quantity: Yup.number().moreThan(0, 'Quantity is required'),
     thumbnail: Yup.mixed().required('Thumbnail is required'),
   });
 
   const defaultValues = useMemo(
     () => ({
+      id: currentProduct?.id || null,
       productCharsSelected: currentProduct?.valueSelected || [],
       name: currentProduct?.name || '',
       description: currentProduct?.description || '',
       images: currentProduct?.images || [],
       thumbnail: currentProduct?.thumbnail,
       price: currentProduct?.price || 0,
-      productType: currentProduct?.productType.id!,
+      quantity: currentProduct?.quantity || 0,
+      productTypeId: currentProduct?.productType.id!,
       status: currentProduct?.status
         ? STATUS_OPTION[0]
         : currentProduct
@@ -206,7 +213,22 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
-      console.log(data);
+      const formData = new FormData();
+      if (data.id) {
+        formData.append('id', data.id);
+      }
+      formData.append('thumbnail', data.thumbnail);
+      data.images.forEach((image) => {
+        formData.append('images', image);
+      });
+      formData.append('productTypeId', data.productTypeId.toString()); // Example product type ID
+      formData.append('name', data.name);
+      formData.append('quantity', data.quantity.toString());
+      formData.append('status', data?.status === 'Active' ? '1' : '0');
+      formData.append('description', data.description);
+      formData.append('price', data.price.toString());
+      formData.append('productCharValues', JSON.stringify(data.productCharsSelected));
+      await productApi.createProduct(formData);
       await new Promise((resolve) => setTimeout(resolve, 500));
       // reset();
       enqueueSnackbar(!isEdit ? 'Create success!' : 'Update success!');
@@ -399,13 +421,13 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
   const isNotFoundProductChar = !filtereProductChars.length && Boolean(charFilterName);
   const isNotFoundProductValue = !filtereProductValue.length && Boolean(valueFilterName);
-  const [searchText, setSearchText] = useState<string>("");
-  useEffect(()=>{
-    console.log(searchText)
-  },[searchText])
-  
+  const [searchText, setSearchText] = useState<string>('');
+  useEffect(() => {
+    console.log(searchText);
+  }, [searchText]);
+
   const handleMenuOpen = () => {
-    setSearchText("");
+    setSearchText('');
   };
   //-----------------------------------------------------------------------------------------------------------
 
@@ -614,15 +636,15 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                             });
                                           }).length !== productSpecCharValueDTOS?.length
                                         ) {
-                                          const newValue = productSpecCharValueDTOS?.filter(item=> item.value.indexOf(searchText)>-1).filter(
-                                            (item: ProductCharValue) => {
+                                          const newValue = productSpecCharValueDTOS
+                                            ?.filter((item) => item.value.indexOf(searchText) > -1)
+                                            .filter((item: ProductCharValue) => {
                                               return !field.value.some(
                                                 (item2: ProductCharValue) => {
                                                   return item2.id === item.id;
                                                 }
                                               );
-                                            }
-                                          );
+                                            });
                                           field.onChange([...field.value, ...newValue!]);
                                           return;
                                         } else {
@@ -663,7 +685,9 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                         }
                                       }
                                     };
-                                    const handleSearchChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
+                                    const handleSearchChange = (
+                                      ev: React.ChangeEvent<HTMLTextAreaElement>
+                                    ) => {
                                       ev.stopPropagation();
                                       const newSearchText = ev.target.value;
                                       setSearchText(newSearchText);
@@ -701,7 +725,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                           <FormControl>
                                             <InputLabel id={id?.toString()}>Char Values</InputLabel>
                                             <Select
-                                            MenuProps={MenuProps}
+                                              MenuProps={MenuProps}
                                               {...field}
                                               onOpen={handleMenuOpen}
                                               style={{ width: '100px' }}
@@ -749,7 +773,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                         }
                                                       );
                                                     }).length ===
-                                                      productSpecCharValueDTOS  ?.filter(
+                                                      productSpecCharValueDTOS?.filter(
                                                         (item) =>
                                                           item.value.indexOf(searchText) > -1
                                                       )?.length &&
@@ -775,21 +799,25 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                 />
                                                 {/* <ListItemText primary={'Select All'} /> */}
                                               </MenuItem>
-                                              {productSpecCharValueDTOS?.filter(item=> item.value.indexOf(searchText)>-1).map((option: any) => (
-                                                <MenuItem key={option.id} value={option}>
-                                                  <Checkbox
-                                                    checked={field.value
-                                                      .map((item: any) => {
-                                                        return (
-                                                          typeof item == 'object' && item.value
-                                                        );
-                                                      })
-                                                      .includes(option.value)}
-                                                  />
+                                              {productSpecCharValueDTOS
+                                                ?.filter(
+                                                  (item) => item.value.indexOf(searchText) > -1
+                                                )
+                                                .map((option: any) => (
+                                                  <MenuItem key={option.id} value={option}>
+                                                    <Checkbox
+                                                      checked={field.value
+                                                        .map((item: any) => {
+                                                          return (
+                                                            typeof item == 'object' && item.value
+                                                          );
+                                                        })
+                                                        .includes(option.value)}
+                                                    />
 
-                                                  <ListItemText primary={option.value} />
-                                                </MenuItem>
-                                              ))}
+                                                    <ListItemText primary={option.value} />
+                                                  </MenuItem>
+                                                ))}
                                             </Select>
                                           </FormControl>
                                         </TableCell>
@@ -857,7 +885,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                   />
                 </div>
 
-                <RHFSelect name="productType" label="Product Type">
+                <RHFSelect name="productTypeId" label="Product Type">
                   <option value=""></option>
                   {productTypes
                     .filter((productType) => productType.status)
@@ -869,12 +897,11 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                 </RHFSelect>
               </Stack>
             </Card>
-
             <Card sx={{ p: 3 }}>
               <Stack spacing={3} mb={2}>
                 <RHFTextField
                   name="price"
-                  label="Regular Price"
+                  label="Price"
                   placeholder="0.00"
                   value={getValues('price') === 0 ? '' : getValues('price')}
                   onChange={(event) => setValue('price', Number(event.target.value))}
@@ -884,6 +911,12 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                     type: 'number',
                   }}
                 />
+              </Stack>
+            </Card>
+
+            <Card sx={{ p: 3 }}>
+              <Stack spacing={3} mb={2}>
+                <RHFTextField name="quantity" label="Quantity" />
               </Stack>
             </Card>
 
