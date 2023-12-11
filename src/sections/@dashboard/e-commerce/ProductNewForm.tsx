@@ -239,17 +239,25 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   };
   const handleDrop = useCallback(
     (acceptedFiles) => {
-      setValue(
-        'images',
-        acceptedFiles.map((file: Blob | MediaSource) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file),
-          })
-        )
+      // Tạo một bản sao của giá trị 'images' hiện tại
+      const existingImages = [...getValues('images')];
+      
+      // Thêm các ảnh mới vào mảng hiện tại
+      const updatedImages = acceptedFiles.map((file: Blob | MediaSource) =>
+        Object.assign(file, {
+          preview: URL.createObjectURL(file),
+        })
       );
+  
+      // Kết hợp ảnh cũ và ảnh mới
+      const allImages = existingImages.concat(updatedImages);
+  
+      // Cập nhật giá trị 'images' với mảng mới
+      setValue('images', allImages);
     },
-    [setValue]
+    [getValues, setValue]
   );
+  
   const handleDrop2 = useCallback(
     (acceptedFiles) => {
       const file = acceptedFiles[0];
