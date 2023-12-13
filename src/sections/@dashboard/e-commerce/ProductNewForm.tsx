@@ -225,9 +225,12 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
       formData.append('name', data.name);
       formData.append('quantity', data.quantity.toString());
       formData.append('status', data?.status === 'Active' ? '1' : '0');
-      formData.append('description', data.description);
       formData.append('price', data.price.toString());
       formData.append('productCharValues', JSON.stringify(data.productCharsSelected));
+
+      const blob = new Blob([data.description], { type: 'text/html' });
+      formData.append('description', blob,"description.html");
+
       await productApi.createProduct(formData);
       await new Promise((resolve) => setTimeout(resolve, 500));
       // reset();
@@ -241,23 +244,23 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     (acceptedFiles) => {
       // Tạo một bản sao của giá trị 'images' hiện tại
       const existingImages = [...getValues('images')];
-      
+
       // Thêm các ảnh mới vào mảng hiện tại
       const updatedImages = acceptedFiles.map((file: Blob | MediaSource) =>
         Object.assign(file, {
           preview: URL.createObjectURL(file),
         })
       );
-  
+
       // Kết hợp ảnh cũ và ảnh mới
       const allImages = existingImages.concat(updatedImages);
-  
+
       // Cập nhật giá trị 'images' với mảng mới
       setValue('images', allImages);
     },
     [getValues, setValue]
   );
-  
+
   const handleDrop2 = useCallback(
     (acceptedFiles) => {
       const file = acceptedFiles[0];
