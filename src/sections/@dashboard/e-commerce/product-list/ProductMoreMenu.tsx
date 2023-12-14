@@ -13,10 +13,10 @@ import MenuPopover from '../../../../components/MenuPopover';
 
 type Props = {
   onDelete: VoidFunction;
-  productName: string;
+  id: string;
 };
 
-export default function ProductMoreMenu({ onDelete, productName }: Props) {
+export default function ProductMoreMenu({ onDelete, id }: Props) {
   const [open, setOpen] = useState<HTMLElement | null>(null);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -59,7 +59,7 @@ export default function ProductMoreMenu({ onDelete, productName }: Props) {
 
         <MenuItem
           component={RouterLink}
-          to={`${PATH_DASHBOARD.eCommerce.root}/product/${paramCase(productName)}/edit`}
+          to={`${PATH_DASHBOARD.eCommerce.root}/product/${id}/edit`}
         >
           <Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />
           Edit

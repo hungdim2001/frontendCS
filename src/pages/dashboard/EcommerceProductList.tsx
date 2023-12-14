@@ -48,8 +48,8 @@ import {
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Product', alignRight: false },
-  { id: 'createdAt', label: 'Create at', alignRight: false },
-  { id: 'inventoryType', label: 'Status', alignRight: false },
+  { id: 'available', label: 'Availale', alignRight: false },
+  { id: 'status', label: 'Status', alignRight: false },
   { id: 'price', label: 'Price', alignRight: true },
   { id: '' },
 ];
@@ -80,7 +80,7 @@ export default function EcommerceProductList() {
   const [orderBy, setOrderBy] = useState('createdAt');
 
   useEffect(() => {
-    dispatch(getProducts());
+    dispatch(getProducts(null));
   }, [dispatch]);
 
   useEffect(() => {
@@ -199,8 +199,7 @@ export default function EcommerceProductList() {
                   {filteredProducts
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row) => {
-                      // const { id, name, thumbnail, price, createdAt, inventoryType } = row;
-                      const { id, name, thumbnail, price,  } = row;
+                      const { id, thumbnail,  name, quantity, status, price,  } = row;
 
 
                       const isItemSelected = selected.indexOf(name) !== -1;
@@ -228,23 +227,19 @@ export default function EcommerceProductList() {
                               {name}
                             </Typography>
                           </TableCell>
-                          {/* <TableCell style={{ minWidth: 160 }}>{fDate(createdAt)}</TableCell>
-                          <TableCell style={{ minWidth: 160 }}>
-                            <Label
-                              variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
-                              color={
-                                (inventoryType === 'out_of_stock' && 'error') ||
-                                (inventoryType === 'low_stock' && 'warning') ||
-                                'success'
-                              }
-                            >
-                              {inventoryType ? sentenceCase(inventoryType) : ''}
-                            </Label>
-                          </TableCell> */}
-                          <TableCell align="right">{fCurrency(price)}</TableCell>
+                          <TableCell style={{ minWidth: 160 }}>{quantity}</TableCell>
+                          <TableCell align="left">
+                        <Label
+                          variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
+                          color={(status === false && 'error') || 'success'}
+                        >
+                          {sentenceCase(status === true ? 'active' : 'inactive')}
+                        </Label>
+                      </TableCell>
+                          <TableCell align="right">{fCurrency(price)}₫</TableCell>
                           <TableCell align="right">
                             <ProductMoreMenu
-                              productName={name}
+                              id={id?.toString()!}
                               onDelete={() => handleDeleteProduct(id)}
                             />
                           </TableCell>

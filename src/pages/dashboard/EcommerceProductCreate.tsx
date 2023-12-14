@@ -25,16 +25,19 @@ export default function EcommerceProductCreate() {
 
   const { pathname } = useLocation();
 
-  const { name = '' } = useParams();
+  const { id = '' } = useParams();
 
   const { products } = useSelector((state) => state.product);
 
   const isEdit = pathname.includes('edit');
 
-  const currentProduct = products.find((product) => paramCase(product.name) === name);
+  const currentProduct = products.find((product) => {
+    console.log( +id!);
+    return product.id == +id!;
+  });
 
   useEffect(() => {
-    dispatch(getProducts());
+    dispatch(getProducts(null));
   }, [dispatch]);
 
   return (
@@ -48,7 +51,7 @@ export default function EcommerceProductCreate() {
               name: 'E-Commerce',
               href: PATH_DASHBOARD.eCommerce.root,
             },
-            { name: !isEdit ? 'New product' : name },
+            { name: !isEdit ? 'New product' : id },
           ]}
         />
 

@@ -37,6 +37,7 @@ import { styled } from '@mui/material/styles';
 // @types
 import { Product, ProductChar, ProductCharValue } from '../../../@types/product';
 // components
+import * as cheerio from 'cheerio';
 import Iconify from 'src/components/Iconify';
 import InputStyle from 'src/components/InputStyle';
 import Scrollbar from 'src/components/Scrollbar';
@@ -147,6 +148,9 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   };
 
   const { enqueueSnackbar } = useSnackbar();
+  useEffect(() => {
+    console.log(currentProduct);
+  }, [currentProduct]);
 
   const { productTypes } = useSelector((state) => state.productTypes);
   useEffect(() => {
@@ -163,13 +167,31 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     quantity: Yup.number().moreThan(0, 'Quantity is required'),
     thumbnail: Yup.mixed().required('Thumbnail is required'),
   });
+  const [descriptionHTML, setDescriptionHTML] = useState('');
 
+  useEffect(() => {
+    if (currentProduct?.description) {
+      fetch(currentProduct.description)
+        .then(response => response.text())
+        .then(data => {
+          const htmlContent = data;
+
+          const $ = cheerio.load(htmlContent);
+          console.log($)
+                setDescriptionHTML(data);
+
+        })
+        .catch(error => {
+          console.error('Error fetching description:', error);
+        });
+    }
+  }, [currentProduct?.description]);
   const defaultValues = useMemo(
     () => ({
       id: currentProduct?.id || null,
       productCharsSelected: currentProduct?.valueSelected || [],
       name: currentProduct?.name || '',
-      description: currentProduct?.description || '',
+      description: descriptionHTML || '', // Set the fetched HTML as description
       images: currentProduct?.images || [],
       thumbnail: currentProduct?.thumbnail,
       price: currentProduct?.price || 0,
@@ -228,12 +250,11 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
       formData.append('price', data.price.toString());
       formData.append('productCharValues', JSON.stringify(data.productCharsSelected));
 
+      console.log(data?.status === 'Active' ? '1' : '0');
       const blob = new Blob([data.description], { type: 'text/html' });
-      formData.append('description', blob,"description.html");
+      formData.append('description', blob, `${data.name}.html`);
 
       await productApi.createProduct(formData);
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      // reset();
       enqueueSnackbar(!isEdit ? 'Create success!' : 'Update success!');
       // navigate(PATH_DASHBOARD.eCommerce.list);
     } catch (error) {
@@ -433,10 +454,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const isNotFoundProductChar = !filtereProductChars.length && Boolean(charFilterName);
   const isNotFoundProductValue = !filtereProductValue.length && Boolean(valueFilterName);
   const [searchText, setSearchText] = useState<string>('');
-  useEffect(() => {
-    console.log(searchText);
-  }, [searchText]);
-
   const handleMenuOpen = () => {
     setSearchText('');
   };

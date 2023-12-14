@@ -60,6 +60,7 @@
     "autosuggest-highlight": "^3.2.0",
     "axios": "^0.24.0",
     "change-case": "^4.1.2",
+    "cheerio": "^1.0.0-rc.12",
     "d3-array": "^3.1.1",
     "d3-scale": "^4.0.2",
     "date-fns": "^2.27.0",

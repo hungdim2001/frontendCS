@@ -5,8 +5,10 @@ import { BaseFormDataApi } from './base-form-data-api';
 const productIns = new BaseApi('/api/product');
 const productFormIns = new BaseFormDataApi('/api/product');
 
-const getProducts = () => {
-  return productIns.get<Product[]>('');
+const getProducts = (id:number|null) => {
+  const path = id ? `/${id}` : '';
+
+  return productIns.get<Product[]>(`/${path}`);
 };
 
 const deleteProducts = (ids:number[]) => {

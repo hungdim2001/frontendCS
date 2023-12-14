@@ -6,6 +6,7 @@ import axios from '../../utils/axios';
 import { CartItem, Product, ProductState } from '../../@types/product';
 //
 import { dispatch } from '../store';
+import { productApi } from 'src/service/app-apis/product';
 
 // ----------------------------------------------------------------------
 
@@ -211,13 +212,13 @@ export const {
 
 // ----------------------------------------------------------------------
 
-export function getProducts() {
+export function getProducts(id:number|null) {
   return async () => {
     dispatch(slice.actions.startLoading());
     try {
-      const response: { data: { products: Product[] } } = await axios.get('/api/products');
-      dispatch(slice.actions.getProductsSuccess(response.data.products));
-    } catch (error) {
+      const response = await productApi.getProducts(id);
+      dispatch(slice.actions.getProductsSuccess(response));
+  } catch (error) {
       dispatch(slice.actions.hasError(error));
     }
   };

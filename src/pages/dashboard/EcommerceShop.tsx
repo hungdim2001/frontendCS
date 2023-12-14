@@ -64,7 +64,7 @@ export default function EcommerceShop() {
     values.category === 'All';
 
   useEffect(() => {
-    dispatch(getProducts());
+    dispatch(getProducts(null));
   }, [dispatch]);
 
   useEffect(() => {
