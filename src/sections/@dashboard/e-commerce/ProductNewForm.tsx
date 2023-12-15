@@ -166,26 +166,41 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     quantity: Yup.number().moreThan(0, 'Quantity is required'),
     thumbnail: Yup.mixed().required('Thumbnail is required'),
   });
-  const defaultValues = useMemo(
-    () => ({
-      id: currentProduct?.id || null,
-      productCharsSelected:
-        currentProduct?.productSpecChars.flatMap((item) => item.productSpecCharValueDTOS!) || [],
-      name: currentProduct?.name || '',
-      description: currentProduct?.description || '', // Set the fetched HTML as description
-      images: currentProduct?.images || [],
-      thumbnail: currentProduct?.thumbnail,
-      price: currentProduct?.price || 0,
-      quantity: currentProduct?.quantity || 0,
-      productTypeId: currentProduct?.productType.id!,
-      status: currentProduct?.status
-        ? STATUS_OPTION[0]
-        : currentProduct
-        ? STATUS_OPTION[1] || STATUS_OPTION[0]
-        : STATUS_OPTION[0],
-    }),
-    [currentProduct]
-  );
+
+  const defaultValues = useMemo(() => {
+    if (currentProduct?.id) {
+      return {
+        id: currentProduct?.id || null,
+        productCharsSelected:
+          currentProduct?.productSpecChars.flatMap((item) => item.productSpecCharValueDTOS!) || [],
+        name: currentProduct?.name || '',
+        description: currentProduct?.description || '', // Set the fetched HTML as description
+        images: currentProduct?.images || [],
+        thumbnail: currentProduct?.thumbnail,
+        price: currentProduct?.price || 0,
+        quantity: currentProduct?.quantity || 0,
+        productTypeId: currentProduct?.productType.id!,
+        status: currentProduct?.status
+          ? STATUS_OPTION[0]
+          : currentProduct
+          ? STATUS_OPTION[1] || STATUS_OPTION[0]
+          : STATUS_OPTION[0],
+      };
+    } else {
+      return {
+        id: null,
+        productCharsSelected: [],
+        name: '',
+        description: '', // Set the fetched HTML as description
+        images: [],
+        thumbnail: '',
+        price: 0,
+        quantity: 0,
+        productTypeId: undefined,
+        status: STATUS_OPTION[0],
+      };
+    }
+  }, [currentProduct]);
 
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(NewProductSchema),
@@ -223,11 +238,17 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         formData.append('id', data.id);
       }
       formData.append('thumbnail', data.thumbnail);
-      data.images.forEach((image) => {
-        formData.append('images', "image");
-        formData.append('images', image);
-
-      });
+      // data.images.forEach((image) => {
+      //   formData.append('images',  image instanceof File ? image : String(image));
+      // });
+      for (const image of data.images) {
+        if (image instanceof File) {
+          formData.append('images', image);
+        } else {
+          formData.append('oldImages', String(image));
+        }
+      }
+      
       formData.append('productTypeId', data.productTypeId.toString()); // Example product type ID
       formData.append('name', data.name);
       formData.append('quantity', data.quantity.toString());
@@ -235,8 +256,8 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
       formData.append('price', data.price.toString());
       formData.append('productCharValues', JSON.stringify(data.productCharsSelected));
       if (data.description !== currentProduct?.description) {
-        console.log(data.description)
-        console.log(currentProduct?.description)
+        console.log(data.description);
+        console.log(currentProduct?.description);
         const blob = new Blob([data.description], { type: 'text/html' });
         formData.append('description', blob, `${data.name}.html`);
       }

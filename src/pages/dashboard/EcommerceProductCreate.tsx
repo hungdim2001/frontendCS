@@ -58,6 +58,11 @@ export default function EcommerceProductCreate() {
   useEffect(() => {
     dispatch(getProducts(null));
   }, [dispatch]);
+  useEffect(()=>{
+console.log(isEdit)
+console.log(currentProduct)
+
+  },[isEdit,currentProduct])
   if (isEdit && !currentProduct.id) {
     return <LoadingScreen />;
   }
