@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { paramCase } from 'change-case';
 import { useParams, useLocation } from 'react-router-dom';
 // @mui
@@ -15,6 +15,12 @@ import Page from '../../components/Page';
 import HeaderBreadcrumbs from '../../components/HeaderBreadcrumbs';
 // sections
 import ProductNewForm from '../../sections/@dashboard/e-commerce/ProductNewForm';
+import { use } from 'i18next';
+import { Product } from 'src/@types/product';
+import { ThunkDispatch } from '@reduxjs/toolkit';
+import { AnyAction, Dispatch } from 'redux';
+import { Edit } from '@mui/icons-material';
+import LoadingScreen from 'src/components/LoadingScreen';
 
 // ----------------------------------------------------------------------
 
@@ -30,16 +36,31 @@ export default function EcommerceProductCreate() {
   const { products } = useSelector((state) => state.product);
 
   const isEdit = pathname.includes('edit');
+  const [currentProduct, setCurrentProduct] = useState<Product>({} as Product);
+  useEffect(() => {
+    const foundProduct = products.find((product) => {
+      return product.id === +id!;
+    });
 
-  const currentProduct = products.find((product) => {
-    console.log( +id!);
-    return product.id == +id!;
-  });
+    if (foundProduct && foundProduct.description) {
+      fetch(foundProduct.description)
+        .then((response) => response.text())
+        .then((data) => {
+          const updatedProduct = { ...foundProduct, description: data };
+          setCurrentProduct(updatedProduct as Product);
+        })
+        .catch((error) => {
+          console.error('Error fetching description:', error);
+        });
+    }
+  }, [id, products]);
 
   useEffect(() => {
     dispatch(getProducts(null));
   }, [dispatch]);
-
+  if (isEdit && !currentProduct.id) {
+    return <LoadingScreen />;
+  }
   return (
     <Page title="Ecommerce: Create a new product">
       <Container maxWidth={themeStretch ? false : 'lg'}>
@@ -54,7 +75,6 @@ export default function EcommerceProductCreate() {
             { name: !isEdit ? 'New product' : id },
           ]}
         />
-
         <ProductNewForm isEdit={isEdit} currentProduct={currentProduct} />
       </Container>
     </Page>

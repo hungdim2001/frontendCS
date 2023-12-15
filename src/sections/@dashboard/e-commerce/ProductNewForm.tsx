@@ -8,6 +8,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Search } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
+  Alert,
   Button,
   Card,
   Checkbox,
@@ -57,6 +58,7 @@ import {
 import ProductCharListHead from './product-char/ProductCharListHead';
 import ProductCharToolbar from './product-char/ProductCharToolbar';
 import { productApi } from 'src/service/app-apis/product';
+import useIsMountedRef from 'src/hooks/useIsMountedRef';
 
 // ----------------------------------------------------------------------
 
@@ -126,7 +128,7 @@ interface FormValuesProps {
   productTypeId: number;
   status: string;
   description: string;
-
+  afterSubmit?: string;
   productCharsSelected: ProductCharValue[];
 }
 
@@ -148,9 +150,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   };
 
   const { enqueueSnackbar } = useSnackbar();
-  useEffect(() => {
-    console.log(currentProduct);
-  }, [currentProduct]);
 
   const { productTypes } = useSelector((state) => state.productTypes);
   useEffect(() => {
@@ -167,31 +166,13 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     quantity: Yup.number().moreThan(0, 'Quantity is required'),
     thumbnail: Yup.mixed().required('Thumbnail is required'),
   });
-  const [descriptionHTML, setDescriptionHTML] = useState('');
-
-  useEffect(() => {
-    if (currentProduct?.description) {
-      fetch(currentProduct.description)
-        .then(response => response.text())
-        .then(data => {
-          const htmlContent = data;
-
-          const $ = cheerio.load(htmlContent);
-          console.log($)
-                setDescriptionHTML(data);
-
-        })
-        .catch(error => {
-          console.error('Error fetching description:', error);
-        });
-    }
-  }, [currentProduct?.description]);
   const defaultValues = useMemo(
     () => ({
       id: currentProduct?.id || null,
-      productCharsSelected: currentProduct?.valueSelected || [],
+      productCharsSelected:
+        currentProduct?.productSpecChars.flatMap((item) => item.productSpecCharValueDTOS!) || [],
       name: currentProduct?.name || '',
-      description: descriptionHTML || '', // Set the fetched HTML as description
+      description: currentProduct?.description || '', // Set the fetched HTML as description
       images: currentProduct?.images || [],
       thumbnail: currentProduct?.thumbnail,
       price: currentProduct?.price || 0,
@@ -217,8 +198,9 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     control,
     setValue,
     getValues,
+    setError,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { errors, isSubmitting },
   } = methods;
 
   const values = watch();
@@ -232,6 +214,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, currentProduct]);
+  const isMountedRef = useIsMountedRef();
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
@@ -241,7 +224,9 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
       }
       formData.append('thumbnail', data.thumbnail);
       data.images.forEach((image) => {
+        formData.append('images', "image");
         formData.append('images', image);
+
       });
       formData.append('productTypeId', data.productTypeId.toString()); // Example product type ID
       formData.append('name', data.name);
@@ -249,16 +234,20 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
       formData.append('status', data?.status === 'Active' ? '1' : '0');
       formData.append('price', data.price.toString());
       formData.append('productCharValues', JSON.stringify(data.productCharsSelected));
-
-      console.log(data?.status === 'Active' ? '1' : '0');
-      const blob = new Blob([data.description], { type: 'text/html' });
-      formData.append('description', blob, `${data.name}.html`);
-
+      if (data.description !== currentProduct?.description) {
+        console.log(data.description)
+        console.log(currentProduct?.description)
+        const blob = new Blob([data.description], { type: 'text/html' });
+        formData.append('description', blob, `${data.name}.html`);
+      }
       await productApi.createProduct(formData);
       enqueueSnackbar(!isEdit ? 'Create success!' : 'Update success!');
       // navigate(PATH_DASHBOARD.eCommerce.list);
     } catch (error) {
       console.error(error);
+      if (isMountedRef.current) {
+        setError('afterSubmit', error);
+      }
     }
   };
   const handleDrop = useCallback(
@@ -319,6 +308,15 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
   const { productChars } = useSelector((state) => state.productChars);
   const [charsSelected, setCharsSelected] = useState<ProductChar[]>([]);
+  useEffect(() => {
+    if (currentProduct?.productSpecChars) {
+      setCharsSelected(
+        productChars.filter((item) =>
+          currentProduct.productSpecChars.some((item2) => item.id === item2.id)
+        )
+      );
+    }
+  }, [currentProduct, productChars]);
 
   const [orderBy, setOrderBy] = useState('name');
 
@@ -461,336 +459,315 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
-          <Card sx={{ p: 3 }}>
-            <Stack spacing={3}>
-              <RHFTextField name="name" label="Product Name" />
-              <div>
-                <LabelStyle>Images</LabelStyle>
-                <RHFUploadMultiFile
-                  name="images"
-                  showPreview
-                  accept="image/*"
-                  maxSize={3145728}
-                  onDrop={handleDrop}
-                  onRemove={handleRemove}
-                  onRemoveAll={handleRemoveAll}
-                />
-              </div>
-              <div>
-                <LabelStyle>Description</LabelStyle>
-                <RHFEditor simple name="description" />
-              </div>
-            </Stack>
-          </Card>
-
-          <Grid item xs={12} md={12} sx={{ mt: 3 }}>
+      <Stack spacing={3}>
+        {' '}
+        {!!errors.afterSubmit && <Alert severity="error">{errors.afterSubmit.message}</Alert>}
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={8}>
             <Card sx={{ p: 3 }}>
-              <Grid container justifyContent="space-between">
-                <Grid item xs={6}>
-                  <div>
-                    <LabelStyle>Product character</LabelStyle>
-                    <RootStyle
-                      sx={{
-                        ...(charSelected.length > 0 && {
-                          color: isLight ? 'primary.main' : 'text.primary',
-                          bgcolor: isLight ? 'primary.lighter' : 'primary.dark',
-                        }),
-                      }}
-                    >
-                      {charSelected.length > 0 ? (
-                        <Typography component="div" variant="subtitle1">
-                          {charSelected.length} selected
-                        </Typography>
-                      ) : (
-                        <InputStyle
-                          stretchStart={240}
-                          value={charFilterName}
-                          onChange={(event) => handleCharFilterByName(event.target.value)}
-                          placeholder="Search character..."
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <Iconify
-                                  icon={'eva:search-fill'}
-                                  sx={{ color: 'text.disabled', width: 20, height: 20 }}
-                                />
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                      )}
+              <Stack spacing={3}>
+                <RHFTextField name="name" label="Product Name" />
+                <div>
+                  <LabelStyle>Images</LabelStyle>
+                  <RHFUploadMultiFile
+                    name="images"
+                    showPreview
+                    accept="image/*"
+                    maxSize={3145728}
+                    onDrop={handleDrop}
+                    onRemove={handleRemove}
+                    onRemoveAll={handleRemoveAll}
+                  />
+                </div>
+                <div>
+                  <LabelStyle>Description</LabelStyle>
+                  <RHFEditor simple name="description" />
+                </div>
+              </Stack>
+            </Card>
 
-                      {charSelected.length > 0 ? (
-                        <Tooltip title="Select">
-                          <IconButton onClick={() => handleSelectChar(charSelected)}>
-                            <Iconify icon={'ei:arrow-right'} />
-                          </IconButton>
-                        </Tooltip>
-                      ) : (
-                        <></>
-                      )}
-                    </RootStyle>
-                    <Scrollbar>
-                      <TableContainer>
-                        <Table>
-                          <ProductCharListHead
-                            order={order}
-                            orderBy={orderBy}
-                            headLabel={TABLE_HEAD_CHAR}
-                            rowCount={productChars.length}
-                            numSelected={charSelected.length}
-                            onRequestSort={handleRequestSort}
-                            onSelectAllClick={handleCharSelectAllClick}
+            <Grid item xs={12} md={12} sx={{ mt: 3 }}>
+              <Card sx={{ p: 3 }}>
+                <Grid container justifyContent="space-between">
+                  <Grid item xs={6}>
+                    <div>
+                      <LabelStyle>Product character</LabelStyle>
+                      <RootStyle
+                        sx={{
+                          ...(charSelected.length > 0 && {
+                            color: isLight ? 'primary.main' : 'text.primary',
+                            bgcolor: isLight ? 'primary.lighter' : 'primary.dark',
+                          }),
+                        }}
+                      >
+                        {charSelected.length > 0 ? (
+                          <Typography component="div" variant="subtitle1">
+                            {charSelected.length} selected
+                          </Typography>
+                        ) : (
+                          <InputStyle
+                            stretchStart={240}
+                            value={charFilterName}
+                            onChange={(event) => handleCharFilterByName(event.target.value)}
+                            placeholder="Search character..."
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <Iconify
+                                    icon={'eva:search-fill'}
+                                    sx={{ color: 'text.disabled', width: 20, height: 20 }}
+                                  />
+                                </InputAdornment>
+                              ),
+                            }}
                           />
-                          <TableBody>
-                            {filtereProductChars
-                              .filter((item) => item.status)
-                              .slice(
-                                pageChar * rowsPerPageChar,
-                                pageChar * rowsPerPageChar + rowsPerPageChar
-                              )
-                              .map((row) => {
-                                const { id, name, status, description } = row;
-                                const isItemSelected = charSelected.indexOf(id!) !== -1;
+                        )}
 
-                                return (
-                                  <TableRow
-                                    hover
-                                    key={id}
-                                    tabIndex={-1}
-                                    role="checkbox"
-                                    selected={isItemSelected}
-                                    aria-checked={isItemSelected}
-                                  >
-                                    <TableCell padding="checkbox">
-                                      <Checkbox
-                                        checked={isItemSelected}
-                                        onClick={() => handleClickChar(id!)}
-                                      />
-                                    </TableCell>
-                                    <TableCell align="left">{name}</TableCell>
-                                    <TableCell align="center">
-                                      <Tooltip title="Select">
-                                        <IconButton onClick={() => handleSelectChar([id!])}>
-                                          <Iconify icon={'ei:arrow-right'} />
-                                        </IconButton>
-                                      </Tooltip>
-                                    </TableCell>
-                                  </TableRow>
-                                );
-                              })}
-                            {emptyRowsChar > 0 && (
-                              <TableRow style={{ height: 53 * emptyRowsChar }}>
-                                <TableCell colSpan={6} />
-                              </TableRow>
-                            )}
-                          </TableBody>
-                          {isNotFoundProductChar && (
+                        {charSelected.length > 0 ? (
+                          <Tooltip title="Select">
+                            <IconButton onClick={() => handleSelectChar(charSelected)}>
+                              <Iconify icon={'ei:arrow-right'} />
+                            </IconButton>
+                          </Tooltip>
+                        ) : (
+                          <></>
+                        )}
+                      </RootStyle>
+                      <Scrollbar>
+                        <TableContainer>
+                          <Table>
+                            <ProductCharListHead
+                              order={order}
+                              orderBy={orderBy}
+                              headLabel={TABLE_HEAD_CHAR}
+                              rowCount={productChars.length}
+                              numSelected={charSelected.length}
+                              onRequestSort={handleRequestSort}
+                              onSelectAllClick={handleCharSelectAllClick}
+                            />
                             <TableBody>
-                              <TableRow>
-                                <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                                  <SearchNotFound searchQuery={charFilterName} />
-                                </TableCell>
-                              </TableRow>
+                              {filtereProductChars
+                                .filter((item) => item.status)
+                                .slice(
+                                  pageChar * rowsPerPageChar,
+                                  pageChar * rowsPerPageChar + rowsPerPageChar
+                                )
+                                .map((row) => {
+                                  const { id, name, status, description } = row;
+                                  const isItemSelected = charSelected.indexOf(id!) !== -1;
+
+                                  return (
+                                    <TableRow
+                                      hover
+                                      key={id}
+                                      tabIndex={-1}
+                                      role="checkbox"
+                                      selected={isItemSelected}
+                                      aria-checked={isItemSelected}
+                                    >
+                                      <TableCell padding="checkbox">
+                                        <Checkbox
+                                          checked={isItemSelected}
+                                          onClick={() => handleClickChar(id!)}
+                                        />
+                                      </TableCell>
+                                      <TableCell align="left">{name}</TableCell>
+                                      <TableCell align="center">
+                                        <Tooltip title="Select">
+                                          <IconButton onClick={() => handleSelectChar([id!])}>
+                                            <Iconify icon={'ei:arrow-right'} />
+                                          </IconButton>
+                                        </Tooltip>
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })}
+                              {emptyRowsChar > 0 && (
+                                <TableRow style={{ height: 53 * emptyRowsChar }}>
+                                  <TableCell colSpan={6} />
+                                </TableRow>
+                              )}
                             </TableBody>
-                          )}
-                        </Table>
-                      </TableContainer>
-                      <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
-                        component="div"
-                        count={productChars.length}
-                        rowsPerPage={rowsPerPageChar}
-                        page={pageChar}
-                        onPageChange={(e, page) => setPageChar(page)}
-                        onRowsPerPageChange={handleChangeRowsPerPageChar}
-                      />
-                    </Scrollbar>
-                  </div>
-                </Grid>
-                <Grid item xs={6}>
-                  <div>
-                    <LabelStyle>Product character value</LabelStyle>
-                    <ProductCharToolbar
-                      numSelected={valueSelected.length}
-                      filterName={valueFilterName}
-                      onFilterName={handleValueFilterByName}
-                      onDeleteProducts={() => handleDeleteValues(valueSelected)}
-                    />
-                    <Scrollbar>
-                      <TableContainer>
-                        {' '}
-                        <Table>
-                          <ProductCharListHead
-                            order={order}
-                            orderBy={orderBy}
-                            headLabel={TABLE_HEAD_VALUE}
-                            rowCount={charsSelected.length}
-                            numSelected={valueSelected.length}
-                            onRequestSort={handleRequestSort}
-                            onSelectAllClick={handleSelectAllClick}
-                          />
-                          <Controller
-                            control={control}
-                            name="productCharsSelected"
-                            render={({ field }) => (
+                            {isNotFoundProductChar && (
                               <TableBody>
-                                {filtereProductValue
-                                  .slice(
-                                    pageValue * rowsPerPageValue,
-                                    pageValue * rowsPerPageValue + rowsPerPageValue
-                                  )
-                                  .map((row) => {
-                                    const { id, name, productSpecCharValueDTOS } = row;
+                                <TableRow>
+                                  <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                    <SearchNotFound searchQuery={charFilterName} />
+                                  </TableCell>
+                                </TableRow>
+                              </TableBody>
+                            )}
+                          </Table>
+                        </TableContainer>
+                        <TablePagination
+                          rowsPerPageOptions={[5, 10, 25]}
+                          component="div"
+                          count={productChars.length}
+                          rowsPerPage={rowsPerPageChar}
+                          page={pageChar}
+                          onPageChange={(e, page) => setPageChar(page)}
+                          onRowsPerPageChange={handleChangeRowsPerPageChar}
+                        />
+                      </Scrollbar>
+                    </div>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div>
+                      <LabelStyle>Product character value</LabelStyle>
+                      <ProductCharToolbar
+                        numSelected={valueSelected.length}
+                        filterName={valueFilterName}
+                        onFilterName={handleValueFilterByName}
+                        onDeleteProducts={() => handleDeleteValues(valueSelected)}
+                      />
+                      <Scrollbar>
+                        <TableContainer>
+                          {' '}
+                          <Table>
+                            <ProductCharListHead
+                              order={order}
+                              orderBy={orderBy}
+                              headLabel={TABLE_HEAD_VALUE}
+                              rowCount={charsSelected.length}
+                              numSelected={valueSelected.length}
+                              onRequestSort={handleRequestSort}
+                              onSelectAllClick={handleSelectAllClick}
+                            />
+                            <Controller
+                              control={control}
+                              name="productCharsSelected"
+                              render={({ field }) => (
+                                <TableBody>
+                                  {filtereProductValue
+                                    .slice(
+                                      pageValue * rowsPerPageValue,
+                                      pageValue * rowsPerPageValue + rowsPerPageValue
+                                    )
+                                    .map((row) => {
+                                      const { id, name, productSpecCharValueDTOS } = row;
 
-                                    const isItemSelected = valueSelected.indexOf(id!) !== -1;
-                                    const handleSelectAll = (event: any, field: any) => {
-                                      const value = event.target.value;
+                                      const isItemSelected = valueSelected.indexOf(id!) !== -1;
+                                      const handleSelectAll = (event: any, field: any) => {
+                                        const value = event.target.value;
 
-                                      if (
-                                        !value[value.length - 1] &&
-                                        value.length != 0 &&
-                                        productSpecCharValueDTOS?.length !== 0
-                                      ) {
                                         if (
-                                          productSpecCharValueDTOS?.filter((item) => {
-                                            return value.some((fieldItem: ProductCharValue) => {
-                                              return (
-                                                typeof fieldItem === 'object' &&
-                                                fieldItem.id === item.id
-                                              );
-                                            });
-                                          }).length !== productSpecCharValueDTOS?.length
+                                          !value[value.length - 1] &&
+                                          value.length != 0 &&
+                                          productSpecCharValueDTOS?.length !== 0
                                         ) {
-                                          const newValue = productSpecCharValueDTOS
-                                            ?.filter((item) => item.value.indexOf(searchText) > -1)
-                                            .filter((item: ProductCharValue) => {
-                                              return !field.value.some(
-                                                (item2: ProductCharValue) => {
-                                                  return item2.id === item.id;
-                                                }
-                                              );
+                                          if (
+                                            productSpecCharValueDTOS?.filter((item) => {
+                                              return value.some((fieldItem: ProductCharValue) => {
+                                                return (
+                                                  typeof fieldItem === 'object' &&
+                                                  fieldItem.id === item.id
+                                                );
+                                              });
+                                            }).length !== productSpecCharValueDTOS?.length
+                                          ) {
+                                            const newValue = productSpecCharValueDTOS
+                                              ?.filter(
+                                                (item) => item.value.indexOf(searchText) > -1
+                                              )
+                                              .filter((item: ProductCharValue) => {
+                                                return !field.value.some(
+                                                  (item2: ProductCharValue) => {
+                                                    return item2.id === item.id;
+                                                  }
+                                                );
+                                              });
+                                            field.onChange([...field.value, ...newValue!]);
+                                            return;
+                                          } else {
+                                            const newValue = value.filter((item: any) => {
+                                              return !productSpecCharValueDTOS?.some((item2) => {
+                                                return (
+                                                  typeof item === 'undefined' ||
+                                                  item2.id === item.id
+                                                );
+                                              });
                                             });
-                                          field.onChange([...field.value, ...newValue!]);
-                                          return;
+                                            field.onChange(newValue);
+                                            return;
+                                          }
                                         } else {
-                                          const newValue = value.filter((item: any) => {
-                                            return !productSpecCharValueDTOS?.some((item2) => {
-                                              return (
-                                                typeof item === 'undefined' || item2.id === item.id
-                                              );
-                                            });
-                                          });
-                                          field.onChange(newValue);
-                                          return;
+                                          if (
+                                            productSpecCharValueDTOS?.filter((item) => {
+                                              return value.some((fieldItem: ProductCharValue) => {
+                                                return (
+                                                  typeof fieldItem === 'object' &&
+                                                  fieldItem.id === item.id
+                                                );
+                                              });
+                                            }).length === productSpecCharValueDTOS?.length
+                                          ) {
+                                            const newValue = productSpecCharValueDTOS?.filter(
+                                              (item: ProductCharValue) => {
+                                                return !field.value.some(
+                                                  (item2: ProductCharValue) => {
+                                                    return item2.id === item.id;
+                                                  }
+                                                );
+                                              }
+                                            );
+                                            field.onChange([...field.value, ...newValue!]);
+                                            return;
+                                          } else {
+                                            field.onChange(value);
+                                          }
                                         }
-                                      } else {
-                                        if (
-                                          productSpecCharValueDTOS?.filter((item) => {
-                                            return value.some((fieldItem: ProductCharValue) => {
-                                              return (
-                                                typeof fieldItem === 'object' &&
-                                                fieldItem.id === item.id
-                                              );
-                                            });
-                                          }).length === productSpecCharValueDTOS?.length
-                                        ) {
-                                          const newValue = productSpecCharValueDTOS?.filter(
-                                            (item: ProductCharValue) => {
-                                              return !field.value.some(
-                                                (item2: ProductCharValue) => {
-                                                  return item2.id === item.id;
-                                                }
-                                              );
-                                            }
-                                          );
-                                          field.onChange([...field.value, ...newValue!]);
-                                          return;
-                                        } else {
-                                          field.onChange(value);
-                                        }
-                                      }
-                                    };
-                                    const handleSearchChange = (
-                                      ev: React.ChangeEvent<HTMLTextAreaElement>
-                                    ) => {
-                                      ev.stopPropagation();
-                                      const newSearchText = ev.target.value;
-                                      setSearchText(newSearchText);
-                                    };
+                                      };
+                                      const handleSearchChange = (
+                                        ev: React.ChangeEvent<HTMLTextAreaElement>
+                                      ) => {
+                                        ev.stopPropagation();
+                                        const newSearchText = ev.target.value;
+                                        setSearchText(newSearchText);
+                                      };
 
-                                    return (
-                                      <TableRow
-                                        hover
-                                        key={id}
-                                        tabIndex={-1}
-                                        role="checkbox"
-                                        selected={isItemSelected}
-                                        aria-checked={isItemSelected}
-                                      >
-                                        <TableCell padding="checkbox">
-                                          <Checkbox
-                                            checked={isItemSelected}
-                                            onClick={() => handleClickValue(id!)}
-                                          />
-                                        </TableCell>
-                                        <TableCell align="center">
-                                          <Button
-                                            sx={{ color: 'error.main' }}
-                                            onClick={() => handleDeleteValue(id)}
-                                            startIcon={
-                                              <Iconify
-                                                icon={'eva:trash-2-outline'}
-                                                sx={{ ...ICON }}
-                                              />
-                                            }
-                                          />
-                                        </TableCell>
-                                        <TableCell align="left">{name}</TableCell>
-                                        <TableCell align="left">
-                                          <FormControl>
-                                            <InputLabel id={id?.toString()}>Char Values</InputLabel>
-                                            <Select
-                                              MenuProps={MenuProps}
-                                              {...field}
-                                              onOpen={handleMenuOpen}
-                                              style={{ width: '100px' }}
-                                              multiple
-                                              label="Char Values"
-                                              onChange={(e: any) => handleSelectAll(e, field)}
-                                              renderValue={(selected) => {
-                                                if (
-                                                  productSpecCharValueDTOS?.filter((item) => {
-                                                    return field.value.some(
-                                                      (fieldItem: ProductCharValue) => {
-                                                        return (
-                                                          typeof fieldItem === 'object' &&
-                                                          fieldItem.id === item.id
-                                                        );
-                                                      }
-                                                    );
-                                                  }).length === productSpecCharValueDTOS?.length &&
-                                                  productSpecCharValueDTOS?.length !== 0
-                                                ) {
-                                                  return 'All';
-                                                }
-                                                return selected
-                                                  .filter((item) => item)
-                                                  .filter((item: any) => {
-                                                    return row.productSpecCharValueDTOS?.some(
-                                                      (char: any) => char.id === item.id
-                                                    );
-                                                  })
-                                                  .map((item: any) => item.value)
-                                                  .join(', ');
-                                              }}
-                                            >
-                                              <MenuItem key={row.id}>
-                                                <Checkbox
-                                                  id={id!.toString()}
-                                                  checked={
+                                      return (
+                                        <TableRow
+                                          hover
+                                          key={id}
+                                          tabIndex={-1}
+                                          role="checkbox"
+                                          selected={isItemSelected}
+                                          aria-checked={isItemSelected}
+                                        >
+                                          <TableCell padding="checkbox">
+                                            <Checkbox
+                                              checked={isItemSelected}
+                                              onClick={() => handleClickValue(id!)}
+                                            />
+                                          </TableCell>
+                                          <TableCell align="center">
+                                            <Button
+                                              sx={{ color: 'error.main' }}
+                                              onClick={() => handleDeleteValue(id)}
+                                              startIcon={
+                                                <Iconify
+                                                  icon={'eva:trash-2-outline'}
+                                                  sx={{ ...ICON }}
+                                                />
+                                              }
+                                            />
+                                          </TableCell>
+                                          <TableCell align="left">{name}</TableCell>
+                                          <TableCell align="left">
+                                            <FormControl>
+                                              <InputLabel id={id?.toString()}>
+                                                Char Values
+                                              </InputLabel>
+                                              <Select
+                                                MenuProps={MenuProps}
+                                                {...field}
+                                                onOpen={handleMenuOpen}
+                                                style={{ width: '100px' }}
+                                                multiple
+                                                label="Char Values"
+                                                onChange={(e: any) => handleSelectAll(e, field)}
+                                                renderValue={(selected) => {
+                                                  if (
                                                     productSpecCharValueDTOS?.filter((item) => {
                                                       return field.value.some(
                                                         (fieldItem: ProductCharValue) => {
@@ -801,159 +778,190 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                         }
                                                       );
                                                     }).length ===
-                                                      productSpecCharValueDTOS?.filter(
-                                                        (item) =>
-                                                          item.value.indexOf(searchText) > -1
-                                                      )?.length &&
+                                                      productSpecCharValueDTOS?.length &&
                                                     productSpecCharValueDTOS?.length !== 0
+                                                  ) {
+                                                    return 'All';
                                                   }
-                                                />
-                                                <TextField
-                                                  type="text"
-                                                  placeholder="Search Values"
-                                                  value={searchText}
-                                                  onChange={handleSearchChange}
-                                                  onClickCapture={(e) => e.stopPropagation()}
-                                                  onKeyDown={(e) => e.stopPropagation()}
-                                                  size="small"
-                                                  InputProps={{
-                                                    startAdornment: (
-                                                      <InputAdornment position="start">
-                                                        <Search />
-                                                      </InputAdornment>
-                                                    ),
-                                                  }}
-                                                  fullWidth
-                                                />
-                                                {/* <ListItemText primary={'Select All'} /> */}
-                                              </MenuItem>
-                                              {productSpecCharValueDTOS
-                                                ?.filter(
-                                                  (item) => item.value.indexOf(searchText) > -1
-                                                )
-                                                .map((option: any) => (
-                                                  <MenuItem key={option.id} value={option}>
-                                                    <Checkbox
-                                                      checked={field.value
-                                                        .map((item: any) => {
-                                                          return (
-                                                            typeof item == 'object' && item.value
-                                                          );
-                                                        })
-                                                        .includes(option.value)}
-                                                    />
+                                                  return selected
+                                                    .filter((item) => item)
+                                                    .filter((item: any) => {
+                                                      return row.productSpecCharValueDTOS?.some(
+                                                        (char: any) => char.id === item.id
+                                                      );
+                                                    })
+                                                    .map((item: any) => item.value)
+                                                    .join(', ');
+                                                }}
+                                              >
+                                                <MenuItem key={row.id}>
+                                                  <Checkbox
+                                                    id={id!.toString()}
+                                                    checked={
+                                                      productSpecCharValueDTOS?.filter((item) => {
+                                                        return field.value.some(
+                                                          (fieldItem: ProductCharValue) => {
+                                                            return (
+                                                              typeof fieldItem === 'object' &&
+                                                              fieldItem.id === item.id
+                                                            );
+                                                          }
+                                                        );
+                                                      }).length ===
+                                                        productSpecCharValueDTOS?.filter(
+                                                          (item) =>
+                                                            item.value.indexOf(searchText) > -1
+                                                        )?.length &&
+                                                      productSpecCharValueDTOS?.length !== 0
+                                                    }
+                                                  />
+                                                  <TextField
+                                                    type="text"
+                                                    placeholder="Search Values"
+                                                    value={searchText}
+                                                    onChange={handleSearchChange}
+                                                    onClickCapture={(e) => e.stopPropagation()}
+                                                    onKeyDown={(e) => e.stopPropagation()}
+                                                    size="small"
+                                                    InputProps={{
+                                                      startAdornment: (
+                                                        <InputAdornment position="start">
+                                                          <Search />
+                                                        </InputAdornment>
+                                                      ),
+                                                    }}
+                                                    fullWidth
+                                                  />
+                                                  {/* <ListItemText primary={'Select All'} /> */}
+                                                </MenuItem>
+                                                {productSpecCharValueDTOS
+                                                  ?.filter(
+                                                    (item) => item.value.indexOf(searchText) > -1
+                                                  )
+                                                  .map((option: any) => (
+                                                    <MenuItem key={option.id} value={option}>
+                                                      <Checkbox
+                                                        checked={field.value
+                                                          .map((item: any) => {
+                                                            return (
+                                                              typeof item == 'object' && item.value
+                                                            );
+                                                          })
+                                                          .includes(option.value)}
+                                                      />
 
-                                                    <ListItemText primary={option.value} />
-                                                  </MenuItem>
-                                                ))}
-                                            </Select>
-                                          </FormControl>
-                                        </TableCell>
-                                      </TableRow>
-                                    );
-                                  })}
-                                {emptyRowsValue > 0 && (
-                                  <TableRow style={{ height: 53 * emptyRowsValue }}>
-                                    <TableCell colSpan={6} />
-                                  </TableRow>
-                                )}
+                                                      <ListItemText primary={option.value} />
+                                                    </MenuItem>
+                                                  ))}
+                                              </Select>
+                                            </FormControl>
+                                          </TableCell>
+                                        </TableRow>
+                                      );
+                                    })}
+                                  {emptyRowsValue > 0 && (
+                                    <TableRow style={{ height: 53 * emptyRowsValue }}>
+                                      <TableCell colSpan={6} />
+                                    </TableRow>
+                                  )}
+                                </TableBody>
+                              )}
+                            />
+                            {isNotFoundProductValue && (
+                              <TableBody>
+                                <TableRow>
+                                  <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                    <SearchNotFound searchQuery={valueFilterName} />
+                                  </TableCell>
+                                </TableRow>
                               </TableBody>
                             )}
-                          />
-                          {isNotFoundProductValue && (
-                            <TableBody>
-                              <TableRow>
-                                <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                                  <SearchNotFound searchQuery={valueFilterName} />
-                                </TableCell>
-                              </TableRow>
-                            </TableBody>
-                          )}
-                        </Table>
-                      </TableContainer>
-                      <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
-                        component="div"
-                        count={charsSelected.length}
-                        rowsPerPage={rowsPerPageValue}
-                        page={pageValue}
-                        onPageChange={(e, page) => setPageValue(page)}
-                        onRowsPerPageChange={handleChangeRowsPerPageValue}
-                      />
-                    </Scrollbar>
-                  </div>
-                </Grid>
-              </Grid>{' '}
-            </Card>
+                          </Table>
+                        </TableContainer>
+                        <TablePagination
+                          rowsPerPageOptions={[5, 10, 25]}
+                          component="div"
+                          count={charsSelected.length}
+                          rowsPerPage={rowsPerPageValue}
+                          page={pageValue}
+                          onPageChange={(e, page) => setPageValue(page)}
+                          onRowsPerPageChange={handleChangeRowsPerPageValue}
+                        />
+                      </Scrollbar>
+                    </div>
+                  </Grid>
+                </Grid>{' '}
+              </Card>
+            </Grid>
           </Grid>
-        </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Stack spacing={3}>
-            <Card sx={{ p: 3 }}>
-              <div>
-                <LabelStyle>Thumbnail</LabelStyle>
-                <RHFUploadAvatar
-                  name="thumbnail"
-                  accept="image/*"
-                  maxSize={3145728}
-                  onDrop={handleDrop2}
-                />
-              </div>
-
-              <Stack spacing={3} mt={2}>
+          <Grid item xs={12} md={4}>
+            <Stack spacing={3}>
+              <Card sx={{ p: 3 }}>
                 <div>
-                  <LabelStyle>Status</LabelStyle>
-                  <RHFRadioGroup
-                    name="status"
-                    options={STATUS_OPTION}
-                    sx={{
-                      '& .MuiFormControlLabel-root': { mr: 4 },
-                    }}
+                  <LabelStyle>Thumbnail</LabelStyle>
+                  <RHFUploadAvatar
+                    name="thumbnail"
+                    accept="image/*"
+                    maxSize={3145728}
+                    onDrop={handleDrop2}
                   />
                 </div>
 
-                <RHFSelect name="productTypeId" label="Product Type">
-                  <option value=""></option>
-                  {productTypes
-                    .filter((productType) => productType.status)
-                    .map((productType) => (
-                      <option key={productType.id} value={productType.id!}>
-                        {productType.name}
-                      </option>
-                    ))}
-                </RHFSelect>
-              </Stack>
-            </Card>
-            <Card sx={{ p: 3 }}>
-              <Stack spacing={3} mb={2}>
-                <RHFTextField
-                  name="price"
-                  label="Price"
-                  placeholder="0.00"
-                  value={getValues('price') === 0 ? '' : getValues('price')}
-                  onChange={(event) => setValue('price', Number(event.target.value))}
-                  InputLabelProps={{ shrink: true }}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">₫</InputAdornment>,
-                    type: 'number',
-                  }}
-                />
-              </Stack>
-            </Card>
+                <Stack spacing={3} mt={2}>
+                  <div>
+                    <LabelStyle>Status</LabelStyle>
+                    <RHFRadioGroup
+                      name="status"
+                      options={STATUS_OPTION}
+                      sx={{
+                        '& .MuiFormControlLabel-root': { mr: 4 },
+                      }}
+                    />
+                  </div>
 
-            <Card sx={{ p: 3 }}>
-              <Stack spacing={3} mb={2}>
-                <RHFTextField name="quantity" label="Quantity" />
-              </Stack>
-            </Card>
+                  <RHFSelect name="productTypeId" label="Product Type">
+                    <option value=""></option>
+                    {productTypes
+                      .filter((productType) => productType.status)
+                      .map((productType) => (
+                        <option key={productType.id} value={productType.id!}>
+                          {productType.name}
+                        </option>
+                      ))}
+                  </RHFSelect>
+                </Stack>
+              </Card>
+              <Card sx={{ p: 3 }}>
+                <Stack spacing={3} mb={2}>
+                  <RHFTextField
+                    name="price"
+                    label="Price"
+                    placeholder="0.00"
+                    value={getValues('price') === 0 ? '' : getValues('price')}
+                    onChange={(event) => setValue('price', Number(event.target.value))}
+                    InputLabelProps={{ shrink: true }}
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">₫</InputAdornment>,
+                      type: 'number',
+                    }}
+                  />
+                </Stack>
+              </Card>
 
-            <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
-              {!isEdit ? 'Create Product' : 'Save Changes'}
-            </LoadingButton>
-          </Stack>
+              <Card sx={{ p: 3 }}>
+                <Stack spacing={3} mb={2}>
+                  <RHFTextField name="quantity" label="Quantity" />
+                </Stack>
+              </Card>
+
+              <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
+                {!isEdit ? 'Create Product' : 'Save Changes'}
+              </LoadingButton>
+            </Stack>
+          </Grid>
         </Grid>
-      </Grid>
+      </Stack>
     </FormProvider>
   );
 }
