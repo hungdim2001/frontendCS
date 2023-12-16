@@ -129,7 +129,7 @@ interface FormValuesProps {
   status: string;
   description: string;
   afterSubmit?: string;
-  productCharsSelected: ProductCharValue[];
+  productCharsSelected: number[];
 }
 
 type Props = {
@@ -168,11 +168,14 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   });
 
   const defaultValues = useMemo(() => {
+    console.log('here');
     if (currentProduct?.id) {
       return {
         id: currentProduct?.id || null,
         productCharsSelected:
-          currentProduct?.productSpecChars.flatMap((item) => item.productSpecCharValueDTOS!) || [],
+          currentProduct?.productSpecChars
+            .flatMap((item) => item.productSpecCharValueDTOS!)
+            .map((value) => value.id!) || [],
         name: currentProduct?.name || '',
         description: currentProduct?.description || '', // Set the fetched HTML as description
         images: currentProduct?.images || [],
@@ -248,7 +251,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
           formData.append('oldImages', String(image));
         }
       }
-      
+
       formData.append('productTypeId', data.productTypeId.toString()); // Example product type ID
       formData.append('name', data.name);
       formData.append('quantity', data.quantity.toString());
@@ -372,6 +375,15 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     }
     setCharSelected([]);
   };
+  const handleSelectAllClick = (checked: boolean) => {
+    if (checked) {
+      const newSelecteds = charsSelected.map((n) => n.id!);
+      setValueSelected(newSelecteds);
+      return;
+    }
+    setValueSelected([]);
+  };
+
 
   const handleClickChar = (id: number) => {
     const selectedIndex = charSelected.indexOf(id);
@@ -409,15 +421,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     setValueSelected(newSelected);
   };
 
-  const handleSelectAllClick = (checked: boolean) => {
-    if (checked) {
-      const newSelecteds = productChars.map((n) => n.id!);
-      setValueSelected(newSelecteds);
-      return;
-    }
-    setValueSelected([]);
-  };
-
+ 
   const handleChangeRowsPerPageChar = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPageChar(parseInt(event.target.value, 10));
     setPageChar(0);
@@ -435,23 +439,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const handleCharFilterByName = (filterName: string) => {
     setCharFilterName(filterName);
     setPageChar(0);
-  };
-
-  const handleDeleteValue = (id: number | null) => {
-    if (id) {
-      const deleteProduct = charsSelected.filter((product) => product.id !== id);
-      setCharsSelected(deleteProduct);
-    }
-  };
-
-  const handleDeleteValues = (ids: (number | null)[]) => {
-    const validIds = ids.filter((id) => id !== null) as number[];
-
-    if (validIds.length > 0) {
-      const deleteProducts = charsSelected.filter((product) => !ids.includes(product.id));
-      setCharSelected([]);
-      setCharsSelected(deleteProducts);
-    }
   };
 
   const emptyRowsChar =
@@ -476,6 +463,10 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const handleMenuOpen = () => {
     setSearchText('');
   };
+
+  useEffect(() => {
+    console.log(getValues('productCharsSelected'));
+  }, [getValues('productCharsSelected')]);
   //-----------------------------------------------------------------------------------------------------------
 
   return (
@@ -633,283 +624,303 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                     </div>
                   </Grid>
                   <Grid item xs={6}>
-                    <div>
-                      <LabelStyle>Product character value</LabelStyle>
-                      <ProductCharToolbar
-                        numSelected={valueSelected.length}
-                        filterName={valueFilterName}
-                        onFilterName={handleValueFilterByName}
-                        onDeleteProducts={() => handleDeleteValues(valueSelected)}
-                      />
-                      <Scrollbar>
-                        <TableContainer>
-                          {' '}
-                          <Table>
-                            <ProductCharListHead
-                              order={order}
-                              orderBy={orderBy}
-                              headLabel={TABLE_HEAD_VALUE}
-                              rowCount={charsSelected.length}
+                    <Controller
+                      control={control}
+                      name="productCharsSelected"
+                      render={({ field }) => {
+                        const handleDeleteValues = (ids: (number | null)[]) => {
+                          const validIds = ids.filter((id) => id !== null) as number[];
+
+                          if (validIds.length > 0) {
+                            const deleteProducts = charsSelected.filter(
+                              (product) => !ids.includes(product.id)
+                            );
+                            const deleteProduct2 = charsSelected.filter((product) =>
+                              ids.includes(product.id)
+                            );
+                            const rest = field.value.filter((value) => {
+                              return !deleteProduct2
+                                ?.flatMap((item) => item.productSpecCharValueDTOS!)
+                                ?.some((item) => item.id === value);
+                            });
+                            field.onChange(rest);
+                            setValueSelected([]);
+                            setCharsSelected(deleteProducts);
+                          }
+                        };
+                        return (
+                          <div>
+                            <LabelStyle>Product character value</LabelStyle>
+                            <ProductCharToolbar
                               numSelected={valueSelected.length}
-                              onRequestSort={handleRequestSort}
-                              onSelectAllClick={handleSelectAllClick}
+                              filterName={valueFilterName}
+                              onFilterName={handleValueFilterByName}
+                              onDeleteProducts={() => handleDeleteValues(valueSelected)}
                             />
-                            <Controller
-                              control={control}
-                              name="productCharsSelected"
-                              render={({ field }) => (
-                                <TableBody>
-                                  {filtereProductValue
-                                    .slice(
-                                      pageValue * rowsPerPageValue,
-                                      pageValue * rowsPerPageValue + rowsPerPageValue
-                                    )
-                                    .map((row) => {
-                                      const { id, name, productSpecCharValueDTOS } = row;
+                            <Scrollbar>
+                              <TableContainer>
+                                {' '}
+                                <Table>
+                                  <ProductCharListHead
+                                    order={order}
+                                    orderBy={orderBy}
+                                    headLabel={TABLE_HEAD_VALUE}
+                                    rowCount={charsSelected.length}
+                                    numSelected={valueSelected.length}
+                                    onRequestSort={handleRequestSort}
+                                    onSelectAllClick={handleSelectAllClick}
+                                  />
 
-                                      const isItemSelected = valueSelected.indexOf(id!) !== -1;
-                                      const handleSelectAll = (event: any, field: any) => {
-                                        const value = event.target.value;
+                                  <TableBody>
+                                    {filtereProductValue
+                                      .slice(
+                                        pageValue * rowsPerPageValue,
+                                        pageValue * rowsPerPageValue + rowsPerPageValue
+                                      )
+                                      .map((row) => {
+                                        const { id, name, productSpecCharValueDTOS } = row;
 
-                                        if (
-                                          !value[value.length - 1] &&
-                                          value.length != 0 &&
-                                          productSpecCharValueDTOS?.length !== 0
-                                        ) {
+                                        const isItemSelected = valueSelected.indexOf(id!) !== -1;
+                                        const handleSelectAll = (event: any, field: any) => {
+                                          const value = event.target.value;
                                           if (
-                                            productSpecCharValueDTOS?.filter((item) => {
-                                              return value.some((fieldItem: ProductCharValue) => {
-                                                return (
-                                                  typeof fieldItem === 'object' &&
-                                                  fieldItem.id === item.id
-                                                );
-                                              });
-                                            }).length !== productSpecCharValueDTOS?.length
+                                            !value[value.length - 1] &&
+                                            value.length != 0 &&
+                                            productSpecCharValueDTOS?.length !== 0
                                           ) {
-                                            const newValue = productSpecCharValueDTOS
-                                              ?.filter(
-                                                (item) => item.value.indexOf(searchText) > -1
-                                              )
-                                              .filter((item: ProductCharValue) => {
-                                                return !field.value.some(
-                                                  (item2: ProductCharValue) => {
-                                                    return item2.id === item.id;
-                                                  }
-                                                );
+                                            if (
+                                              productSpecCharValueDTOS?.filter((item) => {
+                                                return value.some((fieldItem: number) => {
+                                                  return fieldItem === item.id;
+                                                });
+                                              }).length !== productSpecCharValueDTOS?.length
+                                            ) {
+                                              const newValue = productSpecCharValueDTOS
+                                                ?.filter(
+                                                  (item) => item.value.indexOf(searchText) > -1
+                                                )
+                                                .filter((item: ProductCharValue) => {
+                                                  return !field.value.some((item2: number) => {
+                                                    return item2 === item.id;
+                                                  });
+                                                })
+                                                .map((item) => item.id);
+                                              field.onChange([...field.value, ...newValue!]);
+                                              return;
+                                            } else {
+                                              const newValue = value.filter((item: number) => {
+                                                return !productSpecCharValueDTOS?.some((item2) => {
+                                                  return (
+                                                    typeof item === 'undefined' || item2.id === item
+                                                  );
+                                                });
                                               });
-                                            field.onChange([...field.value, ...newValue!]);
-                                            return;
+                                              field.onChange(newValue);
+                                              return;
+                                            }
                                           } else {
-                                            const newValue = value.filter((item: any) => {
-                                              return !productSpecCharValueDTOS?.some((item2) => {
-                                                return (
-                                                  typeof item === 'undefined' ||
-                                                  item2.id === item.id
-                                                );
-                                              });
-                                            });
-                                            field.onChange(newValue);
-                                            return;
+                                            if (
+                                              productSpecCharValueDTOS?.filter((item) => {
+                                                return value.some((fieldItem: number) => {
+                                                  return fieldItem === item.id;
+                                                });
+                                              }).length === productSpecCharValueDTOS?.length
+                                            ) {
+                                              const newValue = productSpecCharValueDTOS
+                                                ?.filter((item: ProductCharValue) => {
+                                                  return !field.value.some((item2: number) => {
+                                                    return item2 === item.id;
+                                                  });
+                                                })
+                                                .map((item) => item.id);
+                                              field.onChange([...field.value, ...newValue!]);
+                                              return;
+                                            } else {
+                                              field.onChange(value);
+                                            }
                                           }
-                                        } else {
-                                          if (
-                                            productSpecCharValueDTOS?.filter((item) => {
-                                              return value.some((fieldItem: ProductCharValue) => {
-                                                return (
-                                                  typeof fieldItem === 'object' &&
-                                                  fieldItem.id === item.id
-                                                );
-                                              });
-                                            }).length === productSpecCharValueDTOS?.length
-                                          ) {
-                                            const newValue = productSpecCharValueDTOS?.filter(
-                                              (item: ProductCharValue) => {
-                                                return !field.value.some(
-                                                  (item2: ProductCharValue) => {
-                                                    return item2.id === item.id;
-                                                  }
-                                                );
-                                              }
+                                        };
+                                        const handleSearchChange = (
+                                          ev: React.ChangeEvent<HTMLTextAreaElement>
+                                        ) => {
+                                          ev.stopPropagation();
+                                          const newSearchText = ev.target.value;
+                                          setSearchText(newSearchText);
+                                        };
+                                        const handleDeleteValue = (id: number | null) => {
+                                          if (id) {
+                                            const deleteProduct = charsSelected.filter(
+                                              (product) => product.id !== id
                                             );
-                                            field.onChange([...field.value, ...newValue!]);
-                                            return;
-                                          } else {
-                                            field.onChange(value);
-                                          }
-                                        }
-                                      };
-                                      const handleSearchChange = (
-                                        ev: React.ChangeEvent<HTMLTextAreaElement>
-                                      ) => {
-                                        ev.stopPropagation();
-                                        const newSearchText = ev.target.value;
-                                        setSearchText(newSearchText);
-                                      };
+                                            const deleteProduct2 = charsSelected.find(
+                                              (product) => product.id === id
+                                            );
 
-                                      return (
-                                        <TableRow
-                                          hover
-                                          key={id}
-                                          tabIndex={-1}
-                                          role="checkbox"
-                                          selected={isItemSelected}
-                                          aria-checked={isItemSelected}
-                                        >
-                                          <TableCell padding="checkbox">
-                                            <Checkbox
-                                              checked={isItemSelected}
-                                              onClick={() => handleClickValue(id!)}
-                                            />
-                                          </TableCell>
-                                          <TableCell align="center">
-                                            <Button
-                                              sx={{ color: 'error.main' }}
-                                              onClick={() => handleDeleteValue(id)}
-                                              startIcon={
-                                                <Iconify
-                                                  icon={'eva:trash-2-outline'}
-                                                  sx={{ ...ICON }}
-                                                />
-                                              }
-                                            />
-                                          </TableCell>
-                                          <TableCell align="left">{name}</TableCell>
-                                          <TableCell align="left">
-                                            <FormControl>
-                                              <InputLabel id={id?.toString()}>
-                                                Char Values
-                                              </InputLabel>
-                                              <Select
-                                                MenuProps={MenuProps}
-                                                {...field}
-                                                onOpen={handleMenuOpen}
-                                                style={{ width: '100px' }}
-                                                multiple
-                                                label="Char Values"
-                                                onChange={(e: any) => handleSelectAll(e, field)}
-                                                renderValue={(selected) => {
-                                                  if (
-                                                    productSpecCharValueDTOS?.filter((item) => {
-                                                      return field.value.some(
-                                                        (fieldItem: ProductCharValue) => {
-                                                          return (
-                                                            typeof fieldItem === 'object' &&
-                                                            fieldItem.id === item.id
-                                                          );
-                                                        }
-                                                      );
-                                                    }).length ===
-                                                      productSpecCharValueDTOS?.length &&
-                                                    productSpecCharValueDTOS?.length !== 0
-                                                  ) {
-                                                    return 'All';
-                                                  }
-                                                  return selected
-                                                    .filter((item) => item)
-                                                    .filter((item: any) => {
-                                                      return row.productSpecCharValueDTOS?.some(
-                                                        (char: any) => char.id === item.id
-                                                      );
-                                                    })
-                                                    .map((item: any) => item.value)
-                                                    .join(', ');
-                                                }}
-                                              >
-                                                <MenuItem key={row.id}>
-                                                  <Checkbox
-                                                    id={id!.toString()}
-                                                    checked={
+                                            const rest = field.value.filter((value) => {
+                                              return !deleteProduct2?.productSpecCharValueDTOS?.some(
+                                                (item) => item.id === value
+                                              );
+                                            });
+                                            field.onChange(rest);
+                                            setCharsSelected(deleteProduct);
+                                          }
+                                        };
+
+                                        return (
+                                          <TableRow
+                                            hover
+                                            key={id}
+                                            tabIndex={-1}
+                                            role="checkbox"
+                                            selected={isItemSelected}
+                                            aria-checked={isItemSelected}
+                                          >
+                                            <TableCell padding="checkbox">
+                                              <Checkbox
+                                                checked={isItemSelected}
+                                                onClick={() => handleClickValue(id!)}
+                                              />
+                                            </TableCell>
+                                            <TableCell align="center">
+                                              <Button
+                                                sx={{ color: 'error.main' }}
+                                                onClick={() => handleDeleteValue(id)}
+                                                startIcon={
+                                                  <Iconify
+                                                    icon={'eva:trash-2-outline'}
+                                                    sx={{ ...ICON }}
+                                                  />
+                                                }
+                                              />
+                                            </TableCell>
+                                            <TableCell align="left">{name}</TableCell>
+                                            <TableCell align="left">
+                                              <FormControl>
+                                                <InputLabel id={id?.toString()}>
+                                                  Char Values
+                                                </InputLabel>
+                                                <Select
+                                                  MenuProps={MenuProps}
+                                                  {...field}
+                                                  onOpen={handleMenuOpen}
+                                                  style={{ width: '100px' }}
+                                                  multiple
+                                                  label="Char Values"
+                                                  onChange={(e: any) => handleSelectAll(e, field)}
+                                                  renderValue={(selected) => {
+                                                    if (
                                                       productSpecCharValueDTOS?.filter((item) => {
                                                         return field.value.some(
-                                                          (fieldItem: ProductCharValue) => {
-                                                            return (
-                                                              typeof fieldItem === 'object' &&
-                                                              fieldItem.id === item.id
-                                                            );
+                                                          (fieldItem: number) => {
+                                                            return fieldItem === item.id;
                                                           }
                                                         );
                                                       }).length ===
-                                                        productSpecCharValueDTOS?.filter(
-                                                          (item) =>
-                                                            item.value.indexOf(searchText) > -1
-                                                        )?.length &&
+                                                        productSpecCharValueDTOS?.length &&
                                                       productSpecCharValueDTOS?.length !== 0
+                                                    ) {
+                                                      return 'All';
                                                     }
-                                                  />
-                                                  <TextField
-                                                    type="text"
-                                                    placeholder="Search Values"
-                                                    value={searchText}
-                                                    onChange={handleSearchChange}
-                                                    onClickCapture={(e) => e.stopPropagation()}
-                                                    onKeyDown={(e) => e.stopPropagation()}
-                                                    size="small"
-                                                    InputProps={{
-                                                      startAdornment: (
-                                                        <InputAdornment position="start">
-                                                          <Search />
-                                                        </InputAdornment>
-                                                      ),
-                                                    }}
-                                                    fullWidth
-                                                  />
-                                                  {/* <ListItemText primary={'Select All'} /> */}
-                                                </MenuItem>
-                                                {productSpecCharValueDTOS
-                                                  ?.filter(
-                                                    (item) => item.value.indexOf(searchText) > -1
-                                                  )
-                                                  .map((option: any) => (
-                                                    <MenuItem key={option.id} value={option}>
-                                                      <Checkbox
-                                                        checked={field.value
-                                                          .map((item: any) => {
-                                                            return (
-                                                              typeof item == 'object' && item.value
-                                                            );
-                                                          })
-                                                          .includes(option.value)}
-                                                      />
+                                                    return productSpecCharValueDTOS
+                                                      ?.filter((item) =>
+                                                        selected.includes(item.id!)
+                                                      )
 
-                                                      <ListItemText primary={option.value} />
-                                                    </MenuItem>
-                                                  ))}
-                                              </Select>
-                                            </FormControl>
-                                          </TableCell>
-                                        </TableRow>
-                                      );
-                                    })}
-                                  {emptyRowsValue > 0 && (
-                                    <TableRow style={{ height: 53 * emptyRowsValue }}>
-                                      <TableCell colSpan={6} />
-                                    </TableRow>
+                                                      .map((item: any) => item.value)
+                                                      .join(', ');
+                                                  }}
+                                                >
+                                                  <MenuItem key={row.id}>
+                                                    <Checkbox
+                                                      id={id!.toString()}
+                                                      checked={
+                                                        productSpecCharValueDTOS?.filter((item) => {
+                                                          return field.value.some(
+                                                            (fieldItem: number) => {
+                                                              return fieldItem === item.id;
+                                                            }
+                                                          );
+                                                        }).length ===
+                                                          productSpecCharValueDTOS?.filter(
+                                                            (item) =>
+                                                              item.value.indexOf(searchText) > -1
+                                                          )?.length &&
+                                                        productSpecCharValueDTOS?.length !== 0
+                                                      }
+                                                    />
+                                                    <TextField
+                                                      type="text"
+                                                      placeholder="Search Values"
+                                                      value={searchText}
+                                                      onChange={handleSearchChange}
+                                                      onClickCapture={(e) => e.stopPropagation()}
+                                                      onKeyDown={(e) => e.stopPropagation()}
+                                                      size="small"
+                                                      InputProps={{
+                                                        startAdornment: (
+                                                          <InputAdornment position="start">
+                                                            <Search />
+                                                          </InputAdornment>
+                                                        ),
+                                                      }}
+                                                      fullWidth
+                                                    />
+                                                  </MenuItem>
+                                                  {productSpecCharValueDTOS
+                                                    ?.filter(
+                                                      (item) => item.value.indexOf(searchText) > -1
+                                                    )
+                                                    .map((option: any) => (
+                                                      <MenuItem key={option.id} value={option.id}>
+                                                        <Checkbox
+                                                          checked={field.value
+                                                            .map((item: number) => {
+                                                              return item;
+                                                            })
+                                                            .includes(option.id)}
+                                                        />
+
+                                                        <ListItemText primary={option.value} />
+                                                      </MenuItem>
+                                                    ))}
+                                                </Select>
+                                              </FormControl>
+                                            </TableCell>
+                                          </TableRow>
+                                        );
+                                      })}
+                                    {emptyRowsValue > 0 && (
+                                      <TableRow style={{ height: 53 * emptyRowsValue }}>
+                                        <TableCell colSpan={6} />
+                                      </TableRow>
+                                    )}
+                                  </TableBody>
+
+                                  {isNotFoundProductValue && (
+                                    <TableBody>
+                                      <TableRow>
+                                        <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                                          <SearchNotFound searchQuery={valueFilterName} />
+                                        </TableCell>
+                                      </TableRow>
+                                    </TableBody>
                                   )}
-                                </TableBody>
-                              )}
-                            />
-                            {isNotFoundProductValue && (
-                              <TableBody>
-                                <TableRow>
-                                  <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                                    <SearchNotFound searchQuery={valueFilterName} />
-                                  </TableCell>
-                                </TableRow>
-                              </TableBody>
-                            )}
-                          </Table>
-                        </TableContainer>
-                        <TablePagination
-                          rowsPerPageOptions={[5, 10, 25]}
-                          component="div"
-                          count={charsSelected.length}
-                          rowsPerPage={rowsPerPageValue}
-                          page={pageValue}
-                          onPageChange={(e, page) => setPageValue(page)}
-                          onRowsPerPageChange={handleChangeRowsPerPageValue}
-                        />
-                      </Scrollbar>
-                    </div>
+                                </Table>
+                              </TableContainer>
+                              <TablePagination
+                                rowsPerPageOptions={[5, 10, 25]}
+                                component="div"
+                                count={charsSelected.length}
+                                rowsPerPage={rowsPerPageValue}
+                                page={pageValue}
+                                onPageChange={(e, page) => setPageValue(page)}
+                                onRowsPerPageChange={handleChangeRowsPerPageValue}
+                              />
+                            </Scrollbar>
+                          </div>
+                        );
+                      }}
+                    />
                   </Grid>
                 </Grid>{' '}
               </Card>
