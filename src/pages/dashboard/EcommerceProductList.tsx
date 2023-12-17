@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 // redux
 import { useDispatch, useSelector } from '../../redux/store';
-import { getProducts } from '../../redux/slices/product';
+import { deleteProducts, getProducts } from '../../redux/slices/product';
 // utils
 import { fDate } from '../../utils/formatTime';
 import { fCurrency } from '../../utils/formatNumber';
@@ -71,7 +71,7 @@ export default function EcommerceProductList() {
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<number[]>([]);
 
   const [filterName, setFilterName] = useState('');
 
@@ -97,18 +97,18 @@ export default function EcommerceProductList() {
 
   const handleSelectAllClick = (checked: boolean) => {
     if (checked) {
-      const selected = productList.map((n) => n.name);
+      const selected = productList.map((n) => n.id!);
       setSelected(selected);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (name: string) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: string[] = [];
+  const handleClick = (id: number) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected: number[] = [];
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selected, id);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -132,15 +132,14 @@ export default function EcommerceProductList() {
   };
 
   const handleDeleteProduct = (productId: number|null) => {
-    const deleteProduct = productList.filter((product) => product.id !== productId);
+    dispatch(deleteProducts([productId!]))
     setSelected([]);
-    setProductList(deleteProduct);
   };
 
-  const handleDeleteProducts = (selected: string[]) => {
-    const deleteProducts = productList.filter((product) => !selected.includes(product.name));
+  const handleDeleteProducts = (selected: number[]) => {
+    dispatch(deleteProducts(selected))
+
     setSelected([]);
-    setProductList(deleteProducts);
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productList.length) : 0;
@@ -202,7 +201,7 @@ export default function EcommerceProductList() {
                       const { id, thumbnail,  name, quantity, status, price,  } = row;
 
 
-                      const isItemSelected = selected.indexOf(name) !== -1;
+                      const isItemSelected = selected.indexOf(id!) !== -1;
 
                       return (
                         <TableRow
@@ -214,7 +213,7 @@ export default function EcommerceProductList() {
                           aria-checked={isItemSelected}
                         >
                           <TableCell padding="checkbox">
-                            <Checkbox checked={isItemSelected} onClick={() => handleClick(name)} />
+                            <Checkbox checked={isItemSelected} onClick={() => handleClick(id!)} />
                           </TableCell>
                           <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
                             <Image

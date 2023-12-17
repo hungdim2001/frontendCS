@@ -211,7 +211,18 @@ export const {
 } = slice.actions;
 
 // ----------------------------------------------------------------------
-
+export function deleteProducts(ids: number[]) {
+  return async () => {
+    try {
+      await productApi.deleteProducts(ids);
+      const response =  await productApi.getProducts(null)
+      dispatch(slice.actions.getProductsSuccess(response));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+}
+  
 export function getProducts(id:number|null) {
   return async () => {
     dispatch(slice.actions.startLoading());

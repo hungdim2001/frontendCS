@@ -257,7 +257,11 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
       formData.append('quantity', data.quantity.toString());
       formData.append('status', data?.status === 'Active' ? '1' : '0');
       formData.append('price', data.price.toString());
-      formData.append('productCharValues', JSON.stringify(data.productCharsSelected));
+      if (data.productCharsSelected) {
+        for (const value of data.productCharsSelected) {
+          formData.append('productCharValues', value.toString());
+        }
+      }
       if (data.description !== currentProduct?.description) {
         console.log(data.description);
         console.log(currentProduct?.description);
@@ -384,7 +388,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     setValueSelected([]);
   };
 
-
   const handleClickChar = (id: number) => {
     const selectedIndex = charSelected.indexOf(id);
     let newSelected: number[] = [];
@@ -421,7 +424,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     setValueSelected(newSelected);
   };
 
- 
   const handleChangeRowsPerPageChar = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPageChar(parseInt(event.target.value, 10));
     setPageChar(0);
