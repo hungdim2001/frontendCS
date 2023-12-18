@@ -41,8 +41,12 @@ export default function ProductDetailsCarousel({ product }: Props) {
   const slider1 = useRef<Slider | null>(null);
 
   const slider2 = useRef<Slider | null>(null);
+  useEffect(()=>{
+    console.log(product)
+  },[product])
 
   const imagesLightbox = product.images.map((_image) => _image);
+  
 
   const handleOpenLightbox = (url: string) => {
     const selectedImage = imagesLightbox.findIndex((index) => index === url);
@@ -113,7 +117,7 @@ export default function ProductDetailsCarousel({ product }: Props) {
         </Box>
       </Box>
 
-      <Box
+      {/* <Box
         sx={{
           my: 3,
           mx: 'auto',
@@ -170,7 +174,7 @@ export default function ProductDetailsCarousel({ product }: Props) {
         setPhotoIndex={setSelectedImage}
         isOpen={openLightbox}
         onCloseRequest={() => setOpenLightbox(false)}
-      />
+      /> */}
     </RootStyle>
   );
 }

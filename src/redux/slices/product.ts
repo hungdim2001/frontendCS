@@ -223,11 +223,11 @@ export function deleteProducts(ids: number[]) {
   };
 }
   
-export function getProducts(id:number|null) {
+export function getProducts() {
   return async () => {
     dispatch(slice.actions.startLoading());
     try {
-      const response = await productApi.getProducts(id);
+      const response = await productApi.getProducts(null);
       dispatch(slice.actions.getProductsSuccess(response));
   } catch (error) {
       dispatch(slice.actions.hasError(error));
@@ -237,14 +237,13 @@ export function getProducts(id:number|null) {
 
 // ----------------------------------------------------------------------
 
-export function getProduct(name: string) {
+export function getProduct(id: number) {
   return async () => {
     dispatch(slice.actions.startLoading());
     try {
-      const response: { data: { product: Product } } = await axios.get('/api/products/product', {
-        params: { name },
-      });
-      dispatch(slice.actions.getProductSuccess(response.data.product));
+      const response= await productApi.getProducts(id);
+      console.log(response)
+      dispatch(slice.actions.getProductSuccess(response[0]));
     } catch (error) {
       console.error(error);
       dispatch(slice.actions.hasError(error));

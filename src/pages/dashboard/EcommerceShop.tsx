@@ -64,7 +64,7 @@ export default function EcommerceShop() {
     values.category === 'All';
 
   useEffect(() => {
-    dispatch(getProducts(null));
+    dispatch(getProducts());
   }, [dispatch]);
 
   useEffect(() => {
@@ -166,7 +166,7 @@ export default function EcommerceShop() {
           )}
         </Stack>
 
-        <ShopProductList products={filteredProducts} loading={!products.length && isDefault} />
+        <ShopProductList products={filteredProducts.filter(item=> item.status)} loading={!products.length && isDefault} />
         <CartWidget />
       </Container>
     </Page>

@@ -51,7 +51,6 @@ const register = (bodyData: RegisterRequestBody) =>
   authApiIns.post<RegisterResponeData>('/register', bodyData);
 
 const login = (bodyData: LoginRequestBody) => {
-  console.log('url ' + authApiIns);
   return authApiIns.post<LoginResponseData>('/login', bodyData);
 };
 

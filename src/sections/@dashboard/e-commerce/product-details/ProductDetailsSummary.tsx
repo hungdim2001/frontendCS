@@ -56,6 +56,7 @@ export default function ProductDetailsSummary({
     price,
     thumbnail,
     status,
+    quantity,
     // colors,
     // available,
     // priceSale,
@@ -66,8 +67,8 @@ export default function ProductDetailsSummary({
 
   const alreadyProduct = cart.map((item) => item.id).includes(id);
 
-  // const isMaxQuantity =
-  //   cart.filter((item) => item.id === id).map((item) => item.quantity)[0] >= available;
+  const isMaxQuantity =
+    cart.filter((item) => item.id === id).map((item) => item.quantity)[0] >= quantity;
 
   const defaultValues = {
     id,
@@ -77,11 +78,11 @@ export default function ProductDetailsSummary({
     price,
     // color: colors[0],
     // size: sizes[4],
-    // quantity: available < 1 ? 0 : 1,
+    quantity: quantity < 1 ? 0 : 1,
   };
 
   const methods = useForm<FormValuesProps>({
-    // defaultValues,
+    defaultValues,
   });
 
   const { watch, control, setValue, handleSubmit } = methods;
@@ -116,49 +117,50 @@ export default function ProductDetailsSummary({
 
   return (
     <RootStyle {...other}>
-      {/* <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-        <Label
-          variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
-          color={inventoryType === 'in_stock' ? 'success' : 'error'}
-          sx={{ textTransform: 'uppercase' }}
-        >
-          {sentenceCase(inventoryType || '')}
-        </Label>
+      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+        {price && (
+          <Label
+            variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
+            color={'error'}
+            sx={{ textTransform: 'uppercase' }}
+          >
+            {sentenceCase('sale')}
+          </Label>
+        )}
 
-        <Typography
+        {/* <Typography
           variant="overline"
           sx={{
             mt: 2,
             mb: 1,
             display: 'block',
-            color: status === 'sale' ? 'error.main' : 'info.main',
+            color: price ? 'error.main' : 'info.main',
           }}
         >
-          {status}
-        </Typography>
+          sale
+        </Typography> */}
 
-        <Typography variant="h5" paragraph>
+        <Typography variant="h5" paragraph sx={{ mt: 1 }}>
           {name}
         </Typography>
 
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-          <Rating value={totalRating} precision={0.1} readOnly />
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+          <Rating value={5} precision={0.1} readOnly />
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            ({fShortenNumber(totalReview)}
-            reviews)
+            ({fShortenNumber(5)} reviews)
           </Typography>
         </Stack>
 
         <Typography variant="h4" sx={{ mb: 3 }}>
           <Box component="span" sx={{ color: 'text.disabled', textDecoration: 'line-through' }}>
-            {priceSale && fCurrency(priceSale)}
+            {price && fCurrency(price)}₫
           </Box>
-          &nbsp;{fCurrency(price)}
+          &nbsp;{fCurrency(price)}₫
         </Typography>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 3 }}>
+        {/* <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 3 }}>
           <Typography variant="subtitle1" sx={{ mt: 0.5 }}>
             Color
           </Typography>
@@ -180,9 +182,9 @@ export default function ProductDetailsSummary({
               />
             )}
           />
-        </Stack>
+        </Stack> */}
 
-        <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
+        {/* <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
           <Typography variant="subtitle1" sx={{ mt: 0.5 }}>
             Size
           </Typography>
@@ -206,7 +208,7 @@ export default function ProductDetailsSummary({
               </option>
             ))}
           </RHFSelect>
-        </Stack>
+        </Stack> */}
 
         <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
           <Typography variant="subtitle1" sx={{ mt: 0.5 }}>
@@ -217,7 +219,7 @@ export default function ProductDetailsSummary({
             <Incrementer
               name="quantity"
               quantity={values.quantity}
-              available={available}
+              available={quantity}
               onIncrementQuantity={() => setValue('quantity', values.quantity + 1)}
               onDecrementQuantity={() => setValue('quantity', values.quantity - 1)}
             />
@@ -226,7 +228,7 @@ export default function ProductDetailsSummary({
               component="div"
               sx={{ mt: 1, textAlign: 'right', color: 'text.secondary' }}
             >
-              Available: {available}
+              Available: {quantity}
             </Typography>
           </div>
         </Stack>
@@ -253,9 +255,9 @@ export default function ProductDetailsSummary({
         </Stack>
 
         <Stack alignItems="center" sx={{ mt: 3 }}>
-          <SocialsButton initialColor />
+          {/* <SocialsButton initialColor /> */}
         </Stack>
-      </FormProvider> */}
+      </FormProvider>
     </RootStyle>
   );
 }

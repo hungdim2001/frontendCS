@@ -77,7 +77,7 @@ export const PATH_DASHBOARD = {
   eCommerce: {
     root: path(ROOTS_DASHBOARD, '/e-commerce'),
     shop: path(ROOTS_DASHBOARD, '/e-commerce/shop'),
-    product: path(ROOTS_DASHBOARD, '/e-commerce/product/:name'),
+    product: path(ROOTS_DASHBOARD, '/e-commerce/product/:id'),
     productById: path(ROOTS_DASHBOARD, '/e-commerce/product/nike-air-force-1-ndestrukt'),
     list: path(ROOTS_DASHBOARD, '/e-commerce/list'),
     newProduct: path(ROOTS_DASHBOARD, '/e-commerce/product/new'),

@@ -1,7 +1,9 @@
 import { paramCase } from 'change-case';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
-import { Box, Card, Link, Typography, Stack } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+
+import { Box, Card, Link, Typography, Stack, IconButton, Button, Rating } from '@mui/material';
 // routes
 import { PATH_DASHBOARD } from '../../../../routes/paths';
 // utils
@@ -12,6 +14,8 @@ import { Product } from '../../../../@types/product';
 import Label from '../../../../components/Label';
 import Image from '../../../../components/Image';
 import { ColorPreview } from '../../../../components/color-utils';
+import Iconify from 'src/components/Iconify';
+import { useState } from 'react';
 
 // ----------------------------------------------------------------------
 
@@ -20,17 +24,20 @@ type Props = {
 };
 
 export default function ShopProductCard({ product }: Props) {
-  const { name, thumbnail, price, status } = product;
+  const { name, thumbnail, price, productSpecChars,id } = product;
 
-  const linkTo = `${PATH_DASHBOARD.eCommerce.root}/product/${paramCase(name)}`;
+  const linkTo = `${PATH_DASHBOARD.eCommerce.root}/product/${id}`;
+  const [hovered, setHovered] = useState(false);
+  const navigate = useNavigate();
 
   return (
-    <Card>
+
+    <Card onClick={() => navigate(linkTo)} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       <Box sx={{ position: 'relative' }}>
-        {status && (
+        {price && (
           <Label
             variant="filled"
-            // color={(status === 'sale' && 'error') || 'info'}
+            color='error'
             sx={{
               top: 16,
               right: 16,
@@ -39,34 +46,76 @@ export default function ShopProductCard({ product }: Props) {
               textTransform: 'uppercase',
             }}
           >
-            {status}
+            sale
           </Label>
         )}
+        {hovered && (
+          <Button
+          onClick={(e)=>{
+            e.stopPropagation();
+            console.log("hetre")
+          }}
+            sx={{
+              backgroundColor: '#ffab00',
+              color: '#212b36',
+              boxShadow: '#ffab003d 0px 8px 16px 0px',
+              cursor: 'pointer',
+              bottom: 16,
+              right: 16,
+              zIndex: 9,
+              position: 'absolute',
+              borderRadius: '50%',
+              width: 48,
+              height: 48,
+              transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minWidth: 32,
+              visibility: 'visible', // Show the button on hover
+              opacity: 1, // Show the button on hover
+              '&:hover': {
+                backgroundColor: '#b76e00',
+              },
+            }}
+          >
+            <Iconify icon={'bxs:cart-add'} width={24} height={24} />
+          </Button>
+        )}
+
         <Image alt={name} src={thumbnail} ratio="1/1" />
       </Box>
 
       <Stack spacing={2} sx={{ p: 3 }}>
-        <Link to={linkTo} color="inherit" component={RouterLink}>
-          <Typography variant="subtitle2" noWrap>
+        <Typography variant="subtitle2" noWrap>
             {name}
           </Typography>
-        </Link>
-
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          {/* <ColorPreview colors={colors} /> */}
-
-          <Stack direction="row" spacing={0.5}>
-            {/* {priceSale && (
+        <Stack direction="column" alignItems="start" justifyContent="start">
+          <Stack direction="row" alignItems="center" spacing={0.5}>
+            {price && (
               <Typography
                 component="span"
                 sx={{ color: 'text.disabled', textDecoration: 'line-through' }}
               >
-                {fCurrency(priceSale)}
+                {fCurrency(price)}₫
               </Typography>
-            )} */}
-
-            <Typography variant="subtitle1">{fCurrency(price)}</Typography>
+            )}
+            <Typography variant="subtitle1">{fCurrency(price)}₫</Typography>
           </Stack>
+          <Stack direction="row" alignItems="center" spacing={0.5}>
+            {productSpecChars?.[0]?.productSpecCharValueDTOS?.[0]?.value && (
+              <Label variant="filled">
+                {productSpecChars?.[0]?.productSpecCharValueDTOS?.[0]?.value}
+              </Label>
+            )}
+
+            {productSpecChars?.[1]?.productSpecCharValueDTOS?.[1]?.value && (
+              <Label variant="filled">
+                {productSpecChars?.[1]?.productSpecCharValueDTOS?.[1]?.value}
+              </Label>
+            )}
+          </Stack>
+          <Rating readOnly={true} name="rating" defaultValue={4.5} precision={0.5} max={5} />
         </Stack>
       </Stack>
     </Card>

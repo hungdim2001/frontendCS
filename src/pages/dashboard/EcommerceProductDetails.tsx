@@ -27,6 +27,7 @@ import {
   ProductDetailsCarousel,
 } from '../../sections/@dashboard/e-commerce/product-details';
 import CartWidget from '../../sections/@dashboard/e-commerce/CartWidget';
+import LoadingScreen from 'src/components/LoadingScreen';
 
 // ----------------------------------------------------------------------
 
@@ -70,13 +71,16 @@ export default function EcommerceProductDetails() {
 
   const [value, setValue] = useState('1');
 
-  const { name = '' } = useParams();
+  const { id = '' } = useParams();
 
   const { product, error, checkout } = useSelector((state) => state.product);
 
   useEffect(() => {
-    dispatch(getProduct(name));
-  }, [dispatch, name]);
+    dispatch(getProduct(+id));
+  }, [dispatch, id]);
+  useEffect(()=>{
+    console.log(product)
+  },[product])
 
   const handleAddCart = (product: CartItem) => {
     dispatch(addCart(product));
@@ -85,6 +89,9 @@ export default function EcommerceProductDetails() {
   const handleGotoStep = (step: number) => {
     dispatch(onGotoStep(step));
   };
+  if (!product) {
+    return <LoadingScreen />;
+  }
 
   return (
     <Page title="Ecommerce: Product Details">
@@ -101,7 +108,7 @@ export default function EcommerceProductDetails() {
               name: 'Shop',
               href: PATH_DASHBOARD.eCommerce.shop,
             },
-            { name: sentenceCase(name) },
+            { name: product?.name! ? product.name : '' },
           ]}
         />
 
@@ -124,23 +131,6 @@ export default function EcommerceProductDetails() {
                 </Grid>
               </Grid>
             </Card>
-
-            <Grid container sx={{ my: 8 }}>
-              {PRODUCT_DESCRIPTION.map((item) => (
-                <Grid item xs={12} md={4} key={item.title}>
-                  <Box sx={{ my: 2, mx: 'auto', maxWidth: 280, textAlign: 'center' }}>
-                    <IconWrapperStyle>
-                      <Iconify icon={item.icon} width={36} height={36} />
-                    </IconWrapperStyle>
-                    <Typography variant="subtitle1" gutterBottom>
-                      {item.title}
-                    </Typography>
-                    <Typography sx={{ color: 'text.secondary' }}>{item.description}</Typography>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-
             {/* <Card>
               <TabContext value={value}>
                 <Box sx={{ px: 3, bgcolor: 'background.neutral' }}>

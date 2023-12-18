@@ -56,7 +56,7 @@ export default function EcommerceProductCreate() {
   }, [id, products]);
 
   useEffect(() => {
-    dispatch(getProducts(null));
+    dispatch(getProducts());
   }, [dispatch]);
   useEffect(()=>{
 console.log(isEdit)
@@ -77,7 +77,7 @@ console.log(currentProduct)
               name: 'E-Commerce',
               href: PATH_DASHBOARD.eCommerce.root,
             },
-            { name: !isEdit ? 'New product' : id },
+            { name: !isEdit ? 'New product' : currentProduct.name },
           ]}
         />
         <ProductNewForm isEdit={isEdit} currentProduct={currentProduct} />
