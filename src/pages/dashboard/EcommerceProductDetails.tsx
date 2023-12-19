@@ -116,12 +116,11 @@ export default function EcommerceProductDetails() {
 
         {product && (
           <>
-            <Card>
               <Grid container>
-                <Grid item xs={12} md={6} lg={7}>
+                <Grid item xs={12} md={4} lg={4}>
                   <ProductDetailsCarousel product={product} />
                 </Grid>
-                <Grid item xs={12} md={6} lg={5}>
+                <Grid item xs={12} md={8} lg={8}>
                   <ProductDetailsSummary
                     product={product}
                     cart={checkout.cart}
@@ -130,7 +129,6 @@ export default function EcommerceProductDetails() {
                   />
                 </Grid>
               </Grid>
-            </Card>
             {/* <Card>
               <TabContext value={value}>
                 <Box sx={{ px: 3, bgcolor: 'background.neutral' }}>

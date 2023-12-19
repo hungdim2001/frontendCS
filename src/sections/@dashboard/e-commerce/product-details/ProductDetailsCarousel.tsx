@@ -2,7 +2,7 @@ import Slider from 'react-slick';
 import { useState, useRef, useEffect } from 'react';
 // @mui
 import { alpha, styled } from '@mui/material/styles';
-import { Box } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 // @types
 import { Product } from '../../../../@types/product';
 //
@@ -41,12 +41,11 @@ export default function ProductDetailsCarousel({ product }: Props) {
   const slider1 = useRef<Slider | null>(null);
 
   const slider2 = useRef<Slider | null>(null);
-  useEffect(()=>{
-    console.log(product)
-  },[product])
+  useEffect(() => {
+    console.log(product);
+  }, [product]);
 
   const imagesLightbox = product.images.map((_image) => _image);
-  
 
   const handleOpenLightbox = (url: string) => {
     const selectedImage = imagesLightbox.findIndex((index) => index === url);
@@ -94,28 +93,28 @@ export default function ProductDetailsCarousel({ product }: Props) {
 
   return (
     <RootStyle>
-      <Box sx={{ p: 1 }}>
-        <Box sx={{ zIndex: 0, borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
-          <Slider {...settings1} asNavFor={nav2} ref={slider1}>
-            {product.images.map((img) => (
-              <Image
-                key={img}
-                alt="large image"
-                src={img}
-                ratio="1/1"
-                onClick={() => handleOpenLightbox(img)}
-                sx={{ cursor: 'zoom-in' }}
-              />
-            ))}
-          </Slider>
-          <CarouselArrowIndex
-            index={currentIndex}
-            total={product.images.length}
-            onNext={handleNext}
-            onPrevious={handlePrevious}
-          />
+        <Box>
+          <Box sx={{ zIndex: 0, borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
+            <Slider {...settings1} asNavFor={nav2} ref={slider1}>
+              {product.images.map((img) => (
+                <Image
+                  key={img}
+                  alt="large image"
+                  src={img}
+                  ratio="1/1"
+                  onClick={() => handleOpenLightbox(img)}
+                  sx={{ cursor: 'zoom-in' }}
+                />
+              ))}
+            </Slider>
+            <CarouselArrowIndex
+              index={currentIndex}
+              total={product.images.length}
+              onNext={handleNext}
+              onPrevious={handlePrevious}
+            />
+          </Box>
         </Box>
-      </Box>
 
       {/* <Box
         sx={{
