@@ -51,7 +51,7 @@ const RootStyle = styled('span')(
       display: 'inline-flex',
       justifyContent: 'center',
       padding: theme.spacing(0, 1),
-      color: theme.palette.grey[800],
+      color: theme.palette.grey[0],
       fontSize: theme.typography.pxToRem(12),
       fontFamily: theme.typography.fontFamily,
       backgroundColor: theme.palette.grey[300],

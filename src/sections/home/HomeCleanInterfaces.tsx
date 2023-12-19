@@ -49,7 +49,7 @@ export default function HomeCleanInterfaces() {
               paragraph
               sx={{
                 ...(!isLight && {
-                  textShadow: (theme) => `4px 4px 16px ${alpha(theme.palette.grey[800], 0.48)}`,
+                  textShadow: (theme) => `4px 4px 16px ${alpha(theme.palette.grey[0], 0.48)}`,
                 }),
               }}
             >

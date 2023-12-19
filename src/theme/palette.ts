@@ -64,7 +64,7 @@ declare module '@mui/material' {
 const PRIMARY = {
   lighter: '#C8FACD',
   light: '#5BE584',
-  main: '#00AB55',
+  main: '#0C68F4',
   dark: '#007B55',
   darker: '#005249',
 };
@@ -79,6 +79,7 @@ const INFO = {
   lighter: '#D0F2FF',
   light: '#74CAFF',
   main: '#1890FF',
+  main500:'#063A88',
   dark: '#0C53B7',
   darker: '#04297A',
 };
@@ -103,10 +104,10 @@ const ERROR = {
   dark: '#B72136',
   darker: '#7A0C2E',
 };
-
 const GREY = {
   0: '#FFFFFF',
   100: '#F9FAFB',
+  700_71:'#717171',
   200: '#F4F6F8',
   300: '#DFE3E8',
   400: '#C4CDD5',
@@ -168,7 +169,7 @@ const palette = {
   light: {
     ...COMMON,
     mode: 'light',
-    text: { primary: GREY[800], secondary: GREY[600], disabled: GREY[500] },
+    text: { primary: COMMON.common.black, secondary: GREY[600], disabled: GREY[500] },
     background: { paper: '#fff', default: '#fff', neutral: GREY[200] },
     action: { active: GREY[600], ...COMMON.action },
   },

@@ -25,7 +25,7 @@ export const ListItemStyle = styled(Button, {
   const isLight = theme.palette.mode === 'light';
 
   const activeRootStyle = {
-    color: theme.palette.grey[800],
+    color: theme.palette.grey[0],
     backgroundColor: theme.palette.common.white,
     boxShadow: `-2px 4px 6px 0 ${alpha(
       isLight ? theme.palette.grey[500] : theme.palette.common.black,

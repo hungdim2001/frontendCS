@@ -57,7 +57,7 @@ export default function ShopProductCard({ product }: Props) {
           }}
             sx={{
               backgroundColor: '#ffab00',
-              color: '#212b36',
+              color: '#000000',
               boxShadow: '#ffab003d 0px 8px 16px 0px',
               cursor: 'pointer',
               bottom: 16,

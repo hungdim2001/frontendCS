@@ -13,7 +13,7 @@ const PopupStyle = styled(Popup)(({ theme }) => {
       padding: theme.spacing(1),
       boxShadow: theme.customShadows.z20,
       borderRadius: theme.shape.borderRadius,
-      backgroundColor: theme.palette.grey[800],
+      backgroundColor: theme.palette.grey[0],
     },
     '& .mapboxgl-popup-close-button': {
       width: 24,
@@ -32,19 +32,19 @@ const PopupStyle = styled(Popup)(({ theme }) => {
     },
     '&.mapboxgl-popup-anchor-top .mapboxgl-popup-tip': {
       marginBottom: -1,
-      borderBottomColor: theme.palette.grey[800],
+      borderBottomColor: theme.palette.grey[0],
     },
     '&.mapboxgl-popup-anchor-right .mapboxgl-popup-tip': {
       marginLeft: -1,
-      borderLeftColor: theme.palette.grey[800],
+      borderLeftColor: theme.palette.grey[0],
     },
     '&.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip': {
       marginTop: -1,
-      borderTopColor: theme.palette.grey[800],
+      borderTopColor: theme.palette.grey[0],
     },
     '&.mapboxgl-popup-anchor-left .mapboxgl-popup-tip': {
       marginRight: -1,
-      borderRightColor: theme.palette.grey[800],
+      borderRightColor: theme.palette.grey[0],
     },
   };
 });

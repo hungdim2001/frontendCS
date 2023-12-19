@@ -10,7 +10,8 @@ const getIcon = (name: string) => (
   <SvgIconStyle src={`/icons/${name}.svg`} sx={{ width: 1, height: 1 }} />
 );
 
-const ICONS = {
+export const ICONS = {
+  star:getIcon('ic_star'),
   blog: getIcon('ic_blog'),
   cart: getIcon('ic_cart'),
   chat: getIcon('ic_chat'),

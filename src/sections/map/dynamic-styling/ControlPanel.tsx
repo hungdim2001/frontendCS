@@ -80,7 +80,7 @@ function ControlPanel({ onChange }: { onChange: (value: string) => void }) {
   });
   const [color, setColor] = useState({
     water: theme.palette.grey[900],
-    labels: theme.palette.grey[800],
+    labels: theme.palette.grey[0],
     parks: theme.palette.primary.dark,
     buildings: theme.palette.grey[900],
     background: theme.palette.grey[700],
