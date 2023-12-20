@@ -65,7 +65,7 @@ const PRIMARY = {
   lighter: '#C8FACD',
   light: '#5BE584',
   main: '#0C68F4',
-  dark: '#007B55',
+  dark: '#052E6D',
   darker: '#005249',
 };
 const SECONDARY = {
@@ -143,13 +143,13 @@ const CHART_COLORS = {
 };
 
 const COMMON = {
-  common: { black: '#000', white: '#fff' },
-  primary: { ...PRIMARY, contrastText: '#fff' },
-  secondary: { ...SECONDARY, contrastText: '#fff' },
-  info: { ...INFO, contrastText: '#fff' },
+  common: { black: '#0C0C0C', white: '#FFFFFF' },
+  primary: { ...PRIMARY, contrastText: '#FFFFFF' },
+  secondary: { ...SECONDARY, contrastText: '#FFFFFF' },
+  info: { ...INFO, contrastText: '#FFFFFF' },
   success: { ...SUCCESS, contrastText: GREY[800] },
   warning: { ...WARNING, contrastText: GREY[800] },
-  error: { ...ERROR, contrastText: '#fff' },
+  error: { ...ERROR, contrastText: '#FFFFFF' },
   grey: GREY,
   gradients: GRADIENTS,
   chart: CHART_COLORS,

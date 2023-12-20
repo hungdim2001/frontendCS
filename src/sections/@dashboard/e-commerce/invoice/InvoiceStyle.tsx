@@ -2,10 +2,10 @@ import { Font, StyleSheet } from '@react-pdf/renderer';
 
 // ----------------------------------------------------------------------
 
-Font.register({
-  family: 'Roboto',
-  fonts: [{ src: '/fonts/Roboto-Regular.ttf' }, { src: '/fonts/Roboto-Bold.ttf' }],
-});
+// Font.register({
+//   family: 'Roboto',
+//   fonts: [{ src: '/fonts/Roboto-Regular.ttf' }, { src: '/fonts/Roboto-Bold.ttf' }],
+// });
 
 const styles = StyleSheet.create({
   col4: { width: '25%' },
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     padding: '40px 24px 0 24px',
     fontSize: 9,
     lineHeight: 1.6,
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto',
     backgroundColor: '#fff',
     textTransform: 'capitalize',
   },

@@ -1,18 +1,56 @@
 @font-face {
-  font-family: 'CircularStd';
+  font-family: 'Inter';
+  font-weight: 100;
+  font-style: normal;
+  src: local('Inter'), url('Inter-Thin.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-weight: 200;
+  font-style: normal;
+  src: local('Inter'), url('Inter-ExtraLight.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-weight: 300;
+  font-style: normal;
+  src: local('Inter'), url('Inter-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
   font-weight: 400;
   font-style: normal;
-  src: local('CircularStd'), url('CircularStd-Book.otf') format('opentype');
+  src: local('Inter'), url('Inter-Regular.ttf') format('truetype');
 }
 @font-face {
-  font-family: 'CircularStd';
+  font-family: 'Inter';
   font-weight: 500;
   font-style: normal;
-  src: local('CircularStd'), url('CircularStd-Medium.otf') format('opentype');
+  src: local('Inter'), url('Inter-Medium.otf') format('truetype');
 }
 @font-face {
-  font-family: 'CircularStd';
+  font-family: 'Inter';
+  font-weight: 600;
+  font-style: normal;
+  src: local('Inter'), url('Inter-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
   font-weight: 700;
   font-style: normal;
-  src: local('CircularStd'), url('CircularStd-Bold.otf') format('opentype');
+  src: local('Inter'), url('Inter-Bold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-weight: 800;
+  font-style: normal;
+  src: local('Inter'), url('Inter-ExtraBold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-weight: 900;
+  font-style: normal;
+  src: local('Inter'), url('Inter-Black.ttf') format('truetype');
 }

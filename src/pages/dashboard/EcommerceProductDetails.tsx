@@ -3,7 +3,17 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 // @mui
 import { alpha, styled } from '@mui/material/styles';
-import { Box, Tab, Card, Grid, Divider, Container, Typography } from '@mui/material';
+import {
+  Box,
+  Tab,
+  Card,
+  Grid,
+  Divider,
+  Container,
+  Typography,
+  List,
+  ListItem,
+} from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 // redux
 import { useDispatch, useSelector } from '../../redux/store';
@@ -78,9 +88,9 @@ export default function EcommerceProductDetails() {
   useEffect(() => {
     dispatch(getProduct(+id));
   }, [dispatch, id]);
-  useEffect(()=>{
-    console.log(product)
-  },[product])
+  useEffect(() => {
+    console.log(product);
+  }, [product]);
 
   const handleAddCart = (product: CartItem) => {
     dispatch(addCart(product));
@@ -95,7 +105,7 @@ export default function EcommerceProductDetails() {
 
   return (
     <Page title="Ecommerce: Product Details">
-      <Container maxWidth={themeStretch ? false : 'lg'}>
+      <Container>
         <HeaderBreadcrumbs
           heading="Product Details"
           links={[
@@ -116,29 +126,49 @@ export default function EcommerceProductDetails() {
 
         {product && (
           <>
-              <Grid container>
-                <Grid item xs={12} md={4} lg={4}>
-                  <ProductDetailsCarousel product={product} />
-                </Grid>
-                <Grid item xs={12} md={8} lg={8}>
-                  <ProductDetailsSummary
-                    product={product}
-                    cart={checkout.cart}
-                    onAddCart={handleAddCart}
-                    onGotoStep={handleGotoStep}
-                  />
-                </Grid>
+            <Grid container>
+              <Grid item xs={12} md={4} lg={4}>
+                <ProductDetailsCarousel product={product} />
               </Grid>
-            {/* <Card>
+              <Grid item xs={12} md={8} lg={8}>
+                <ProductDetailsSummary
+                  product={product}
+                  cart={checkout.cart}
+                  onAddCart={handleAddCart}
+                  onGotoStep={handleGotoStep}
+                />
+              </Grid>
+            </Grid>
+            <Card>
               <TabContext value={value}>
-                <Box sx={{ px: 3, bgcolor: 'background.neutral' }}>
+                <Box sx={{ px: 3 }}>
                   <TabList onChange={(e, value) => setValue(value)}>
-                    <Tab disableRipple value="1" label="Description" />
+                    <Tab
+                      disableRipple
+                      value="1"
+                      label="Technical Details"
+                      sx={{
+                        '&.Mui-selected': {
+                          color: '#0C68F4',
+                        },
+                        color: 'black',
+                        fontSize: '18px',
+                        fontWeight: 300,
+                      }}
+                    />
                     <Tab
                       disableRipple
                       value="2"
-                      label={`Review (${product.reviews.length})`}
-                      sx={{ '& .MuiTab-wrapper': { whiteSpace: 'nowrap' } }}
+                      label={`Review (10)`}
+                      sx={{
+                        '&.Mui-selected': {
+                          color: '#0C68F4',
+                        },
+                        color: 'black',
+                        fontSize: '18px',
+                        fontWeight: 300,
+                        '&.MuiTab-wrapper': { whiteSpace: 'nowrap' },
+                      }}
                     />
                   </TabList>
                 </Box>
@@ -147,14 +177,44 @@ export default function EcommerceProductDetails() {
 
                 <TabPanel value="1">
                   <Box sx={{ p: 3 }}>
-                    <Markdown children={product.description} />
+                    <Typography variant="h5" sx={{ mt: 0.5 }}>
+                      Technical Details{' '}
+                    </Typography>
+                    <List
+                      sx={{
+                        color: '#717171',
+                      }}
+                    >
+                      {product.productSpecChars.slice(0, 5).map((char, index) => (
+                        <ListItem
+                          key={char.id}
+                          sx={{
+                            p: 2,
+                            backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'transparent',
+                          }}
+                        >
+                          <Grid container justifyContent="flex-start" alignItems="center">
+                            <Grid item xs={4} sm={4} md={4}>
+                              <Typography sx={{ color: '#717171' }} variant="h6">
+                                {char.name}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={8} sm={8} md={8}>
+                              <Typography variant="body1" sx={{ color: '#2D2D2D' }}>
+                                {char.productSpecCharValueDTOS!.map((value) => value.value)}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </ListItem>
+                      ))}
+                    </List>
                   </Box>
                 </TabPanel>
                 <TabPanel value="2">
                   <ProductDetailsReview product={product} />
                 </TabPanel>
               </TabContext>
-            </Card> */}
+            </Card>
           </>
         )}
 

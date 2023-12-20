@@ -116,7 +116,7 @@ export default function ProductDetailsCarousel({ product }: Props) {
           </Box>
         </Box>
 
-      {/* <Box
+      <Box
         sx={{
           my: 3,
           mx: 'auto',
@@ -173,7 +173,7 @@ export default function ProductDetailsCarousel({ product }: Props) {
         setPhotoIndex={setSelectedImage}
         isOpen={openLightbox}
         onCloseRequest={() => setOpenLightbox(false)}
-      /> */}
+      />
     </RootStyle>
   );
 }

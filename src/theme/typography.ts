@@ -7,9 +7,9 @@ const FONT_PRIMARY = 'Inter, sans-serif'; // Google Font
 
 const typography = {
   fontFamily: FONT_PRIMARY,
-  fontWeightRegular: 400,
-  fontWeightMedium: 600,
-  fontWeightBold: 700,
+  // fontWeightRegular: 400,
+  // fontWeightMedium: 600,
+  // fontWeightBold: 700,
   h1: {
     fontWeight: 500,
     lineHeight: 80 / 64,
@@ -38,6 +38,7 @@ const typography = {
   h5: {
     fontWeight: 500,
     lineHeight: 1.5,
+    color:'#000000',
     fontSize: pxToRem(20),
     ...responsiveFontSizes({ sm: 19, md: 20, lg: 20 }),
   },
@@ -60,8 +61,10 @@ const typography = {
   body1: {
     lineHeight: 1.5,
     fontSize: pxToRem(16),
+    fontWeight: 300,
   },
   body2: {
+    fontWeight: 500,
     lineHeight: 22 / 14,
     fontSize: pxToRem(14),
   },

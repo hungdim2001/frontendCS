@@ -135,17 +135,17 @@ export default function ProductDetailsSummary({
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Grid container>
-        <Grid item xs={12} md={6} lg={7}>
-          <Typography variant="h5" paragraph sx={{ mt: 1 }}>
+        <Grid item xs={12} md={6} lg={7} sx={{ p: 3 }}>
+          <Typography variant="h5" paragraph>
             {name}
           </Typography>
-          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
             <Label
               sx={{
                 backgroundColor: 'info.main500',
                 color: 'common.white',
-                fontWeight: 500,
-                lineHeight: 22 / 14,
+                fontWeight: 300,
+                lineHeight: 22 / 12,
                 fontSize: 12,
               }}
             >
@@ -176,7 +176,7 @@ export default function ProductDetailsSummary({
               sold: 24
             </Typography>
           </Stack>
-          <Stack direction="row" alignItems="start" sx={{ my: 3 }}>
+          <Stack direction="row" alignItems="start" sx={{ mb: 2 }}>
             <Typography variant="subtitle1" sx={{ mt: 0.5 }}>
               Select color
             </Typography>
@@ -213,25 +213,26 @@ export default function ProductDetailsSummary({
           &nbsp;{fCurrency(price)}₫
         </Typography> */}
 
-          <List sx={{ color: '#717171', listStyleType: 'disc' }}>
+          <List
+            sx={{
+              color: '#717171',
+              '& li::before': { content: '"\\2022"', color: '#717171', marginRight: '8px' },
+            }}
+          >
             {productSpecChars.slice(0, 5).map((char) => (
-              <ListItem
-                key={char.id}
-                sx={{
-                  display: 'list-item',
-                }}
-              >
-                <Typography
-                  sx={{
-                    color: '#717171',
-                    fontWeight: 500,
-                    lineHeight: 22 / 14,
-                    fontSize: 14,
-                  }}
-                >
-                  {char.name}:{' '}
-                  {char.productSpecCharValueDTOS?.map((value) => value.value).join(',')}
-                </Typography>
+              <ListItem key={char.id}>
+                <Grid container justifyContent="flex-start" alignItems="center">
+                  <Grid item xs={4} sm={4} md={4}>
+                    <Typography sx={{ color: '#717171' }} variant="body2">
+                      {char.name}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={8} sm={8} md={8}>
+                    <Typography variant="body2" sx={{ color: '#0C0C0C' }}>
+                      {char.productSpecCharValueDTOS?.slice(0, 1).map((value) => value.value)}
+                    </Typography>
+                  </Grid>
+                </Grid>
               </ListItem>
             ))}
           </List>
@@ -244,14 +245,24 @@ export default function ProductDetailsSummary({
                 ({fShortenNumber(5)} reviews)
               </Typography>
             </Stack> */}
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ mb: 2 }}
+            >
               <Stack direction="row" flex={1} justifyContent="flex-start">
                 <Typography variant="h5"> {fCurrency(price)}₫</Typography>
               </Stack>
               <Stack direction="row" justifyContent="flex-end">
                 <Typography
                   variant="h6"
-                  sx={{ color: '#F45E0C', display: 'flex', alignItems: 'center' }}
+                  sx={{
+                    color: '#F45E0C',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
                 >
                   <svg
                     width="24"
@@ -277,18 +288,23 @@ export default function ProductDetailsSummary({
                       fill="#F45E0C"
                     />
                   </svg>
-                   -12 %
+                  &#160;-{fCurrency(price)}₫
                 </Typography>
               </Stack>
-              
             </Stack>
-            <Typography variant="h5">
-              <Box component="span" sx={{ color: 'text.disabled', textDecoration: 'line-through' }}>
-                {price && fCurrency(price)}₫
-              </Box>
+            <Typography
+              sx={{
+                mb: 2,
+                color: '#717171',
+                fontWeight: 500,
+                lineHeight: 22 / 14,
+                fontSize: 14,
+              }}
+            >
+              Last price {price && fCurrency(price)}₫
             </Typography>
 
-            <Stack direction="row" justifyContent="space-between">
+            <Stack direction="row" justifyContent="space-between" sx={{ mb: 2 }}>
               <Typography variant="subtitle1" sx={{ mt: 0.5 }}>
                 Quantity
               </Typography>
@@ -311,19 +327,28 @@ export default function ProductDetailsSummary({
               </div>
             </Stack>
 
-            <Stack direction="row" spacing={2}>
+            <Stack direction="column">
               <Button
                 fullWidth
                 disabled={isMaxQuantity}
                 size="large"
                 onClick={handleAddCart}
-                sx={{ whiteSpace: 'nowrap' }}
+                sx={{ fontSize: '16px', fontWeight: 300, whiteSpace: 'nowrap', mb: 2 }}
                 variant="outlined"
               >
                 Add to Cart
               </Button>
 
-              <Button fullWidth size="large" type="submit" variant="contained">
+              <Button
+                sx={{
+                  fontSize: '16px',
+                  fontWeight: 300,
+                }}
+                fullWidth
+                size="large"
+                type="submit"
+                variant="contained"
+              >
                 Buy Now
               </Button>
             </Stack>

@@ -97,10 +97,6 @@ export default function ProductDetailsReviewForm({ onClose, id, ...other }: Prop
 
           <RHFTextField name="review" label="Review *" multiline rows={3} />
 
-          <RHFTextField name="name" label="Name *" />
-
-          <RHFTextField name="email" label="Email *" />
-
           <Stack direction="row" justifyContent="flex-end" spacing={1.5}>
             <Button color="inherit" variant="outlined" onClick={onCancel}>
               Cancel
