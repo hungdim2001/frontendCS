@@ -185,7 +185,7 @@ export default function EcommerceProductDetails() {
                         color: '#717171',
                       }}
                     >
-                      {product.productSpecChars.slice(0, 5).map((char, index) => (
+                      {product.productSpecChars.map((char, index) => (
                         <ListItem
                           key={char.id}
                           sx={{

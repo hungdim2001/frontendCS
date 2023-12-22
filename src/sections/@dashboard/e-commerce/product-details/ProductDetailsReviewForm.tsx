@@ -76,7 +76,7 @@ export default function ProductDetailsReviewForm({ onClose, id, ...other }: Prop
 
   return (
     <RootStyle {...other} id={id}>
-      <Typography variant="subtitle1" gutterBottom>
+      <Typography variant="h5" gutterBottom>
         Add Review
       </Typography>
 

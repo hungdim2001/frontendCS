@@ -49,6 +49,7 @@ export type ProductTypeState  = {
 
 export type ProductCharValue  = BaseDTO &{
   value: string;
+  priority: number;
 };
 export type Product = BaseDTO &{
   thumbnail: string;
@@ -60,6 +61,7 @@ export type Product = BaseDTO &{
   productType:ProductType;
   productSpecChars:ProductChar[];
   valueSelected:(ProductCharValue)[];
+  color:string;
   // tags: string[];
   // priceSale: number | null;
   // totalRating: number;

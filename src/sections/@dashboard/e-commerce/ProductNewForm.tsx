@@ -9,14 +9,18 @@ import { Search } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
   Alert,
+  Box,
   Button,
   Card,
   Checkbox,
+  Divider,
   FormControl,
+  FormControlLabel,
   Grid,
   IconButton,
   InputAdornment,
   InputLabel,
+  ListItem,
   ListItemText,
   MenuItem,
   Select,
@@ -59,6 +63,8 @@ import ProductCharListHead from './product-char/ProductCharListHead';
 import ProductCharToolbar from './product-char/ProductCharToolbar';
 import { productApi } from 'src/service/app-apis/product';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
+import { G } from '@react-pdf/renderer';
+import RHFColorPicker from 'src/components/hook-form/RHFColorPicker';
 
 // ----------------------------------------------------------------------
 
@@ -130,6 +136,8 @@ interface FormValuesProps {
   description: string;
   afterSubmit?: string;
   productCharsSelected: number[];
+  color:string;
+  priority: number[];
 }
 
 type Props = {
@@ -183,6 +191,8 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         price: currentProduct?.price || 0,
         quantity: currentProduct?.quantity || 0,
         productTypeId: currentProduct?.productType.id!,
+        color: currentProduct.color||'#000000',
+        priority:currentProduct.productSpecChars.flatMap(item=> item.productSpecCharValueDTOS).filter(item=> item?.priority!=1).map(value=> value?.priority),
         status: currentProduct?.status
           ? STATUS_OPTION[0]
           : currentProduct
@@ -199,8 +209,10 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         thumbnail: '',
         price: 0,
         quantity: 0,
+        color:'#000000',
         productTypeId: undefined,
         status: STATUS_OPTION[0],
+        priority:undefined
       };
     }
   }, [currentProduct]);
@@ -262,6 +274,13 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
           formData.append('productCharValues', value.toString());
         }
       }
+      console.log(data.priority);
+      if (data.priority) {
+        for (const value of data.priority) {
+          formData.append('priority', value.toString());
+        }
+      }
+
       if (data.description !== currentProduct?.description) {
         console.log(data.description);
         console.log(currentProduct?.description);
@@ -467,8 +486,8 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   };
 
   useEffect(() => {
-    console.log(getValues('productCharsSelected'));
-  }, [getValues('productCharsSelected')]);
+    console.log(getValues('priority'));
+  }, [getValues('priority')]);
   //-----------------------------------------------------------------------------------------------------------
 
   return (
@@ -685,6 +704,8 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                         const isItemSelected = valueSelected.indexOf(id!) !== -1;
                                         const handleSelectAll = (event: any, field: any) => {
                                           const value = event.target.value;
+                                          const elementsOnlyInList2 = getValues('priority')?.filter((item:number) => !value.includes(item));
+                                          setValue('priority',elementsOnlyInList2);
                                           if (
                                             !value[value.length - 1] &&
                                             value.length != 0 &&
@@ -872,17 +893,78 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                     ?.filter(
                                                       (item) => item.value.indexOf(searchText) > -1
                                                     )
-                                                    .map((option: any) => (
-                                                      <MenuItem key={option.id} value={option.id}>
-                                                        <Checkbox
-                                                          checked={field.value
-                                                            .map((item: number) => {
-                                                              return item;
-                                                            })
-                                                            .includes(option.id)}
-                                                        />
+                                                    .map((option: any, index) => (
+                                                      <MenuItem
+                                                        sx={{
+                                                          backgroundColor:
+                                                            index % 2 === 0
+                                                              ? '#f9f9f9'
+                                                              : 'transparent',
+                                                        }}
+                                                        key={option.id}
+                                                        value={option.id}
+                                                      >
+                                                        <Stack direction="column">
+                                                          <Stack
+                                                            direction="row"
+                                                            alignItems="center"
+                                                          >
+                                                            <Checkbox
+                                                              checked={field.value
+                                                                .map((item: number) => {
+                                                                  return item;
+                                                                })
+                                                                .includes(option.id)}
+                                                            />
+                                                            <ListItemText primary={option.value} />
+                                                          </Stack>
+                                                          <Divider></Divider>
+                                                          <Stack
+                                                            onClick={(e) => {
+                                                              e.stopPropagation();
+                                                            }}
+                                                            direction="row"
+                                                            alignItems="center"
+                                                          >
+                                                            <Checkbox
+                                                              onChange={(e) => {
+                                                                const priorityValues =
+                                                                  getValues('priority') || []; // Use empty array if 'priority' is null or undefined
 
-                                                        <ListItemText primary={option.value} />
+                                                                if (e.target.checked) {
+                                                                  setValue('priority', [
+                                                                    ...priorityValues,
+                                                                    option.id,
+                                                                  ]);
+                                                                } else {
+                                                                  const newValue =
+                                                                    priorityValues.filter(
+                                                                      (item) => item !== option.id
+                                                                    );
+                                                                  setValue('priority', newValue);
+                                                                }
+                                                              }}
+                                                              disabled={
+                                                                !field.value
+                                                                  .map((item: number) => item)
+                                                                  .includes(option.id)
+                                                              }
+                                                              checked={
+                                                                !!(
+                                                                  getValues('priority') &&
+                                                                  getValues('priority').includes(
+                                                                    option.id
+                                                                  ) &&
+                                                                  field.value
+                                                                    .map((item: number) => item)
+                                                                    .includes(option.id)
+                                                                )
+                                                              }
+                                                            />
+
+                                                            <ListItemText primary={'display'} />
+                                                          </Stack>
+                                                        </Stack>
                                                       </MenuItem>
                                                     ))}
                                                 </Select>
@@ -928,6 +1010,11 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
               </Card>
             </Grid>
           </Grid>
+          <Card sx={{ p: 3 }}>
+                <Stack spacing={3} mb={2}>
+                  <RHFColorPicker name="color" label="Color" />
+                </Stack>
+              </Card>
 
           <Grid item xs={12} md={4}>
             <Stack spacing={3}>
@@ -988,6 +1075,9 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                   <RHFTextField name="quantity" label="Quantity" />
                 </Stack>
               </Card>
+
+           
+
 
               <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
                 {!isEdit ? 'Create Product' : 'Save Changes'}

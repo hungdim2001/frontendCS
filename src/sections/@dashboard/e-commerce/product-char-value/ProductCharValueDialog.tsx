@@ -168,6 +168,7 @@ export default function ProductCharValueDialog({
         }
         const newProductCharValue: ProductCharValue = {
           id: null,
+          priority:-1,
           description: data.descriptionCharValue,
           value: data.valueCharValue,
           status: data.statusCharValue === 'Active' ? true : false,

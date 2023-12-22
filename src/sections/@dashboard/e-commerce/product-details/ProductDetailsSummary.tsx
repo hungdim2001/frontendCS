@@ -219,17 +219,17 @@ export default function ProductDetailsSummary({
               '& li::before': { content: '"\\2022"', color: '#717171', marginRight: '8px' },
             }}
           >
-            {productSpecChars.slice(0, 5).map((char) => (
+            {productSpecChars.filter(item=> item.productSpecCharValueDTOS?.some(value=> value.priority!=-1)).map((char) => (
               <ListItem key={char.id}>
                 <Grid container justifyContent="flex-start" alignItems="center">
-                  <Grid item xs={4} sm={4} md={4}>
+                  <Grid item xs={5} sm={5} md={5}>
                     <Typography sx={{ color: '#717171' }} variant="body2">
                       {char.name}
                     </Typography>
                   </Grid>
-                  <Grid item xs={8} sm={8} md={8}>
+                  <Grid item xs={7} sm={7} md={7}>
                     <Typography variant="body2" sx={{ color: '#0C0C0C' }}>
-                      {char.productSpecCharValueDTOS?.slice(0, 1).map((value) => value.value)}
+                      {char.productSpecCharValueDTOS?.filter(value=> value.priority!=-1).map((value) => value.value).join(', ')}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -251,8 +251,8 @@ export default function ProductDetailsSummary({
               alignItems="center"
               sx={{ mb: 2 }}
             >
-              <Stack direction="row" flex={1} justifyContent="flex-start">
-                <Typography variant="h5"> {fCurrency(price)}₫</Typography>
+              <Stack direction="row" flex={1} justifyContent="flex-start" sx={{mr:1}}>
+                <Typography variant="h6"> {fCurrency(price)}₫</Typography>
               </Stack>
               <Stack direction="row" justifyContent="flex-end">
                 <Typography

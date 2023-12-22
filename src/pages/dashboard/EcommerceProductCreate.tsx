@@ -41,7 +41,6 @@ export default function EcommerceProductCreate() {
     const foundProduct = products.find((product) => {
       return product.id === +id!;
     });
-
     if (foundProduct && foundProduct.description) {
       fetch(foundProduct.description)
         .then((response) => response.text())

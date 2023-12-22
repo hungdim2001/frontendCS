@@ -64,9 +64,9 @@ const typography = {
     fontWeight: 300,
   },
   body2: {
-    fontWeight: 500,
-    lineHeight: 22 / 14,
-    fontSize: pxToRem(14),
+    fontWeight: 300,
+    lineHeight: 22 / 18,
+    fontSize: pxToRem(18),
   },
   caption: {
     lineHeight: 1.5,
