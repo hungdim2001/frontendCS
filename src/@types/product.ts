@@ -30,6 +30,14 @@ export type ProductReview = {
   postedAt: Date | string | number;
 };
 
+
+export type Variant = BaseDTO & {
+  name: string;
+  chars:number[];
+  quantity: number;
+  price: number;
+};
+
 export type ProductChar = BaseDTO & {
   name: string;
   productSpecCharValueDTOS: ProductCharValue[]|null;
@@ -56,12 +64,12 @@ export type Product = BaseDTO &{
   images: string[];
   name: string;
   price: number;
-  // code: string;
   quantity: number;
   productType:ProductType;
   productSpecChars:ProductChar[];
   valueSelected:(ProductCharValue)[];
   color:string;
+  variants: Variant[]
   // tags: string[];
   // priceSale: number | null;
   // totalRating: number;

@@ -40,7 +40,7 @@ import {
 import { styled } from '@mui/material/styles';
 // routes
 // @types
-import { Product, ProductChar, ProductCharValue } from '../../../@types/product';
+import { Product, ProductChar, ProductCharValue, Variant } from '../../../@types/product';
 // components
 import * as cheerio from 'cheerio';
 import Iconify from 'src/components/Iconify';
@@ -65,6 +65,8 @@ import { productApi } from 'src/service/app-apis/product';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import { G } from '@react-pdf/renderer';
 import RHFColorPicker from 'src/components/hook-form/RHFColorPicker';
+import VariantList from './variant/VariantList';
+import product from 'src/redux/slices/product';
 
 // ----------------------------------------------------------------------
 
@@ -136,8 +138,9 @@ interface FormValuesProps {
   description: string;
   afterSubmit?: string;
   productCharsSelected: number[];
-  color:string;
+  color: string;
   priority: number[];
+  variants: Variant[];
 }
 
 type Props = {
@@ -191,8 +194,12 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         price: currentProduct?.price || 0,
         quantity: currentProduct?.quantity || 0,
         productTypeId: currentProduct?.productType.id!,
-        color: currentProduct.color||'#000000',
-        priority:currentProduct.productSpecChars.flatMap(item=> item.productSpecCharValueDTOS).filter(item=> item?.priority!=1).map(value=> value?.priority),
+        color: currentProduct.color || '#000000',
+        variant: currentProduct.variants,
+        priority: currentProduct.productSpecChars
+          .flatMap((item) => item.productSpecCharValueDTOS)
+          .filter((item) => item?.priority != 1)
+          .map((value) => value?.priority),
         status: currentProduct?.status
           ? STATUS_OPTION[0]
           : currentProduct
@@ -209,10 +216,10 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         thumbnail: '',
         price: 0,
         quantity: 0,
-        color:'#000000',
+        color: '#000000',
         productTypeId: undefined,
         status: STATUS_OPTION[0],
-        priority:undefined
+        priority: undefined,
       };
     }
   }, [currentProduct]);
@@ -485,10 +492,82 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     setSearchText('');
   };
 
+  // function generateVariants( id: number): Variant[] {
+  //   const variants: Variant[] = [];
+
+  //   const findProductByID = productChars.find((char) =>
+  //   char.productSpecCharValueDTOS?.some((value) => value.id === id)
+  // );
+
+  //   const generate = (currentVariants: number[], index: number): void => {
+  //     if (index === data.length) {
+  //       variants.push({ chars: currentVariants, name: 'Generated Name', quantity: 0, price: 0 });
+  //       return;
+  //     }
+
+  //     const currentProduct = findProductByID(data[index].id);
+  //     if (!currentProduct) return;
+
+  //     if (currentProduct.id === id || currentVariants.includes(currentProduct.id)) {
+  //       generate(currentVariants, index + 1);
+  //     } else {
+  //       const updatedVariants = [...currentVariants, currentProduct.id];
+  //       generate(updatedVariants, index + 1);
+  //       generate(currentVariants, index + 1);
+  //     }
+  //   };
+
+  //   generate([], 0);
+  //   return variants;
+  // }
+
   useEffect(() => {
-    console.log(getValues('priority'));
-  }, [getValues('priority')]);
-  //-----------------------------------------------------------------------------------------------------------
+    console.log(getValues('variants'));
+  }, [getValues('variants')]);
+  const [variants, setVariant] = useState<{ [key: number]: number }[]>();
+  useEffect(() => {
+    const groupedProductCharValues: Attributes = {};
+    getValues('priority')
+      .filter((item) => item != -1)
+      .forEach((valueID) => {
+        const foundProductChar = charsSelected.find((char) => {
+          return char.productSpecCharValueDTOS?.some((value) => {
+            return value.id == valueID;
+          });
+        });
+
+        if (foundProductChar) {
+          if (!groupedProductCharValues[foundProductChar.id!]) {
+            groupedProductCharValues[foundProductChar.id!] = [];
+          }
+          groupedProductCharValues[foundProductChar.id!].push(valueID);
+        }
+      });
+  }, [getValues('priority'), charsSelected]);
+
+  interface Attributes {
+    [key: string | number]: number[];
+  }
+
+  // function generateVariants(attributes: Attributes): { [key: number]: number }[] {
+  //   const keys = Object.keys(attributes);
+  //   const values = Object.values(attributes);
+  //   const result: { [key: number]: number }[] = [];
+
+  //   const generate = (current: { [key: string]: number }, index: number): void => {
+  //     if (index === keys.length) {
+  //       result.push(current);
+  //       return;
+  //     }
+
+  //     for (const value of values[index]) {
+  //       generate({ ...current, [keys[index]]: value }, index + 1);
+  //     }
+  //   };
+
+  //   generate({}, 0);
+  //   return result;
+  // }
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -516,6 +595,13 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                   <LabelStyle>Description</LabelStyle>
                   <RHFEditor simple name="description" />
                 </div>
+              </Stack>
+            </Card>
+
+            <Card sx={{ p: 3 }}>
+              <Stack spacing={3}>
+                <LabelStyle>Variants</LabelStyle>
+                {/* <VariantList productChars={productChars} variants={variants}></VariantList> */}
               </Stack>
             </Card>
 
@@ -704,8 +790,10 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                         const isItemSelected = valueSelected.indexOf(id!) !== -1;
                                         const handleSelectAll = (event: any, field: any) => {
                                           const value = event.target.value;
-                                          const elementsOnlyInList2 = getValues('priority')?.filter((item:number) => !value.includes(item));
-                                          setValue('priority',elementsOnlyInList2);
+                                          const elementsOnlyInList2 = getValues('priority')?.filter(
+                                            (item: number) => value.includes(item)
+                                          );
+                                          setValue('priority', elementsOnlyInList2);
                                           if (
                                             !value[value.length - 1] &&
                                             value.length != 0 &&
@@ -928,21 +1016,66 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                           >
                                                             <Checkbox
                                                               onChange={(e) => {
-                                                                const priorityValues =
-                                                                  getValues('priority') || []; // Use empty array if 'priority' is null or undefined
+                                                                const variantsValues =
+                                                                  getValues('variants') || []; // Use empty array if 'priority' is null or undefined
 
-                                                                if (e.target.checked) {
-                                                                  setValue('priority', [
-                                                                    ...priorityValues,
-                                                                    option.id,
-                                                                  ]);
-                                                                } else {
-                                                                  const newValue =
-                                                                    priorityValues.filter(
-                                                                      (item) => item !== option.id
-                                                                    );
-                                                                  setValue('priority', newValue);
+                                                                if (variantsValues.length === 0) {
+                                                                  const variantObject: Variant = {
+                                                                    chars: [option.id],
+                                                                    quantity: 0,
+                                                                    price: 0,
+                                                                  } as Variant;
+                                                                  variantsValues.push(
+                                                                    variantObject
+                                                                  );
+                                                                  setValue(
+                                                                    'variants',
+                                                                    variantsValues
+                                                                  );
+                                                                  return;
                                                                 }
+                                                                const productChar =
+                                                                  productChars.find((item) =>
+                                                                    item.productSpecCharValueDTOS?.some(
+                                                                      (value) =>
+                                                                        value.id === option.id
+                                                                    )
+                                                                  );
+                                                                  for (const item of variantsValues){
+                                                                    console.log('here')
+                                                                   if (
+                                                                     productChar?.productSpecCharValueDTOS?.some(
+                                                                       (value) =>
+                                                                         item.chars.includes(
+                                                                           value.id!
+                                                                         )
+                                                                     )
+                                                                   ) {
+                                                                     const variantObject: Variant = {
+                                                                       chars: item.chars
+                                                                         .filter(
+                                                                           (char) =>
+                                                                             !productChar?.productSpecCharValueDTOS?.some(
+                                                                               (value) =>
+                                                                                 value.id === char
+                                                                             )
+                                                                         )
+                                                                         .concat([option.id]),
+                                                                       quantity: 0,
+                                                                       price: 0,
+                                                                     } as Variant;
+                                                                     variantsValues.push(
+                                                                       variantObject
+                                                                     );
+                                                                     setValue(
+                                                                       'variants',
+                                                                       variantsValues
+                                                                     );
+                                                                     return;
+                                                                   }
+                                                                 }
+
+                                                              
                                                               }}
                                                               disabled={
                                                                 !field.value
@@ -951,10 +1084,10 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                               }
                                                               checked={
                                                                 !!(
-                                                                  getValues('priority') &&
-                                                                  getValues('priority').includes(
-                                                                    option.id
-                                                                  ) &&
+                                                                  getValues('variants') &&
+                                                                  getValues('variants')
+                                                                    .flatMap((item) => item.chars)
+                                                                    .includes(option.id) &&
                                                                   field.value
                                                                     .map((item: number) => item)
                                                                     .includes(option.id)
@@ -1010,11 +1143,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
               </Card>
             </Grid>
           </Grid>
-          <Card sx={{ p: 3 }}>
-                <Stack spacing={3} mb={2}>
-                  <RHFColorPicker name="color" label="Color" />
-                </Stack>
-              </Card>
 
           <Grid item xs={12} md={4}>
             <Stack spacing={3}>
@@ -1075,9 +1203,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                   <RHFTextField name="quantity" label="Quantity" />
                 </Stack>
               </Card>
-
-           
-
 
               <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
                 {!isEdit ? 'Create Product' : 'Save Changes'}
