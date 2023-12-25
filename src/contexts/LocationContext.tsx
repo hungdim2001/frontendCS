@@ -48,7 +48,6 @@ function LocationProvider({ children }: LocationProviderProps) {
 
   useEffect(() => {
     (async () => {
-      console.log('effect1');
       try {
         const initData = await initialLocation();
         setLocationState(locationStateInit);
@@ -63,7 +62,6 @@ function LocationProvider({ children }: LocationProviderProps) {
   }, []);
   useEffect(() => {
     (async () => {
-      console.log(province);
       if (!province?.areaCode) return;
 
       const options = await locationApi.area(province.areaCode);

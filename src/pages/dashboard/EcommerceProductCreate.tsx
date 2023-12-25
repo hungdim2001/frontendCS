@@ -21,6 +21,8 @@ import { ThunkDispatch } from '@reduxjs/toolkit';
 import { AnyAction, Dispatch } from 'redux';
 import { Edit } from '@mui/icons-material';
 import LoadingScreen from 'src/components/LoadingScreen';
+import { getProductTypes } from 'src/redux/slices/product-type';
+import { getProductChars } from 'src/redux/slices/product-char';
 
 // ----------------------------------------------------------------------
 
@@ -55,11 +57,11 @@ export default function EcommerceProductCreate() {
   }, [id, products]);
 
   useEffect(() => {
+    dispatch(getProductChars(null));
+    dispatch(getProductTypes());
     dispatch(getProducts());
   }, [dispatch]);
   useEffect(()=>{
-console.log(isEdit)
-console.log(currentProduct)
 
   },[isEdit,currentProduct])
   if (isEdit && !currentProduct.id) {

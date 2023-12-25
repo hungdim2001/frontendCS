@@ -29,17 +29,18 @@ import Iconify from 'src/components/Iconify';
 import HeaderBreadcrumbs from 'src/components/HeaderBreadcrumbs';
 import ProductCharToolbar from '../product-char/ProductCharToolbar';
 import Scrollbar from 'src/components/Scrollbar';
-import ProductCharListHead from '../product-char/ProductCharListHead';
 import Page from 'src/components/Page';
 import Label from 'src/components/Label';
 import SearchNotFound from 'src/components/SearchNotFound';
 import VariantListHead from './VariantListHead';
+import { UseFormSetValue } from 'react-hook-form';
+import VariantListToolbar from './VariantListToolBar';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'img', label: 'Image', alignRight: false },
-  { id: 'name', label: 'Name', alignRight: false },
+  { id: 'id', label: 'ID', alignRight: false },
+  { id: 'variant', label: 'Variant', alignRight: false },
   { id: 'quantity', label: 'Quantity', alignRight: false },
   { id: 'price', label: 'Price', alignRight: false },
   { id: 'update' },
@@ -47,23 +48,18 @@ const TABLE_HEAD = [
 
 // ----------------------------------------------------------------------
 type Props = {
-productChars:ProductChar[];
-variants: { [key: number]: number }[]|undefined;
+  productChars: ProductChar[];
+  variants: Variant[];
+  setValue: UseFormSetValue<any>;
 };
 
-
-export default function VariantList({variants,productChars}: Props) {
+export default function VariantList({ variants, productChars, setValue }: Props) {
   const ICON = {
     mr: 2,
     width: 20,
     height: 20,
   };
 
-  const theme = useTheme();
-
-  const { themeStretch } = useSettings();
-
-  const [productCharList, setProductCharList] = useState<Variant[]>([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [page, setPage] = useState(0);
@@ -89,49 +85,31 @@ export default function VariantList({variants,productChars}: Props) {
     dispatch(getProductChars(null));
   }, [dispatch]);
 
-  function createVariants(variants: { [key: number]: number }[], productChars: ProductChar[]): Variant[] {
-    const variantObjects: Variant[] = [];
-  
-    for (const variant of variants) {
-      const variantNames: string[] = [];
-        for (const key in variant) {
-        const charId = parseInt(key);
-        const charValueId = variant[charId];
-        const matchingProductChar = productChars.find((char) =>
-          char.productSpecCharValueDTOS?.some((value) => value.id === charValueId)
-        );
-  
-        if (matchingProductChar) {
-          const matchingValue = matchingProductChar.productSpecCharValueDTOS?.find((value) => value.id === charValueId);
-          if (matchingValue) {
-            variantNames.push(`${matchingProductChar.name}: ${matchingValue.value}`);
-          }
-        }
-      }
-  
-      const variantObject: Variant = {
-        name: variantNames.join(', '),
-        chars: Object.values(variant),
-        quantity: 0,
-        price: 0,
-      } as Variant;
-  
-      variantObjects.push(variantObject);
-    }
-  
-    return variantObjects;
-  }
-  
-
   useEffect(() => {
     if (productChars.length) {
-      setProductCharList(createVariants(variants!,productChars));
+      for (const variant of variants) {
+        const variantNames: string[] = [];
+        variant.chars.forEach((item) => {
+          const matchingProductChar = productChars.find((char) =>
+            char.productSpecCharValueDTOS?.some((value) => value.id === item)
+          );
+          if (matchingProductChar) {
+            const matchingValue = matchingProductChar.productSpecCharValueDTOS?.find(
+              (value) => value.id === item
+            );
+            if (matchingValue) {
+              variantNames.push(`${matchingProductChar.name}: ${matchingValue.value}`);
+            }
+          }
+        });
+        variant.name = variantNames.join(',');
+      }
     }
   }, [productChars, variants]);
 
   const handleSelectAllClick = (checked: boolean) => {
     if (checked) {
-      const newSelecteds = productCharList.map((n) => n.id);
+      const newSelecteds = variants.map((n) => n.id);
       setSelected(newSelecteds);
       return;
     }
@@ -166,7 +144,6 @@ export default function VariantList({variants,productChars}: Props) {
     setPage(0);
   };
 
-
   const handleEditProductChar = (id: number | null) => {
     if (id) {
       navigate(`${PATH_DASHBOARD.productChar.edit}/${id}`, { replace: true });
@@ -178,21 +155,24 @@ export default function VariantList({variants,productChars}: Props) {
 
     if (validIds.length > 0) {
       dispatch(deleteProductChars(validIds));
-      const deleteProducts = productCharList.filter((product) => !ids.includes(product.id));
+      const deleteProducts = variants.filter((product) => !ids.includes(product.id));
       setSelected([]);
-      setProductCharList(deleteProducts);
+      setValue('variants', deleteProductChars);
     }
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - productCharList.length) : 0;
-
-  const filteredUsers = applySortFilter(productCharList, getComparator(order, orderBy), filterName);
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - variants.length) : 0;
+  const [filteredUsers, setFilteredUsers] = useState<Variant[]>([]);
+  useEffect(() => {
+    setFilteredUsers(applySortFilter(variants, getComparator(order, orderBy), filterName));
+  }, [variants]);
+  // const filteredUsers = applySortFilter(variants, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && Boolean(filterName);
 
   return (
     <Card>
-      <ProductCharToolbar
+      <VariantListToolbar
         numSelected={selected.length}
         filterName={filterName}
         onFilterName={handleFilterByName}
@@ -206,7 +186,7 @@ export default function VariantList({variants,productChars}: Props) {
               order={order}
               orderBy={orderBy}
               headLabel={TABLE_HEAD}
-              rowCount={productCharList.length}
+              rowCount={variants.length}
               numSelected={selected.length}
               onRequestSort={handleRequestSort}
               onSelectAllClick={handleSelectAllClick}
@@ -227,14 +207,12 @@ export default function VariantList({variants,productChars}: Props) {
                       selected={isItemSelected}
                       aria-checked={isItemSelected}
                     >
-                      
+                      <TableCell padding="checkbox">
+                        <Checkbox checked={isItemSelected} onClick={() => handleClick(id!)} />
+                      </TableCell>
                       <TableCell align="left">{id}</TableCell>
-                      <TableCell align="left">
-                      {name}
-                      </TableCell>
-                      <TableCell align="left">
-                        {quantity}
-                      </TableCell>
+                      <TableCell align="left">{name}</TableCell>
+                      <TableCell align="left">{quantity}</TableCell>
                       <TableCell align="left">{price}</TableCell>
 
                       <TableCell align="center">
@@ -243,7 +221,6 @@ export default function VariantList({variants,productChars}: Props) {
                           startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
                         />
                       </TableCell>
-  
                     </TableRow>
                   );
                 })}
@@ -269,7 +246,7 @@ export default function VariantList({variants,productChars}: Props) {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={productCharList.length}
+        count={variants.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={(e, page) => setPage(page)}
@@ -299,11 +276,7 @@ function getComparator(order: string, orderBy: string) {
     : (a: Anonymous, b: Anonymous) => -descendingComparator(a, b, orderBy);
 }
 
-function applySortFilter(
-  array: Variant[],
-  comparator: (a: any, b: any) => number,
-  query: string
-) {
+function applySortFilter(array: Variant[], comparator: (a: any, b: any) => number, query: string) {
   const stabilizedThis = array.map((el, index) => [el, index] as const);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);

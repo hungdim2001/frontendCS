@@ -68,7 +68,6 @@ export type Product = BaseDTO &{
   productType:ProductType;
   productSpecChars:ProductChar[];
   valueSelected:(ProductCharValue)[];
-  color:string;
   variants: Variant[]
   // tags: string[];
   // priceSale: number | null;

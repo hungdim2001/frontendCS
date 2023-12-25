@@ -7,7 +7,6 @@ import { PATH_DASHBOARD } from './routes/paths';
 // ----------------------------------------------------------------------
 
 export const HOST_API = process.env.REACT_APP_HOST_API_KEY || '';
-console.log("host: " + HOST_API)
 
 export const REFRESH_TOKEN_KEY = '_app_rf_tk';
 export const REFRESH_TOKEN_EXP_TIME = '_app_rf_tk_max_age';

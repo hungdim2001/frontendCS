@@ -67,6 +67,7 @@ import { G } from '@react-pdf/renderer';
 import RHFColorPicker from 'src/components/hook-form/RHFColorPicker';
 import VariantList from './variant/VariantList';
 import product from 'src/redux/slices/product';
+import LoadingScreen from 'src/components/LoadingScreen';
 
 // ----------------------------------------------------------------------
 
@@ -138,8 +139,6 @@ interface FormValuesProps {
   description: string;
   afterSubmit?: string;
   productCharsSelected: number[];
-  color: string;
-  priority: number[];
   variants: Variant[];
 }
 
@@ -163,10 +162,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const { enqueueSnackbar } = useSnackbar();
 
   const { productTypes } = useSelector((state) => state.productTypes);
-  useEffect(() => {
-    dispatch(getProductTypes());
-    dispatch(getProductChars(null));
-  }, [dispatch]);
+
 
   const NewProductSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
@@ -179,7 +175,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   });
 
   const defaultValues = useMemo(() => {
-    console.log('here');
     if (currentProduct?.id) {
       return {
         id: currentProduct?.id || null,
@@ -194,12 +189,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         price: currentProduct?.price || 0,
         quantity: currentProduct?.quantity || 0,
         productTypeId: currentProduct?.productType.id!,
-        color: currentProduct.color || '#000000',
-        variant: currentProduct.variants,
-        priority: currentProduct.productSpecChars
-          .flatMap((item) => item.productSpecCharValueDTOS)
-          .filter((item) => item?.priority != 1)
-          .map((value) => value?.priority),
+        variant: currentProduct.variants || [],
         status: currentProduct?.status
           ? STATUS_OPTION[0]
           : currentProduct
@@ -217,9 +207,9 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         price: 0,
         quantity: 0,
         color: '#000000',
+        variant: [],
         productTypeId: undefined,
         status: STATUS_OPTION[0],
-        priority: undefined,
       };
     }
   }, [currentProduct]);
@@ -281,13 +271,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
           formData.append('productCharValues', value.toString());
         }
       }
-      console.log(data.priority);
-      if (data.priority) {
-        for (const value of data.priority) {
-          formData.append('priority', value.toString());
-        }
-      }
-
       if (data.description !== currentProduct?.description) {
         console.log(data.description);
         console.log(currentProduct?.description);
@@ -492,83 +475,9 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     setSearchText('');
   };
 
-  // function generateVariants( id: number): Variant[] {
-  //   const variants: Variant[] = [];
-
-  //   const findProductByID = productChars.find((char) =>
-  //   char.productSpecCharValueDTOS?.some((value) => value.id === id)
-  // );
-
-  //   const generate = (currentVariants: number[], index: number): void => {
-  //     if (index === data.length) {
-  //       variants.push({ chars: currentVariants, name: 'Generated Name', quantity: 0, price: 0 });
-  //       return;
-  //     }
-
-  //     const currentProduct = findProductByID(data[index].id);
-  //     if (!currentProduct) return;
-
-  //     if (currentProduct.id === id || currentVariants.includes(currentProduct.id)) {
-  //       generate(currentVariants, index + 1);
-  //     } else {
-  //       const updatedVariants = [...currentVariants, currentProduct.id];
-  //       generate(updatedVariants, index + 1);
-  //       generate(currentVariants, index + 1);
-  //     }
-  //   };
-
-  //   generate([], 0);
-  //   return variants;
-  // }
-
   useEffect(() => {
     console.log(getValues('variants'));
   }, [getValues('variants')]);
-  const [variants, setVariant] = useState<{ [key: number]: number }[]>();
-  useEffect(() => {
-    const groupedProductCharValues: Attributes = {};
-    getValues('priority')
-      .filter((item) => item != -1)
-      .forEach((valueID) => {
-        const foundProductChar = charsSelected.find((char) => {
-          return char.productSpecCharValueDTOS?.some((value) => {
-            return value.id == valueID;
-          });
-        });
-
-        if (foundProductChar) {
-          if (!groupedProductCharValues[foundProductChar.id!]) {
-            groupedProductCharValues[foundProductChar.id!] = [];
-          }
-          groupedProductCharValues[foundProductChar.id!].push(valueID);
-        }
-      });
-  }, [getValues('priority'), charsSelected]);
-
-  interface Attributes {
-    [key: string | number]: number[];
-  }
-
-  // function generateVariants(attributes: Attributes): { [key: number]: number }[] {
-  //   const keys = Object.keys(attributes);
-  //   const values = Object.values(attributes);
-  //   const result: { [key: number]: number }[] = [];
-
-  //   const generate = (current: { [key: string]: number }, index: number): void => {
-  //     if (index === keys.length) {
-  //       result.push(current);
-  //       return;
-  //     }
-
-  //     for (const value of values[index]) {
-  //       generate({ ...current, [keys[index]]: value }, index + 1);
-  //     }
-  //   };
-
-  //   generate({}, 0);
-  //   return result;
-  // }
-
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
@@ -598,10 +507,14 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
               </Stack>
             </Card>
 
-            <Card sx={{ p: 3 }}>
+            <Card sx={{ p: 3, mt: 3 }}>
               <Stack spacing={3}>
                 <LabelStyle>Variants</LabelStyle>
-                {/* <VariantList productChars={productChars} variants={variants}></VariantList> */}
+                <VariantList
+                  productChars={productChars}
+                  variants={getValues('variants') ? getValues('variants') : []}
+                  setValue={setValue}
+                ></VariantList>
               </Stack>
             </Card>
 
@@ -790,10 +703,43 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                         const isItemSelected = valueSelected.indexOf(id!) !== -1;
                                         const handleSelectAll = (event: any, field: any) => {
                                           const value = event.target.value;
-                                          const elementsOnlyInList2 = getValues('priority')?.filter(
-                                            (item: number) => value.includes(item)
-                                          );
-                                          setValue('priority', elementsOnlyInList2);
+                                          const elementsOnlyInList2 = getValues('variants')
+                                            ?.flatMap((map) => map.chars)
+                                            .filter((item: number) => !value.includes(item));
+                                          if (elementsOnlyInList2) {
+                                            const variantsValues = getValues('variants');
+                                            elementsOnlyInList2.forEach((option) => {
+                                              if (
+                                                variantsValues.every((item) =>
+                                                  item.chars.includes(option)
+                                                )
+                                              ) {
+                                                variantsValues.forEach(
+                                                  (variant) =>
+                                                    (variant.chars = variant.chars.filter(
+                                                      (item) => item !== option
+                                                    ))
+                                                );
+                                                setValue(
+                                                  'variants',
+                                                  variantsValues.filter(
+                                                    (item) => item.chars.length != 0
+                                                  )
+                                                );
+                                              } else {
+                                                const newVariants = variantsValues.filter(
+                                                  (item) => !item.chars.includes(option)
+                                                );
+                                                setValue(
+                                                  'variants',
+                                                  newVariants.filter(
+                                                    (item) => item.chars.length != 0
+                                                  )
+                                                );
+                                              }
+                                            });
+                                          }
+
                                           if (
                                             !value[value.length - 1] &&
                                             value.length != 0 &&
@@ -1025,6 +971,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                                     quantity: 0,
                                                                     price: 0,
                                                                   } as Variant;
+
                                                                   variantsValues.push(
                                                                     variantObject
                                                                   );
@@ -1034,48 +981,99 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                                   );
                                                                   return;
                                                                 }
-                                                                const productChar =
-                                                                  productChars.find((item) =>
-                                                                    item.productSpecCharValueDTOS?.some(
-                                                                      (value) =>
-                                                                        value.id === option.id
-                                                                    )
+                                                                if (e.target.checked) {
+                                                                  const productChar =
+                                                                    productChars.find((item) =>
+                                                                      item.productSpecCharValueDTOS?.some(
+                                                                        (value) =>
+                                                                          value.id === option.id
+                                                                      )
+                                                                    );
+                                                                  for (const item of variantsValues) {
+                                                                    if (
+                                                                      productChar?.productSpecCharValueDTOS?.some(
+                                                                        (value) =>
+                                                                          item.chars.includes(
+                                                                            value.id!
+                                                                          )
+                                                                      )
+                                                                    ) {
+                                                                      const variantObject: Variant =
+                                                                        {
+                                                                          chars: item.chars
+                                                                            .filter(
+                                                                              (char) =>
+                                                                                !productChar?.productSpecCharValueDTOS?.some(
+                                                                                  (value) =>
+                                                                                    value.id ===
+                                                                                    char
+                                                                                )
+                                                                            )
+                                                                            .concat([option.id]),
+                                                                          quantity: 0,
+                                                                          price: 0,
+                                                                        } as Variant;
+                                                                      if (
+                                                                        !variantsValues.some(
+                                                                          (item) =>
+                                                                            item.chars.every(
+                                                                              (item) =>
+                                                                                variantObject.chars.includes(
+                                                                                  item
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                      ) {
+                                                                        variantsValues.push(
+                                                                          variantObject
+                                                                        );
+                                                                      }
+                                                                    } else {
+                                                                      item.chars.push(option.id);
+                                                                    }
+                                                                  }
+                                                                  setValue(
+                                                                    'variants',
+                                                                    variantsValues
                                                                   );
-                                                                  for (const item of variantsValues){
-                                                                    console.log('here')
-                                                                   if (
-                                                                     productChar?.productSpecCharValueDTOS?.some(
-                                                                       (value) =>
-                                                                         item.chars.includes(
-                                                                           value.id!
-                                                                         )
-                                                                     )
-                                                                   ) {
-                                                                     const variantObject: Variant = {
-                                                                       chars: item.chars
-                                                                         .filter(
-                                                                           (char) =>
-                                                                             !productChar?.productSpecCharValueDTOS?.some(
-                                                                               (value) =>
-                                                                                 value.id === char
-                                                                             )
-                                                                         )
-                                                                         .concat([option.id]),
-                                                                       quantity: 0,
-                                                                       price: 0,
-                                                                     } as Variant;
-                                                                     variantsValues.push(
-                                                                       variantObject
-                                                                     );
-                                                                     setValue(
-                                                                       'variants',
-                                                                       variantsValues
-                                                                     );
-                                                                     return;
-                                                                   }
-                                                                 }
-
-                                                              
+                                                                } else {
+                                                                  if (
+                                                                    variantsValues.every((item) =>
+                                                                      item.chars.includes(option.id)
+                                                                    )
+                                                                  ) {
+                                                                    variantsValues.forEach(
+                                                                      (variant) =>
+                                                                        (variant.chars =
+                                                                          variant.chars.filter(
+                                                                            (item) =>
+                                                                              item !== option.id
+                                                                          ))
+                                                                    );
+                                                                    setValue(
+                                                                      'variants',
+                                                                      variantsValues.filter(
+                                                                        (item) =>
+                                                                          item.chars.length != 0
+                                                                      )
+                                                                    );
+                                                                  } else {
+                                                                    const newVariants =
+                                                                      variantsValues.filter(
+                                                                        (item) =>
+                                                                          !item.chars.includes(
+                                                                            option.id
+                                                                          )
+                                                                      );
+                                                                    setValue(
+                                                                      'variants',
+                                                                      newVariants.filter(
+                                                                        (item) =>
+                                                                          item.chars.length != 0
+                                                                      )
+                                                                    );
+                                                                  }
+                                                                }
                                                               }}
                                                               disabled={
                                                                 !field.value
