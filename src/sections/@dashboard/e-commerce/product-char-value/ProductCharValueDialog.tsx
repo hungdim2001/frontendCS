@@ -1,32 +1,28 @@
+import { useEffect } from 'react';
 import * as Yup from 'yup';
-import { useEffect, useState } from 'react';
 // @mui
-import { styled } from '@mui/material/styles';
+import { yupResolver } from '@hookform/resolvers/yup';
 import {
+  Alert,
+  Backdrop,
   Box,
+  Button,
+  Grid,
+  IconButton,
   Input,
   Portal,
-  Button,
-  Divider,
-  Backdrop,
-  IconButton,
-  Typography,
-  Grid,
-  Card,
   Stack,
-  Alert,
+  Typography
 } from '@mui/material';
-import useResponsive from 'src/hooks/useResponsive';
-import Iconify from 'src/components/Iconify';
-import { FormProvider, RHFSelect, RHFTextField } from 'src/components/hook-form';
-import { LoadingButton } from '@mui/lab';
+import { styled } from '@mui/material/styles';
 import { useForm } from 'react-hook-form';
 import { ProductCharValue } from 'src/@types/product';
-import { yupResolver } from '@hookform/resolvers/yup';
+import Iconify from 'src/components/Iconify';
+import { FormProvider, RHFSelect, RHFTextField } from 'src/components/hook-form';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
-import { productSpecCharApi } from '../../../../service/app-apis/product-char';
-import useAuth from '../../../../hooks/useAuth';
 import { useSelector } from 'src/redux/store';
+import useAuth from '../../../../hooks/useAuth';
+import { productSpecCharApi } from '../../../../service/app-apis/product-char';
 // hooks
 // components
 

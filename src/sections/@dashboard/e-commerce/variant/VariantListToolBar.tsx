@@ -50,7 +50,7 @@ export default function VariantListToolbar({
           stretchStart={240}
           value={filterName}
           onChange={(event) => onFilterName(event.target.value)}
-          placeholder="Search characteristic value ..."
+          placeholder="Search Variants ..."
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

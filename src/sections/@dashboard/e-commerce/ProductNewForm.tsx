@@ -68,6 +68,7 @@ import RHFColorPicker from 'src/components/hook-form/RHFColorPicker';
 import VariantList from './variant/VariantList';
 import product from 'src/redux/slices/product';
 import LoadingScreen from 'src/components/LoadingScreen';
+import { fCurrency } from 'src/utils/formatNumber';
 
 // ----------------------------------------------------------------------
 
@@ -162,7 +163,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const { enqueueSnackbar } = useSnackbar();
 
   const { productTypes } = useSelector((state) => state.productTypes);
-
 
   const NewProductSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
@@ -968,8 +968,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                                 if (variantsValues.length === 0) {
                                                                   const variantObject: Variant = {
                                                                     chars: [option.id],
-                                                                    quantity: 0,
-                                                                    price: 0,
                                                                   } as Variant;
 
                                                                   variantsValues.push(
@@ -1179,13 +1177,13 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                   </RHFSelect>
                 </Stack>
               </Card>
-              <Card sx={{ p: 3 }}>
+              {/* <Card sx={{ p: 3 }}>
                 <Stack spacing={3} mb={2}>
                   <RHFTextField
                     name="price"
                     label="Price"
                     placeholder="0.00"
-                    value={getValues('price') === 0 ? '' : getValues('price')}
+                    value={getValues('price') === 0 ? '' : fCurrency(getValues('price'))}
                     onChange={(event) => setValue('price', Number(event.target.value))}
                     InputLabelProps={{ shrink: true }}
                     InputProps={{
@@ -1194,13 +1192,17 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                     }}
                   />
                 </Stack>
-              </Card>
+              </Card> */}
 
-              <Card sx={{ p: 3 }}>
+              {/* <Card sx={{ p: 3 }}>
                 <Stack spacing={3} mb={2}>
-                  <RHFTextField name="quantity" label="Quantity" />
+                  <RHFTextField
+                    name="quantity"
+                    label="Quantity"
+                    value={getValues('quantity') === 0 ? '' : getValues('quantity')}
+                  />
                 </Stack>
-              </Card>
+              </Card> */}
 
               <LoadingButton type="submit" variant="contained" size="large" loading={isSubmitting}>
                 {!isEdit ? 'Create Product' : 'Save Changes'}

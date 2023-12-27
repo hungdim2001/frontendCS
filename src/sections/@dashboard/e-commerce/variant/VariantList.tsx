@@ -35,15 +35,18 @@ import SearchNotFound from 'src/components/SearchNotFound';
 import VariantListHead from './VariantListHead';
 import { UseFormSetValue } from 'react-hook-form';
 import VariantListToolbar from './VariantListToolBar';
+import VariantDialog from './VariantDialog';
+import Image from '../../../../components/Image';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'id', label: 'ID', alignRight: false },
-  { id: 'variant', label: 'Variant', alignRight: false },
-  { id: 'quantity', label: 'Quantity', alignRight: false },
-  { id: 'price', label: 'Price', alignRight: false },
+  { id: 'id', label: 'ID', alignLeft: true },
+  { id: 'variant', label: 'Variant', alignLeft: true },
+  { id: 'quantity', label: 'Quantity', alignLeft: true },
+  { id: 'price', label: 'Price', alignLeft: true },
   { id: 'update' },
+  { id: 'delete' },
 ];
 
 // ----------------------------------------------------------------------
@@ -144,9 +147,19 @@ export default function VariantList({ variants, productChars, setValue }: Props)
     setPage(0);
   };
 
-  const handleEditProductChar = (id: number | null) => {
+  const handleEditVariant = (name: string) => {
+    const variantEdited = variants.filter((variant) => variant.name === name)[0];
+    setVariant(variantEdited);
+    setOpen(true);
+  };
+
+  const handleDeleteProductChar = (id: number | null) => {
     if (id) {
-      navigate(`${PATH_DASHBOARD.productChar.edit}/${id}`, { replace: true });
+      const ids = [id];
+      dispatch(deleteProductChars(ids));
+      const deleteProduct = variants.filter((product) => product.id !== id);
+      setSelected([]);
+      setValue('variants', deleteProductChars);
     }
   };
 
@@ -166,12 +179,38 @@ export default function VariantList({ variants, productChars, setValue }: Props)
   useEffect(() => {
     setFilteredUsers(applySortFilter(variants, getComparator(order, orderBy), filterName));
   }, [variants]);
-  // const filteredUsers = applySortFilter(variants, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && Boolean(filterName);
+  const [open, setOpen] = useState<boolean>(false);
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const [variant, setVariant] = useState<Variant>({ status: true } as Variant);
+
+  // Assuming 'variants' and 'variant' are defined somewhere in your code...
+
+  // Update the 'variants' array based on the 'variant' object
+  useEffect(() => {
+    setValue(
+      'variants',
+      variants.map((item) => {
+        if (item.name === variant.name) {
+          return { ...variant }; // Return a new object with updated values
+        }
+        return item; // For items other than the one to be updated, return them unchanged
+      })
+    );
+  }, [variant]);
 
   return (
     <Card>
+      <VariantDialog
+        setVariant={setVariant}
+        variant={variant}
+        isOpenCompose={open}
+        onCloseCompose={handleClose}
+      />
       <VariantListToolbar
         numSelected={selected.length}
         filterName={filterName}
@@ -195,7 +234,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
               {filteredUsers
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const { id, name, quantity, price } = row;
+                  const { id, name, image, quantity, price } = row;
                   const isItemSelected = selected.indexOf(id) !== -1;
 
                   return (
@@ -211,14 +250,44 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                         <Checkbox checked={isItemSelected} onClick={() => handleClick(id!)} />
                       </TableCell>
                       <TableCell align="left">{id}</TableCell>
-                      <TableCell align="left">{name}</TableCell>
+                      <TableCell align="left">
+                        {typeof image === 'string' ? (
+                          <Image
+                            disabledEffect
+                            alt={name}
+                            src={image} // Assuming 'image' is the URL of the image when it's a string
+                            sx={{ borderRadius: 1.5, width: 64, height: 64, mr: 2 }}
+                          />
+                        ) : (
+                          image.preview && ( // Ensure 'preview' exists before accessing it for 'File' type
+                            <Image
+                              disabledEffect
+                              alt={name}
+                              src={image.preview} // Access 'preview' for 'File' type
+                              sx={{ borderRadius: 1.5, width: 64, height: 64, mr: 2 }}
+                            />
+                          )
+                        )}
+
+                        <Typography variant="subtitle2" noWrap>
+                          {name}
+                        </Typography>
+                      </TableCell>
                       <TableCell align="left">{quantity}</TableCell>
                       <TableCell align="left">{price}</TableCell>
 
                       <TableCell align="center">
                         <Button
-                          onClick={() => handleEditProductChar(id)}
+                          onClick={() => handleEditVariant(name)}
+                          // onClick={ handleOpen}
                           startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Button
+                          sx={{ color: 'error.main' }}
+                          onClick={() => handleDeleteProductChar(id)}
+                          startIcon={<Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />}
                         />
                       </TableCell>
                     </TableRow>
