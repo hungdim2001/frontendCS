@@ -282,7 +282,7 @@ Props) {
                   maxSize={3145728}
                   onDrop={handleDrop2}
                 />
-                <TextField value={variant.name} label="Name" />
+                <TextField   value={variant.name? variant.name:'Default'} label="Name" />
                 <RHFTextField type="number" name="quantityVariant" label="Quantity" />
                 <RHFTextField type="number" name="priceVariant" label="Price" />
                 <RHFTextField name="descriptionVariant" label="Description" />

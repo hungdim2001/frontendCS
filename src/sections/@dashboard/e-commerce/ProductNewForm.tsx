@@ -122,8 +122,6 @@ interface FormValuesProps {
   thumbnail: File | string;
   images: (File | string)[];
   name: string;
-  // price: number;
-  // quantity: number;
   productTypeId: number;
   status: string;
   description: string;
@@ -158,8 +156,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
     description: Yup.string().required('Description is required'),
     productTypeId: Yup.string().required('Product Type is required'),
     images: Yup.array().min(1, 'Images is required'),
-    price: Yup.number().moreThan(0, 'Price should not be ₫0.00'),
-    quantity: Yup.number().moreThan(0, 'Quantity is required'),
     thumbnail: Yup.mixed().required('Thumbnail is required'),
   });
 
@@ -175,10 +171,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         description: currentProduct?.description || '', // Set the fetched HTML as description
         images: currentProduct?.images || [],
         thumbnail: currentProduct?.thumbnail,
-        // price: currentProduct?.price || 0,
-        // quantity: currentProduct?.quantity || 0,
         productTypeId: currentProduct?.productType.id!,
-
         variants: currentProduct.variants
           ? currentProduct.variants.some((item) => item.chars.includes(-1))
             ? currentProduct.variants
@@ -197,10 +190,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         name: '',
         description: '', // Set the fetched HTML as description
         images: [],
-        thumbnail: '',
-        // price: 0,
-        // quantity: 0,
-        color: '#000000',
+        thumbnail: undefined,
         variants: [{ chars: [-1] } as Variant],
         productTypeId: undefined,
         status: STATUS_OPTION[0],
@@ -239,14 +229,16 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
+      console.log(data)
+      if(data.variants.some(item=> !item.price|| !item.quantity)){
+        throw new Error('Image, Quantity and Price is not setted');
+
+      }
       const formData = new FormData();
       if (data.id) {
         formData.append('id', data.id);
       }
       formData.append('thumbnail', data.thumbnail);
-      // data.images.forEach((image) => {
-      //   formData.append('images',  image instanceof File ? image : String(image));
-      // });
       for (const image of data.images) {
         if (image instanceof File) {
           formData.append('images', image);
@@ -254,30 +246,23 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
           formData.append('oldImages', String(image));
         }
       }
-
       formData.append('productTypeId', data.productTypeId.toString()); // Example product type ID
       formData.append('name', data.name);
-      // formData.append('quantity', data.quantity.toString());
       formData.append('status', data?.status === 'Active' ? '1' : '0');
-      // formData.append('price', data.price.toString());
       if (data.productCharsSelected) {
         for (const value of data.productCharsSelected) {
           formData.append('productCharValues', value.toString());
         }
       }
       if (data.description !== currentProduct?.description) {
-        console.log(data.description);
-        console.log(currentProduct?.description);
         const blob = new Blob([data.description], { type: 'text/html' });
         formData.append('description', blob, `${data.name}.html`);
       }
-      await productApi.createProduct(formData);
       enqueueSnackbar(!isEdit ? 'Create success!' : 'Update success!');
-      // navigate(PATH_DASHBOARD.eCommerce.list);
     } catch (error) {
       console.error(error);
       if (isMountedRef.current) {
-        setError('afterSubmit', error);
+        setError('afterSubmit', { type: 'custom', message: error.message });
       }
     }
   };
@@ -699,7 +684,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                           const value = event.target.value;
                                           const elementsOnlyInList2 = getValues('variants')
                                             ?.flatMap((map) => map.chars)
-                                            .filter((item: number) => !value.includes(item));
+                                            .filter((item: number) => !value.includes(item)&& item!==-1);
                                           if (elementsOnlyInList2) {
                                             const variantsValues = getValues('variants');
                                             elementsOnlyInList2.forEach((option) => {
@@ -958,7 +943,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                               onChange={(e) => {
                                                                 const variantsValues =
                                                                   getValues('variants') || []; // Use empty array if 'priority' is null or undefined
-
                                                                 if (variantsValues.length === 1) {
                                                                   const variantObject: Variant = {
                                                                     chars: [option.id],

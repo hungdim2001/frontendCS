@@ -60,7 +60,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
-  const [selected, setSelected] = useState<(number | null)[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
 
   const [orderBy, setOrderBy] = useState('name');
 
@@ -82,7 +82,6 @@ export default function VariantList({ variants, productChars, setValue }: Props)
     if (productChars.length) {
       for (const variant of variants.filter((item) => !item.chars.includes(-1))) {
         const variantNames: string[] = [];
-        // if (variant.chars.includes(-1)) break;
         variant.chars.forEach((item) => {
           const matchingProductChar = productChars.find((char) =>
             char.productSpecCharValueDTOS?.some((value) => value.id === item)
@@ -103,18 +102,18 @@ export default function VariantList({ variants, productChars, setValue }: Props)
 
   const handleSelectAllClick = (checked: boolean) => {
     if (checked) {
-      const newSelecteds = variants.map((n) => n.id);
+      const newSelecteds = variants.filter(item=> !item.chars.includes(-1)).map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (id: number | null) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected: (number | null)[] = [];
+  const handleClick = (name: string) => {
+    const selectedIndex = selected.indexOf(name);
+    let newSelected: string[] = [];
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
+      newSelected = newSelected.concat(selected, name);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -150,14 +149,13 @@ export default function VariantList({ variants, productChars, setValue }: Props)
     setValue('variants', deleteProduct);
   };
 
-  const handleDeleteProducts = (ids: (number | null)[]) => {
-    const validIds = ids.filter((id) => id !== null) as number[];
+  const handleDeleteProducts = (names: string[]) => {
+    const validIds = names.filter((name) => name !== null) as string[];
 
     if (validIds.length > 0) {
-      dispatch(deleteProductChars(validIds));
-      const deleteProducts = variants.filter((product) => !ids.includes(product.id));
+      const deleteProducts = variants.filter((product) => !names.includes(product.name));
       setSelected([]);
-      setValue('variants', deleteProductChars);
+      setValue('variants', deleteProducts);
     }
   };
 
@@ -219,7 +217,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const { id, name, chars, image, quantity, price } = row;
-                  const isItemSelected = selected.indexOf(id) !== -1;
+                  const isItemSelected = selected.indexOf(name) !== -1;
 
                   return (
                     <TableRow
@@ -230,9 +228,14 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                       selected={isItemSelected}
                       aria-checked={isItemSelected}
                     >
-                      <TableCell padding="checkbox">
-                        <Checkbox checked={isItemSelected} onClick={() => handleClick(id!)} />
-                      </TableCell>
+                      {chars.includes(-1) ? (
+                      <TableCell align="left"></TableCell>
+                      ) : (
+                        <TableCell padding="checkbox">
+                          <Checkbox checked={isItemSelected} onClick={() => handleClick(name!)} />
+                        </TableCell>
+                      )}
+
                       <TableCell align="left">{id}</TableCell>
                       <TableCell align="left" sx={{ display: 'flex', alignItems: 'center' }}>
                         {image ? (
@@ -255,21 +258,19 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                       <TableCell align="center">
                         <Button
                           onClick={() => handleEditVariant(name)}
-                          // onClick={ handleOpen}
                           startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
                         />
                       </TableCell>
-                      {!chars.includes(-1) ? (
+                      {chars.includes(-1) ? (
+                        <></>
+                      ) : (
                         <TableCell align="center">
-                          {}
                           <Button
                             sx={{ color: 'error.main' }}
                             onClick={() => handleDeleteProductChar(name)}
                             startIcon={<Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />}
                           />
                         </TableCell>
-                      ) : (
-                        <></>
                       )}
                     </TableRow>
                   );
