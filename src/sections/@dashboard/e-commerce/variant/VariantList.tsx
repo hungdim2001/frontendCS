@@ -1,42 +1,33 @@
-import { sentenceCase } from 'change-case';
 import { useEffect, useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 // @mui
-import { useTheme } from '@mui/material/styles';
 import {
-  Card,
-  Table,
-  Avatar,
   Button,
+  Card,
   Checkbox,
-  TableRow,
+  Table,
   TableBody,
   TableCell,
-  Container,
-  Typography,
   TableContainer,
   TablePagination,
-  Box,
+  TableRow,
+  Typography,
 } from '@mui/material';
 // routes
 
-import { deleteProductChars, getProductChars } from 'src/redux/slices/product-char';
-import useSettings from 'src/hooks/useSettings';
-import { ProductChar, Variant } from 'src/@types/product';
-import { useDispatch, useSelector } from 'src/redux/store';
-import { PATH_DASHBOARD } from 'src/routes/paths';
-import Iconify from 'src/components/Iconify';
-import HeaderBreadcrumbs from 'src/components/HeaderBreadcrumbs';
-import ProductCharToolbar from '../product-char/ProductCharToolbar';
-import Scrollbar from 'src/components/Scrollbar';
-import Page from 'src/components/Page';
-import Label from 'src/components/Label';
-import SearchNotFound from 'src/components/SearchNotFound';
-import VariantListHead from './VariantListHead';
+import { isString } from 'lodash';
 import { UseFormSetValue } from 'react-hook-form';
-import VariantListToolbar from './VariantListToolBar';
-import VariantDialog from './VariantDialog';
+import { ProductChar, Variant } from 'src/@types/product';
+import Iconify from 'src/components/Iconify';
+import Scrollbar from 'src/components/Scrollbar';
+import SearchNotFound from 'src/components/SearchNotFound';
+import { deleteProductChars, getProductChars } from 'src/redux/slices/product-char';
+import { useDispatch } from 'src/redux/store';
+import { fCurrency } from 'src/utils/formatNumber';
 import Image from '../../../../components/Image';
+import VariantDialog from './VariantDialog';
+import VariantListHead from './VariantListHead';
+import VariantListToolbar from './VariantListToolBar';
 
 // ----------------------------------------------------------------------
 
@@ -76,7 +67,6 @@ export default function VariantList({ variants, productChars, setValue }: Props)
   const [filterName, setFilterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  // const { productChars } = useSelector((state) => state.productChars);
 
   const handleRequestSort = (property: string) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -90,8 +80,9 @@ export default function VariantList({ variants, productChars, setValue }: Props)
 
   useEffect(() => {
     if (productChars.length) {
-      for (const variant of variants) {
+      for (const variant of variants.filter((item) => !item.chars.includes(-1))) {
         const variantNames: string[] = [];
+        // if (variant.chars.includes(-1)) break;
         variant.chars.forEach((item) => {
           const matchingProductChar = productChars.find((char) =>
             char.productSpecCharValueDTOS?.some((value) => value.id === item)
@@ -153,14 +144,10 @@ export default function VariantList({ variants, productChars, setValue }: Props)
     setOpen(true);
   };
 
-  const handleDeleteProductChar = (id: number | null) => {
-    if (id) {
-      const ids = [id];
-      dispatch(deleteProductChars(ids));
-      const deleteProduct = variants.filter((product) => product.id !== id);
-      setSelected([]);
-      setValue('variants', deleteProductChars);
-    }
+  const handleDeleteProductChar = (name: string) => {
+    const deleteProduct = variants.filter((variant) => variant.name !== name);
+    setSelected([]);
+    setValue('variants', deleteProduct);
   };
 
   const handleDeleteProducts = (ids: (number | null)[]) => {
@@ -188,9 +175,6 @@ export default function VariantList({ variants, productChars, setValue }: Props)
 
   const [variant, setVariant] = useState<Variant>({ status: true } as Variant);
 
-  // Assuming 'variants' and 'variant' are defined somewhere in your code...
-
-  // Update the 'variants' array based on the 'variant' object
   useEffect(() => {
     setValue(
       'variants',
@@ -234,7 +218,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
               {filteredUsers
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const { id, name, image, quantity, price } = row;
+                  const { id, name, chars, image, quantity, price } = row;
                   const isItemSelected = selected.indexOf(id) !== -1;
 
                   return (
@@ -250,31 +234,23 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                         <Checkbox checked={isItemSelected} onClick={() => handleClick(id!)} />
                       </TableCell>
                       <TableCell align="left">{id}</TableCell>
-                      <TableCell align="left">
-                        {typeof image === 'string' ? (
+                      <TableCell align="left" sx={{ display: 'flex', alignItems: 'center' }}>
+                        {image ? (
                           <Image
-                            disabledEffect
                             alt={name}
-                            src={image} // Assuming 'image' is the URL of the image when it's a string
+                            src={isString(image) ? image : image.preview}
                             sx={{ borderRadius: 1.5, width: 64, height: 64, mr: 2 }}
                           />
                         ) : (
-                          image.preview && ( // Ensure 'preview' exists before accessing it for 'File' type
-                            <Image
-                              disabledEffect
-                              alt={name}
-                              src={image.preview} // Access 'preview' for 'File' type
-                              sx={{ borderRadius: 1.5, width: 64, height: 64, mr: 2 }}
-                            />
-                          )
+                          <></>
                         )}
 
                         <Typography variant="subtitle2" noWrap>
-                          {name}
+                          {!chars.includes(-1) ? name : 'default'}
                         </Typography>
                       </TableCell>
                       <TableCell align="left">{quantity}</TableCell>
-                      <TableCell align="left">{price}</TableCell>
+                      <TableCell align="left">{fCurrency(price)}</TableCell>
 
                       <TableCell align="center">
                         <Button
@@ -283,13 +259,18 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                           startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
                         />
                       </TableCell>
-                      <TableCell align="center">
-                        <Button
-                          sx={{ color: 'error.main' }}
-                          onClick={() => handleDeleteProductChar(id)}
-                          startIcon={<Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />}
-                        />
-                      </TableCell>
+                      {!chars.includes(-1) ? (
+                        <TableCell align="center">
+                          {}
+                          <Button
+                            sx={{ color: 'error.main' }}
+                            onClick={() => handleDeleteProductChar(name)}
+                            startIcon={<Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />}
+                          />
+                        </TableCell>
+                      ) : (
+                        <></>
+                      )}
                     </TableRow>
                   );
                 })}

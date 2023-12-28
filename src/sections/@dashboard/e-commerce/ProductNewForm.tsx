@@ -9,18 +9,15 @@ import { Search } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
   Alert,
-  Box,
   Button,
   Card,
   Checkbox,
   Divider,
   FormControl,
-  FormControlLabel,
   Grid,
   IconButton,
   InputAdornment,
   InputLabel,
-  ListItem,
   ListItemText,
   MenuItem,
   Select,
@@ -42,14 +39,13 @@ import { styled } from '@mui/material/styles';
 // @types
 import { Product, ProductChar, ProductCharValue, Variant } from '../../../@types/product';
 // components
-import * as cheerio from 'cheerio';
 import Iconify from 'src/components/Iconify';
 import InputStyle from 'src/components/InputStyle';
 import Scrollbar from 'src/components/Scrollbar';
 import SearchNotFound from 'src/components/SearchNotFound';
-import { getProductChars } from 'src/redux/slices/product-char';
-import { getProductTypes } from 'src/redux/slices/product-type';
-import { dispatch, useSelector } from 'src/redux/store';
+import useIsMountedRef from 'src/hooks/useIsMountedRef';
+import { useSelector } from 'src/redux/store';
+import { productApi } from 'src/service/app-apis/product';
 import {
   FormProvider,
   RHFEditor,
@@ -61,14 +57,7 @@ import {
 } from '../../../components/hook-form';
 import ProductCharListHead from './product-char/ProductCharListHead';
 import ProductCharToolbar from './product-char/ProductCharToolbar';
-import { productApi } from 'src/service/app-apis/product';
-import useIsMountedRef from 'src/hooks/useIsMountedRef';
-import { G } from '@react-pdf/renderer';
-import RHFColorPicker from 'src/components/hook-form/RHFColorPicker';
 import VariantList from './variant/VariantList';
-import product from 'src/redux/slices/product';
-import LoadingScreen from 'src/components/LoadingScreen';
-import { fCurrency } from 'src/utils/formatNumber';
 
 // ----------------------------------------------------------------------
 
@@ -133,14 +122,14 @@ interface FormValuesProps {
   thumbnail: File | string;
   images: (File | string)[];
   name: string;
-  price: number;
-  quantity: number;
+  // price: number;
+  // quantity: number;
   productTypeId: number;
   status: string;
   description: string;
-  afterSubmit?: string;
-  productCharsSelected: number[];
   variants: Variant[];
+  productCharsSelected: number[];
+  afterSubmit?: string;
 }
 
 type Props = {
@@ -186,10 +175,15 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         description: currentProduct?.description || '', // Set the fetched HTML as description
         images: currentProduct?.images || [],
         thumbnail: currentProduct?.thumbnail,
-        price: currentProduct?.price || 0,
-        quantity: currentProduct?.quantity || 0,
+        // price: currentProduct?.price || 0,
+        // quantity: currentProduct?.quantity || 0,
         productTypeId: currentProduct?.productType.id!,
-        variant: currentProduct.variants || [],
+
+        variants: currentProduct.variants
+          ? currentProduct.variants.some((item) => item.chars.includes(-1))
+            ? currentProduct.variants
+            : currentProduct.variants.concat({ chars: [-1]} as Variant)
+          : [{ chars: [-1] } as Variant],
         status: currentProduct?.status
           ? STATUS_OPTION[0]
           : currentProduct
@@ -204,10 +198,10 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         description: '', // Set the fetched HTML as description
         images: [],
         thumbnail: '',
-        price: 0,
-        quantity: 0,
+        // price: 0,
+        // quantity: 0,
         color: '#000000',
-        variant: [],
+        variants: [{ chars: [-1] } as Variant],
         productTypeId: undefined,
         status: STATUS_OPTION[0],
       };
@@ -263,9 +257,9 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
       formData.append('productTypeId', data.productTypeId.toString()); // Example product type ID
       formData.append('name', data.name);
-      formData.append('quantity', data.quantity.toString());
+      // formData.append('quantity', data.quantity.toString());
       formData.append('status', data?.status === 'Active' ? '1' : '0');
-      formData.append('price', data.price.toString());
+      // formData.append('price', data.price.toString());
       if (data.productCharsSelected) {
         for (const value of data.productCharsSelected) {
           formData.append('productCharValues', value.toString());
@@ -965,7 +959,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                                 const variantsValues =
                                                                   getValues('variants') || []; // Use empty array if 'priority' is null or undefined
 
-                                                                if (variantsValues.length === 0) {
+                                                                if (variantsValues.length === 1) {
                                                                   const variantObject: Variant = {
                                                                     chars: [option.id],
                                                                   } as Variant;
@@ -987,10 +981,12 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                                           value.id === option.id
                                                                       )
                                                                     );
-                                                                  for (const item of variantsValues) {
+                                                                  for (const item of variantsValues.filter(item=> !item.chars.includes(-1))) {
+                                                                    if(!item.chars) break;
                                                                     if (
                                                                       productChar?.productSpecCharValueDTOS?.some(
                                                                         (value) =>
+                                                                          item.chars &&
                                                                           item.chars.includes(
                                                                             value.id!
                                                                           )
@@ -1008,8 +1004,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                                                 )
                                                                             )
                                                                             .concat([option.id]),
-                                                                          quantity: 0,
-                                                                          price: 0,
                                                                         } as Variant;
                                                                       if (
                                                                         !variantsValues.some(

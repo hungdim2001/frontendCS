@@ -1,4 +1,5 @@
 
+import { CustomFile } from "src/components/upload";
 import { BaseDTO } from "./common";
 
 export type PaymentType = 'paypal' | 'credit_card' | 'cash';
@@ -36,7 +37,7 @@ export type Variant = BaseDTO & {
   chars:number[];
   quantity: number;
   price: number;
-  image:string|File;
+  image:string|CustomFile;
 };
 
 export type ProductChar = BaseDTO & {

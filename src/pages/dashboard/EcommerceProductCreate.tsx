@@ -16,7 +16,7 @@ import HeaderBreadcrumbs from '../../components/HeaderBreadcrumbs';
 // sections
 import ProductNewForm from '../../sections/@dashboard/e-commerce/ProductNewForm';
 import { use } from 'i18next';
-import { Product } from 'src/@types/product';
+import { Product, Variant } from 'src/@types/product';
 import { ThunkDispatch } from '@reduxjs/toolkit';
 import { AnyAction, Dispatch } from 'redux';
 import { Edit } from '@mui/icons-material';
@@ -43,6 +43,7 @@ export default function EcommerceProductCreate() {
     const foundProduct = products.find((product) => {
       return product.id === +id!;
     });
+
     if (foundProduct && foundProduct.description) {
       fetch(foundProduct.description)
         .then((response) => response.text())
@@ -61,9 +62,7 @@ export default function EcommerceProductCreate() {
     dispatch(getProductTypes());
     dispatch(getProducts());
   }, [dispatch]);
-  useEffect(()=>{
-
-  },[isEdit,currentProduct])
+  useEffect(() => {}, [isEdit, currentProduct]);
   if (isEdit && !currentProduct.id) {
     return <LoadingScreen />;
   }
