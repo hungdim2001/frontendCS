@@ -258,6 +258,8 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         const blob = new Blob([data.description], { type: 'text/html' });
         formData.append('description', blob, `${data.name}.html`);
       }
+      // await dispatch(createProduct(formData));
+
       enqueueSnackbar(!isEdit ? 'Create success!' : 'Update success!');
     } catch (error) {
       console.error(error);

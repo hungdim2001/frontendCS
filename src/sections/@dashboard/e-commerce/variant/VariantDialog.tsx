@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import * as Yup from 'yup';
 // @mui
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -73,17 +73,27 @@ type Props = {
 export default function VariantDialog({
   isOpenCompose,
   onCloseCompose,
-  variant,setVariant
-}: //   setProductCharValue,
-//   setProductCharValues,
+  variant,
+  setVariant,
+}: 
 Props) {
-  const defaultValues = {
-    quantityVariant: variant?.quantity?.toString() || '',
-    imageVariant: variant?.image,
-    priceVariant: variant?.price?.toString() || '',
-    statusVariant: variant ? (variant.status ? 'Active' : 'InActive') : 'Active',
-    descriptionVariant: variant?.description || '',
-  };
+  const defaultValues = useMemo(() => {
+    console.log('here');
+    return {
+      quantityVariant: variant?.quantity?.toString() || '',
+      imageVariant: variant?.image,
+      priceVariant: variant?.price?.toString() || '',
+      statusVariant: variant ? (variant.status ? 'Active' : 'InActive') : 'Active',
+      descriptionVariant: variant?.description || '',
+    };
+  }, [variant]);
+  // const defaultValues = {
+  //   quantityVariant: variant?.quantity?.toString() || '',
+  //   imageVariant: variant?.image,
+  //   priceVariant: variant?.price?.toString() || '',
+  //   statusVariant: variant ? (variant.status ? 'Active' : 'InActive') : 'Active',
+  //   descriptionVariant: variant?.description || '',
+  // };
 
   const variantSchema = Yup.object().shape({
     quantityVariant: Yup.number().required().moreThan(0, 'Quantity is required'),
@@ -97,16 +107,12 @@ Props) {
     defaultValues,
   });
   const isMountedRef = useIsMountedRef();
-  //   useEffect(() => {
-  //     // if (isEdit && productCharValue) {
-  //     //   reset(defaultValues);
-  //     // //   setValue('statusCharValue', defaultValues.statusCharValue, { shouldValidate: true });
-  //     // }
-  //     // if (!isEdit) {
-  //     //   reset(defaultValues);
-  //     // }
-  //     // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   }, [isEdit]);
+    useEffect(() => {
+      if (variant) {
+        reset(defaultValues);
+      }
+    //  eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [variant]);
   const {
     reset,
     setValue,
@@ -120,17 +126,17 @@ Props) {
     try {
       const newVariant: Variant = {
         ...variant,
-        image:data.imageVariant,
+        image: data.imageVariant,
         description: data.descriptionVariant,
         quantity: +data.quantityVariant,
         price: +data.priceVariant,
         status: data.imageVariant === 'Active' ? true : false,
-        updateDatetime: variant.id? new Date():null,
-        updateUser:variant.id? user?.id || null:null,
-        createDatetime:variant.id? variant.createDatetime: new Date(),
-        createUser: variant.id? variant.updateUser: user?.id||null
+        updateDatetime: variant.id ? new Date() : null,
+        updateUser: variant.id ? user?.id || null : null,
+        createDatetime: variant.id ? variant.createDatetime : new Date(),
+        createUser: variant.id ? variant.updateUser : user?.id || null,
       };
-      setVariant(newVariant)
+      setVariant(newVariant);
       // Check if the data.codeCharValue is unique
 
       //   if (isEdit) {
@@ -282,12 +288,12 @@ Props) {
                   maxSize={3145728}
                   onDrop={handleDrop2}
                 />
-                <TextField   value={variant.name? variant.name:'Default'} label="Name" />
+                <TextField value={variant.name ? variant.name : 'Default'} label="Name" />
                 <RHFTextField type="number" name="quantityVariant" label="Quantity" />
                 <RHFTextField type="number" name="priceVariant" label="Price" />
                 <RHFTextField name="descriptionVariant" label="Description" />
                 <RHFSelect
-                  name="statusCharValue"
+                  name="statusVariant"
                   label="Status"
                   onChange={(e) =>
                     handleChange(e as React.ChangeEvent<HTMLInputElement>, 'statusVariant')

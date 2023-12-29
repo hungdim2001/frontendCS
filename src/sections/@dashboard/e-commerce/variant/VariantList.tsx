@@ -248,7 +248,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                           <></>
                         )}
 
-                        <Typography variant="subtitle2" noWrap>
+                        <Typography variant="subtitle2" >
                           {!chars.includes(-1) ? name : 'default'}
                         </Typography>
                       </TableCell>
