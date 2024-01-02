@@ -237,18 +237,18 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                       )}
 
                       <TableCell align="left">{id}</TableCell>
-                      <TableCell align="left" sx={{ display: 'flex', alignItems: 'center' }}>
+                      <TableCell align="left" sx={{ display: 'flex', alignItems: 'center',gap:2 }}>
                         {image ? (
-                          <Image
+                          <img
                             alt={name}
                             src={isString(image) ? image : image.preview}
-                            sx={{ borderRadius: 1.5, width: 64, height: 64, mr: 2 }}
+                            style={{ borderRadius: 1.5, width: 64, height: 64, }}
                           />
                         ) : (
                           <></>
                         )}
 
-                        <Typography variant="subtitle2" >
+                        <Typography variant="subtitle2" flexWrap='wrap'>
                           {!chars.includes(-1) ? name : 'default'}
                         </Typography>
                       </TableCell>

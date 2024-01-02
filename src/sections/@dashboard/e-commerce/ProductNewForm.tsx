@@ -175,7 +175,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         variants: currentProduct.variants
           ? currentProduct.variants.some((item) => item.chars.includes(-1))
             ? currentProduct.variants
-            : currentProduct.variants.concat({ chars: [-1]} as Variant)
+            : currentProduct.variants.concat({ chars: [-1] } as Variant)
           : [{ chars: [-1] } as Variant],
         status: currentProduct?.status
           ? STATUS_OPTION[0]
@@ -229,10 +229,8 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
-      console.log(data)
-      if(data.variants.some(item=> !item.price|| !item.quantity)){
+      if (data.variants.some((item) => !item.price || !item.quantity)) {
         throw new Error('Image, Quantity and Price is not setted');
-
       }
       const formData = new FormData();
       if (data.id) {
@@ -258,7 +256,14 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         const blob = new Blob([data.description], { type: 'text/html' });
         formData.append('description', blob, `${data.name}.html`);
       }
-      formData.append('variants', JSON.stringify(data.variants))
+      if (data.variants) {
+        for (const value of data.variants) {
+          formData.append('variants', JSON.stringify({ ...value, chars: value.chars.toString(),image: value.image instanceof File? value.image.path: value.image}));
+          if (value.image instanceof File) {
+            formData.append('variantImages', value.image, value.chars.toString()+"."+value.image.name.split('.')[1]);
+          }
+        }
+      }
       await productApi.createProduct(formData);
       enqueueSnackbar(!isEdit ? 'Create success!' : 'Update success!');
     } catch (error) {
@@ -686,7 +691,9 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                           const value = event.target.value;
                                           const elementsOnlyInList2 = getValues('variants')
                                             ?.flatMap((map) => map.chars)
-                                            .filter((item: number) => !value.includes(item)&& item!==-1);
+                                            .filter(
+                                              (item: number) => !value.includes(item) && item !== -1
+                                            );
                                           if (elementsOnlyInList2) {
                                             const variantsValues = getValues('variants');
                                             elementsOnlyInList2.forEach((option) => {
@@ -967,8 +974,11 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                                           value.id === option.id
                                                                       )
                                                                     );
-                                                                  for (const item of variantsValues.filter(item=> !item.chars.includes(-1))) {
-                                                                    if(!item.chars) break;
+                                                                  for (const item of variantsValues.filter(
+                                                                    (item) =>
+                                                                      !item.chars.includes(-1)
+                                                                  )) {
+                                                                    if (!item.chars) break;
                                                                     if (
                                                                       productChar?.productSpecCharValueDTOS?.some(
                                                                         (value) =>
