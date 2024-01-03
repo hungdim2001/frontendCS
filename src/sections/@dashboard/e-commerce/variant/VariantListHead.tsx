@@ -39,8 +39,8 @@ export default function VariantListHead({
       <TableRow>
         <TableCell padding="checkbox">
           <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
+            indeterminate={numSelected > 0 && numSelected < rowCount-1}
+            checked={rowCount > 0 && numSelected === rowCount-1&& numSelected!==0}
             onChange={(event) => onSelectAllClick(event.target.checked)}
           />
         </TableCell>

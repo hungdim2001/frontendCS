@@ -60,7 +60,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
-  const [selected, setSelected] = useState<number[][]>([[]]);
+  const [selected, setSelected] = useState<number[][]>([]);
 
   const [orderBy, setOrderBy] = useState('name');
 
@@ -112,14 +112,21 @@ export default function VariantList({ variants, productChars, setValue }: Props)
   };
 
   const handleClick = (chars: number[]) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: string[] = [];
+    variants.filter((variant) => variant.chars.every((char) => !chars.includes(char)));
+
+    const selectedIndex = selected.findIndex((variant, index) => {
+      if (variant.every((char) => !chars.includes(char))) {
+        return index;
+      }
+      return -1;
+    });
+    let newSelected: number[][] = [];
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selected, [chars]); // Thêm selected và chars làm mảng con mới
     } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
+      newSelected = selected.slice(1); // Loại bỏ mảng con đầu tiên nếu selectedIndex là 0
     } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
+      newSelected = selected.slice(0, -1); // Loại bỏ mảng con cuối cùng nếu selectedIndex là vị trí cuối cùng
     } else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selected.slice(0, selectedIndex),
@@ -140,46 +147,51 @@ export default function VariantList({ variants, productChars, setValue }: Props)
   };
 
   const handleEditVariant = (chars: number[]) => {
-    const variantEdited = variants.filter((variant) => variant.chars.every(char=> chars.includes(char)))[0];
+    const variantEdited = variants.filter((variant) =>
+      variant.chars.every((char) => chars.includes(char))
+    )[0];
     const name = !chars.includes(-1)
       ? chars
           .map((item) => {
             const matchingProductChar = productChars.find((char) =>
-              char.productSpecCharValueDTOS?.some(
-                (value) => value.id === item
-              )
+              char.productSpecCharValueDTOS?.some((value) => value.id === item)
             );
             if (matchingProductChar) {
-              const matchingValue =
-                matchingProductChar.productSpecCharValueDTOS?.find(
-                  (value) => value.id === item
-                );
+              const matchingValue = matchingProductChar.productSpecCharValueDTOS?.find(
+                (value) => value.id === item
+              );
               if (matchingValue) {
                 return `${matchingProductChar.name}: ${matchingValue.value}`;
               }
             }
           })
           .join(',')
-      : 'default'
-    setVariant({...variantEdited, name:name});
+      : 'default';
+    setVariant({ ...variantEdited, name: name });
     setOpen(true);
   };
 
   const handleDeleteProductChar = (chars: number[]) => {
-    const deleteProduct = variants.filter((variant) => variant.chars.every(char=> chars.includes(char)))
+    const deleteProduct = variants.filter((variant) =>
+      variant.chars.every((char) => !chars.includes(char))
+    );
     setSelected([]);
     setValue('variants', deleteProduct);
   };
 
-  const handleDeleteProducts = (chars: [number[]]) => {
+  const handleDeleteProducts = (chars: number[][]) => {
     // const validIds = names.filter((name) => name !== null) as string[];
-    
+
+    // return arr.length === chars.length && arr.every((value, index) => value === chars[index]);
 
     // if (validIds.length > 0) {
-      const deleteProducts = variants.filter((variant) => variant.chars.every(char=> chars.flatMap(x=> x).includes(char)))
-      setSelected([]);
-      setValue('variants', deleteProducts);
-    // }
+
+    const deleteProduct = variants.filter(
+      (variant) => !chars.some((arr) => JSON.stringify(arr) === JSON.stringify(variant.chars))
+    );
+
+    setSelected([]);
+    setValue('variants', deleteProduct);
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - variants.length) : 0;
@@ -240,13 +252,11 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const { id, chars, image, quantity, price } = row;
-                  const name =!chars.includes(-1)
+                  const name = !chars.includes(-1)
                     ? chars
                         .map((item) => {
                           const matchingProductChar = productChars.find((char) =>
-                            char.productSpecCharValueDTOS?.some(
-                              (value) => value.id === item
-                            )
+                            char.productSpecCharValueDTOS?.some((value) => value.id === item)
                           );
                           if (matchingProductChar) {
                             const matchingValue =
@@ -259,9 +269,15 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                           }
                         })
                         .join(',')
-                    : 'default'
-                  const isItemSelected = selected.indexOf(name) !== -1;
-
+                    : 'default';
+                  // const isItemSelected = selected.indexOf(name) !== -1;
+                  const isItemSelected =
+                    selected.findIndex((arr) => {
+                      return (
+                        arr.length === chars.length &&
+                        arr.every((value, index) => value === chars[index])
+                      );
+                    }) !== -1;
                   return (
                     <TableRow
                       hover
@@ -275,7 +291,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                         <TableCell align="left"></TableCell>
                       ) : (
                         <TableCell padding="checkbox">
-                          <Checkbox checked={isItemSelected} onClick={() => handleClick(name!)} />
+                          <Checkbox checked={isItemSelected} onClick={() => handleClick(chars)} />
                         </TableCell>
                       )}
 
@@ -295,7 +311,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                         )}
 
                         <Typography variant="subtitle2" flexWrap="wrap">
-                      
+                          {name}
                         </Typography>
                       </TableCell>
                       <TableCell align="left">{quantity}</TableCell>
@@ -313,7 +329,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                         <TableCell align="center">
                           <Button
                             sx={{ color: 'error.main' }}
-                            onClick={() => handleDeleteProductChar(name)}
+                            onClick={() => handleDeleteProductChar(chars)}
                             startIcon={<Iconify icon={'eva:trash-2-outline'} sx={{ ...ICON }} />}
                           />
                         </TableCell>
