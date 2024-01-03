@@ -254,13 +254,13 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
       }
       if (data.description !== currentProduct?.description) {
         const blob = new Blob([data.description], { type: 'text/html' });
-        formData.append('description', blob, `${data.name}.html`);
+        formData.append('description', blob, `${data.name.replace(/\s/g, '')}.html`);
       }
       if (data.variants) {
         for (const value of data.variants) {
           formData.append('variants', JSON.stringify({ ...value, chars: value.chars.toString(),image: value.image instanceof File? value.image.path: value.image}));
           if (value.image instanceof File) {
-            formData.append('variantImages', value.image, value.chars.toString()+"."+value.image.name.split('.')[1]);
+            formData.append('variantImages', value.image, value.chars.join('')+"."+value.image.name.split('.')[1]);
           }
         }
       }

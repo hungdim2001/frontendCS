@@ -78,7 +78,6 @@ export default function VariantDialog({
 }: 
 Props) {
   const defaultValues = useMemo(() => {
-    console.log('here');
     return {
       quantityVariant: variant?.quantity?.toString() || '',
       imageVariant: variant?.image,

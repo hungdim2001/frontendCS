@@ -60,7 +60,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
 
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<number[][]>([[]]);
 
   const [orderBy, setOrderBy] = useState('name');
 
@@ -78,38 +78,40 @@ export default function VariantList({ variants, productChars, setValue }: Props)
     dispatch(getProductChars(null));
   }, [dispatch]);
 
-  useEffect(() => {
-    if (productChars.length) {
-      for (const variant of variants.filter((item) => !item.chars.includes(-1))) {
-        const variantNames: string[] = [];
-        variant.chars.forEach((item) => {
-          const matchingProductChar = productChars.find((char) =>
-            char.productSpecCharValueDTOS?.some((value) => value.id === item)
-          );
-          if (matchingProductChar) {
-            const matchingValue = matchingProductChar.productSpecCharValueDTOS?.find(
-              (value) => value.id === item
-            );
-            if (matchingValue) {
-              variantNames.push(`${matchingProductChar.name}: ${matchingValue.value}`);
-            }
-          }
-        });
-        variant.name = variantNames.join(',');
-      }
-    }
-  }, [productChars, variants]);
+  // useEffect(() => {
+  //   if (productChars.length) {
+  //     for (const variant of variants.filter((item) => !item.chars.includes(-1))) {
+  //       const variantNames: string[] = [];
+  //       variant.chars
+  //         .map((item) => {
+  //           const matchingProductChar = productChars.find((char) =>
+  //             char.productSpecCharValueDTOS?.some((value) => value.id === item)
+  //           );
+  //           if (matchingProductChar) {
+  //             const matchingValue = matchingProductChar.productSpecCharValueDTOS?.find(
+  //               (value) => value.id === item
+  //             );
+  //             if (matchingValue) {
+  //               variantNames.push(`${matchingProductChar.name}: ${matchingValue.value}`);
+  //             }
+  //           }
+  //         })
+  //         .join(',');
+  //       variant.name = variantNames.join(',');
+  //     }
+  //   }
+  // }, [productChars, variants]);
 
   const handleSelectAllClick = (checked: boolean) => {
     if (checked) {
-      const newSelecteds = variants.filter(item=> !item.chars.includes(-1)).map((n) => n.name);
+      const newSelecteds = variants.filter((item) => !item.chars.includes(-1)).map((n) => n.chars);
       setSelected(newSelecteds);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (name: string) => {
+  const handleClick = (chars: number[]) => {
     const selectedIndex = selected.indexOf(name);
     let newSelected: string[] = [];
     if (selectedIndex === -1) {
@@ -137,26 +139,47 @@ export default function VariantList({ variants, productChars, setValue }: Props)
     setPage(0);
   };
 
-  const handleEditVariant = (name: string) => {
-    const variantEdited = variants.filter((variant) => variant.name === name)[0];
-    setVariant(variantEdited);
+  const handleEditVariant = (chars: number[]) => {
+    const variantEdited = variants.filter((variant) => variant.chars.every(char=> chars.includes(char)))[0];
+    const name = !chars.includes(-1)
+      ? chars
+          .map((item) => {
+            const matchingProductChar = productChars.find((char) =>
+              char.productSpecCharValueDTOS?.some(
+                (value) => value.id === item
+              )
+            );
+            if (matchingProductChar) {
+              const matchingValue =
+                matchingProductChar.productSpecCharValueDTOS?.find(
+                  (value) => value.id === item
+                );
+              if (matchingValue) {
+                return `${matchingProductChar.name}: ${matchingValue.value}`;
+              }
+            }
+          })
+          .join(',')
+      : 'default'
+    setVariant({...variantEdited, name:name});
     setOpen(true);
   };
 
-  const handleDeleteProductChar = (name: string) => {
-    const deleteProduct = variants.filter((variant) => variant.name !== name);
+  const handleDeleteProductChar = (chars: number[]) => {
+    const deleteProduct = variants.filter((variant) => variant.chars.every(char=> chars.includes(char)))
     setSelected([]);
     setValue('variants', deleteProduct);
   };
 
-  const handleDeleteProducts = (names: string[]) => {
-    const validIds = names.filter((name) => name !== null) as string[];
+  const handleDeleteProducts = (chars: [number[]]) => {
+    // const validIds = names.filter((name) => name !== null) as string[];
+    
 
-    if (validIds.length > 0) {
-      const deleteProducts = variants.filter((product) => !names.includes(product.name));
+    // if (validIds.length > 0) {
+      const deleteProducts = variants.filter((variant) => variant.chars.every(char=> chars.flatMap(x=> x).includes(char)))
       setSelected([]);
       setValue('variants', deleteProducts);
-    }
+    // }
   };
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - variants.length) : 0;
@@ -216,7 +239,27 @@ export default function VariantList({ variants, productChars, setValue }: Props)
               {filteredUsers
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const { id, name, chars, image, quantity, price } = row;
+                  const { id, chars, image, quantity, price } = row;
+                  const name =!chars.includes(-1)
+                    ? chars
+                        .map((item) => {
+                          const matchingProductChar = productChars.find((char) =>
+                            char.productSpecCharValueDTOS?.some(
+                              (value) => value.id === item
+                            )
+                          );
+                          if (matchingProductChar) {
+                            const matchingValue =
+                              matchingProductChar.productSpecCharValueDTOS?.find(
+                                (value) => value.id === item
+                              );
+                            if (matchingValue) {
+                              return `${matchingProductChar.name}: ${matchingValue.value}`;
+                            }
+                          }
+                        })
+                        .join(',')
+                    : 'default'
                   const isItemSelected = selected.indexOf(name) !== -1;
 
                   return (
@@ -229,7 +272,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                       aria-checked={isItemSelected}
                     >
                       {chars.includes(-1) ? (
-                      <TableCell align="left"></TableCell>
+                        <TableCell align="left"></TableCell>
                       ) : (
                         <TableCell padding="checkbox">
                           <Checkbox checked={isItemSelected} onClick={() => handleClick(name!)} />
@@ -237,19 +280,22 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                       )}
 
                       <TableCell align="left">{id}</TableCell>
-                      <TableCell align="left" sx={{ display: 'flex', alignItems: 'center',gap:2 }}>
+                      <TableCell
+                        align="left"
+                        sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
+                      >
                         {image ? (
                           <img
                             alt={name}
                             src={isString(image) ? image : image.preview}
-                            style={{ borderRadius: 1.5, width: 64, height: 64, }}
+                            style={{ borderRadius: 1.5, width: 64, height: 64 }}
                           />
                         ) : (
                           <></>
                         )}
 
-                        <Typography variant="subtitle2" flexWrap='wrap'>
-                          {!chars.includes(-1) ? name : 'default'}
+                        <Typography variant="subtitle2" flexWrap="wrap">
+                      
                         </Typography>
                       </TableCell>
                       <TableCell align="left">{quantity}</TableCell>
@@ -257,7 +303,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
 
                       <TableCell align="center">
                         <Button
-                          onClick={() => handleEditVariant(name)}
+                          onClick={() => handleEditVariant(chars)}
                           startIcon={<Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />}
                         />
                       </TableCell>
