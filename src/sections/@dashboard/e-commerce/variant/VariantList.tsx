@@ -172,9 +172,9 @@ export default function VariantList({ variants, productChars, setValue }: Props)
   };
 
   const handleDeleteProductChar = (chars: number[]) => {
-    console.log(chars)
-    const deleteProduct = variants.filter((variant) =>
-      !variant.chars.every((char) => chars.includes(char))
+    console.log(chars);
+    const deleteProduct = variants.filter(
+      (variant) => !variant.chars.every((char) => chars.includes(char))
     );
     setSelected([]);
     setValue('variants', deleteProduct);
@@ -204,16 +204,16 @@ export default function VariantList({ variants, productChars, setValue }: Props)
   const [variant, setVariant] = useState<Variant>({ status: true } as Variant);
 
   useEffect(() => {
-    if(variant.chars)
-    setValue(
-      'variants',
-      variants.map((item) => {
-        if (item.chars.every((char) => variant.chars.includes(char))) {
-          return { ...variant }; // Return a new object with updated values
-        }
-        return item; // For items other than the one to be updated, return them unchanged
-      })
-    );
+    if (variant.chars)
+      setValue(
+        'variants',
+        variants.map((item) => {
+          if (item.chars.every((char) => variant.chars.includes(char))) {
+            return { ...variant }; // Return a new object with updated values
+          }
+          return item; // For items other than the one to be updated, return them unchanged
+        })
+      );
   }, [variant]);
 
   return (
@@ -232,7 +232,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
       />
 
       <Scrollbar>
-        <TableContainer sx={{ minWidth: 800 }}>
+        <TableContainer sx={{ minWidth: 650 }}>
           <Table>
             <VariantListHead
               order={order}
@@ -276,15 +276,15 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                     }) !== -1;
                   return (
                     <TableRow
-                      hover
                       key={index}
                       tabIndex={-1}
+                      sx={{ borderBottom: '1px solid #919eab3d' ,}}
                       role="checkbox"
                       selected={isItemSelected}
                       aria-checked={isItemSelected}
                     >
                       {chars.includes(-1) ? (
-                        <TableCell align="left"></TableCell>
+                        <TableCell  align="left"></TableCell>
                       ) : (
                         <TableCell padding="checkbox">
                           <Checkbox checked={isItemSelected} onClick={() => handleClick(chars)} />
@@ -296,6 +296,41 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                         align="left"
                         sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
                       >
+                        <div
+                          style={{
+                            position: 'relative',
+                            display: 'block',
+                            background: '#F4F6F8',
+                            width: '50px',
+                            padding: '0 0 50px',
+                            msFlexPositive: '0',
+                            flexGrow: '0',
+                            WebkitFlexShrink: '0',
+                            flexShrink: '0',
+                          }}
+                        >
+                          <svg
+                            width="20px"
+                            height="20px"
+                            viewBox="0 0 20 20"
+                            style={{
+                              position: 'absolute',
+                              maxWidth: '100%',
+                              maxHeight: '100%',
+                              display: 'block',
+                              top: 0,
+                              right: 0,
+                              bottom: 0,
+                              left: 0,
+                              margin: 'auto',
+                              color: '#cecece',
+                            }}
+                          >
+                            <path d="M14 9l-5 5-3-2-5 3v4h18v-6z"></path>
+                            <path d="M19 0H1C.448 0 0 .448 0 1v18c0 .552.448 1 1 1h18c.552 0 1-.448 1-1V1c0-.552-.448-1-1-1zM8 6c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm0 4c1.654 0 3-1.346 3-3S9.654 4 8 4 5 5.346 5 7s1.346 3 3 3zm-6 8v-2.434l3.972-2.383 2.473 1.65c.398.264.925.21 1.262-.126l4.367-4.367L18 13.48V18H2zM18 2v8.92l-3.375-2.7c-.398-.32-.973-.287-1.332.073l-4.42 4.42-2.318-1.545c-.322-.214-.74-.225-1.07-.025L2 13.233V2h16z"></path>
+                          </svg>
+                        </div>
+
                         {image ? (
                           <img
                             alt={name}
@@ -306,7 +341,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                           <></>
                         )}
 
-                        <Typography variant="subtitle2" flexWrap="wrap">
+                        <Typography  flexWrap="wrap">
                           {name}
                         </Typography>
                       </TableCell>

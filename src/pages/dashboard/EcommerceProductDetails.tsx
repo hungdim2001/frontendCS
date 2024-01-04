@@ -185,7 +185,7 @@ export default function EcommerceProductDetails() {
                         color: '#717171',
                       }}
                     >
-                      {product.productSpecChars.map((char, index) => (
+                      {product.productSpecChars.map((char:any, index) => (
                         <ListItem
                           key={char.id}
                           sx={{
@@ -201,7 +201,7 @@ export default function EcommerceProductDetails() {
                             </Grid>
                             <Grid item xs={8} sm={8} md={8}>
                               <Typography variant="body1" sx={{ color: '#2D2D2D' }}>
-                                {char.productSpecCharValueDTOS!.map((value) => value.value)}
+                                {char.productSpecCharValueDTOS!.map((value:any) => value.value)}
                               </Typography>
                             </Grid>
                           </Grid>
