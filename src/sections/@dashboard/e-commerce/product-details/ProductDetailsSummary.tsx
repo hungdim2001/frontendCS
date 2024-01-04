@@ -219,7 +219,7 @@ export default function ProductDetailsSummary({
               '& li::before': { content: '"\\2022"', color: '#717171', marginRight: '8px' },
             }}
           >
-            {productSpecChars.filter(item=> item.productSpecCharValueDTOS?.some(value=> value.priority!=-1)).map((char) => (
+            {/* {productSpecChars.filter(item=> item.productSpecCharValueDTOS?.some(value=> value.priority!=-1)).map((char) => (
               <ListItem key={char.id}>
                 <Grid container justifyContent="flex-start" alignItems="center">
                   <Grid item xs={5} sm={5} md={5}>
@@ -234,7 +234,7 @@ export default function ProductDetailsSummary({
                   </Grid>
                 </Grid>
               </ListItem>
-            ))}
+            ))} */}
           </List>
         </Grid>
         <Grid item xs={12} md={6} lg={5}>

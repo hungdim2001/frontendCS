@@ -59,7 +59,7 @@ export type ProductTypeState  = {
 
 export type ProductCharValue  = BaseDTO &{
   value: string;
-  priority: number;
+  isVariant: boolean;
 };
 export type Product = BaseDTO &{
   thumbnail: string;
