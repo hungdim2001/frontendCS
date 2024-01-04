@@ -129,7 +129,7 @@ Props) {
         description: data.descriptionVariant,
         quantity: +data.quantityVariant,
         price: +data.priceVariant,
-        status: data.imageVariant === 'Active' ? true : false,
+        status: data.statusVariant === 'Active' ? true : false,
         updateDatetime: variant.id ? new Date() : null,
         updateUser: variant.id ? user?.id || null : null,
         createDatetime: variant.id ? variant.createDatetime : new Date(),

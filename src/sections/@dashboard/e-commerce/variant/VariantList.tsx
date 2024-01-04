@@ -172,20 +172,15 @@ export default function VariantList({ variants, productChars, setValue }: Props)
   };
 
   const handleDeleteProductChar = (chars: number[]) => {
+    console.log(chars)
     const deleteProduct = variants.filter((variant) =>
-      variant.chars.every((char) => !chars.includes(char))
+      !variant.chars.every((char) => chars.includes(char))
     );
     setSelected([]);
     setValue('variants', deleteProduct);
   };
 
   const handleDeleteProducts = (chars: number[][]) => {
-    // const validIds = names.filter((name) => name !== null) as string[];
-
-    // return arr.length === chars.length && arr.every((value, index) => value === chars[index]);
-
-    // if (validIds.length > 0) {
-
     const deleteProduct = variants.filter(
       (variant) => !chars.some((arr) => JSON.stringify(arr) === JSON.stringify(variant.chars))
     );
@@ -209,10 +204,11 @@ export default function VariantList({ variants, productChars, setValue }: Props)
   const [variant, setVariant] = useState<Variant>({ status: true } as Variant);
 
   useEffect(() => {
+    if(variant.chars)
     setValue(
       'variants',
       variants.map((item) => {
-        if (item.name === variant.name) {
+        if (item.chars.every((char) => variant.chars.includes(char))) {
           return { ...variant }; // Return a new object with updated values
         }
         return item; // For items other than the one to be updated, return them unchanged
