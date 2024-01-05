@@ -75,8 +75,7 @@ export default function VariantDialog({
   onCloseCompose,
   variant,
   setVariant,
-}: 
-Props) {
+}: Props) {
   const defaultValues = useMemo(() => {
     return {
       quantityVariant: variant?.quantity?.toString() || '',
@@ -106,12 +105,12 @@ Props) {
     defaultValues,
   });
   const isMountedRef = useIsMountedRef();
-    useEffect(() => {
-      if (variant) {
-        reset(defaultValues);
-      }
+  useEffect(() => {
+    if (variant) {
+      reset(defaultValues);
+    }
     //  eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [variant]);
+  }, [variant]);
   const {
     reset,
     setValue,
@@ -281,12 +280,47 @@ Props) {
                   gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
                 }}
               >
-                <RHFUploadAvatar
+                {/* <div
+                  style={{
+                    position: 'relative',
+                    display: 'block',
+                    background: '#F4F6F8',
+                    width: '50px',
+                    padding: '0 0 50px',
+                    msFlexPositive: '0',
+                    flexGrow: '0',
+                    WebkitFlexShrink: '0',
+                    flexShrink: '0',
+                  }}
+                >
+                  <svg
+                    width="20px"
+                    height="20px"
+                    viewBox="0 0 20 20"
+                    style={{
+                      position: 'absolute',
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      display: 'block',
+                      top: 0,
+                      right: 0,
+                      bottom: 0,
+                      left: 0,
+                      margin: 'auto',
+                      color: '#cecece',
+                    }}
+                  >
+                    <path d="M14 9l-5 5-3-2-5 3v4h18v-6z"></path>
+                    <path d="M19 0H1C.448 0 0 .448 0 1v18c0 .552.448 1 1 1h18c.552 0 1-.448 1-1V1c0-.552-.448-1-1-1zM8 6c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm0 4c1.654 0 3-1.346 3-3S9.654 4 8 4 5 5.346 5 7s1.346 3 3 3zm-6 8v-2.434l3.972-2.383 2.473 1.65c.398.264.925.21 1.262-.126l4.367-4.367L18 13.48V18H2zM18 2v8.92l-3.375-2.7c-.398-.32-.973-.287-1.332.073l-4.42 4.42-2.318-1.545c-.322-.214-.74-.225-1.07-.025L2 13.233V2h16z"></path>
+                  </svg>
+                </div> */}
+
+                {/* <RHFUploadAvatar
                   name="imageVariant"
                   accept="image/*"
                   maxSize={3145728}
                   onDrop={handleDrop2}
-                />
+                /> */}
                 <TextField value={variant.name ? variant.name : 'Default'} label="Name" />
                 <RHFTextField type="number" name="quantityVariant" label="Quantity" />
                 <RHFTextField type="number" name="priceVariant" label="Price" />

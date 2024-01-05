@@ -58,6 +58,7 @@ import {
 import ProductCharListHead from './product-char/ProductCharListHead';
 import ProductCharToolbar from './product-char/ProductCharToolbar';
 import VariantList from './variant/VariantList';
+import { useDropzone } from 'react-dropzone';
 
 // ----------------------------------------------------------------------
 
@@ -258,9 +259,20 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
       }
       if (data.variants) {
         for (const value of data.variants) {
-          formData.append('variants', JSON.stringify({ ...value, chars: value.chars.toString(),image: value.image instanceof File? value.image.path: value.image}));
+          formData.append(
+            'variants',
+            JSON.stringify({
+              ...value,
+              chars: value.chars.toString(),
+              image: value.image instanceof File ? value.image.path : value.image,
+            })
+          );
           if (value.image instanceof File) {
-            formData.append('variantImages', value.image, value.chars.join('')+"."+value.image.name.split('.')[1]);
+            formData.append(
+              'variantImages',
+              value.image,
+              value.chars.join('') + '.' + value.image.name.split('.')[1]
+            );
           }
         }
       }
@@ -460,10 +472,10 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const handleMenuOpen = () => {
     setSearchText('');
   };
-
   useEffect(() => {
     console.log(getValues('variants'));
   }, [getValues('variants')]);
+
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
@@ -500,6 +512,9 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                   productChars={productChars}
                   variants={getValues('variants') ? getValues('variants') : []}
                   setValue={setValue}
+                  onRemove={handleRemove}
+                  onRemoveAll={handleRemoveAll}
+                  files={getValues('images')}
                 ></VariantList>
               </Stack>
             </Card>

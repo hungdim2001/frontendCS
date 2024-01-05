@@ -28,6 +28,8 @@ import Image from '../../../../components/Image';
 import VariantDialog from './VariantDialog';
 import VariantListHead from './VariantListHead';
 import VariantListToolbar from './VariantListToolBar';
+import VariantImageDialog from './VariantImageDiaLog';
+import { DropEvent, FileRejection } from 'react-dropzone';
 
 // ----------------------------------------------------------------------
 
@@ -45,9 +47,13 @@ type Props = {
   productChars: ProductChar[];
   variants: Variant[];
   setValue: UseFormSetValue<any>;
+  onRemove: (file: File | string) => void;
+  onRemoveAll: VoidFunction;
+  files: (File | string)[];
+
 };
 
-export default function VariantList({ variants, productChars, setValue }: Props) {
+export default function VariantList({ variants, productChars, setValue,onRemove,onRemoveAll, files  }: Props) {
   const ICON = {
     mr: 2,
     width: 20,
@@ -215,7 +221,13 @@ export default function VariantList({ variants, productChars, setValue }: Props)
         })
       );
   }, [variant]);
-
+  const [openDialogImageVariant, setOpenDialogImageVariant] = useState(false);
+  const handleOpenImageVariant = () => {
+    setOpenDialogImageVariant(true);
+  };
+  const handleCloseImageVariant = () => {
+    setOpenDialogImageVariant(false);
+  };
   return (
     <Card>
       <VariantDialog
@@ -223,6 +235,14 @@ export default function VariantList({ variants, productChars, setValue }: Props)
         variant={variant}
         isOpenCompose={open}
         onCloseCompose={handleClose}
+      />
+      <VariantImageDialog
+        isOpenCompose={openDialogImageVariant}
+        onCloseCompose={handleCloseImageVariant}
+        onRemove={onRemove}
+        onRemoveAll={onRemoveAll}
+        files= {files}
+        setValue={setValue}
       />
       <VariantListToolbar
         numSelected={selected.length}
@@ -278,13 +298,13 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                     <TableRow
                       key={index}
                       tabIndex={-1}
-                      sx={{ borderBottom: '1px solid #919eab3d' ,}}
+                      sx={{ borderBottom: '1px solid #919eab3d' }}
                       role="checkbox"
                       selected={isItemSelected}
                       aria-checked={isItemSelected}
                     >
                       {chars.includes(-1) ? (
-                        <TableCell  align="left"></TableCell>
+                        <TableCell align="left"></TableCell>
                       ) : (
                         <TableCell padding="checkbox">
                           <Checkbox checked={isItemSelected} onClick={() => handleClick(chars)} />
@@ -297,6 +317,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                         sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
                       >
                         <div
+                        onClick={handleOpenImageVariant}
                           style={{
                             position: 'relative',
                             display: 'block',
@@ -341,9 +362,7 @@ export default function VariantList({ variants, productChars, setValue }: Props)
                           <></>
                         )}
 
-                        <Typography  flexWrap="wrap">
-                          {name}
-                        </Typography>
+                        <Typography flexWrap="wrap">{name}</Typography>
                       </TableCell>
                       <TableCell align="left">{quantity}</TableCell>
                       <TableCell align="left">{fCurrency(price)}</TableCell>

@@ -54,7 +54,6 @@ export default function UploadSingleFile({
           }),
         }}
       >
-        <input {...getInputProps()} />
 
         <BlockContent />
 
