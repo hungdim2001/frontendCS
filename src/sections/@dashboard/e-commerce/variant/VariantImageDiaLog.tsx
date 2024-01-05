@@ -75,6 +75,8 @@ type Props = {
   onRemoveAll: VoidFunction;
   files: (File | string)[];
   setValue: UseFormSetValue<any>;
+  variant: Variant;
+  setVariant: (variant: Variant) => void;
 
   //   variant: Variant;
   //   setVariant: (variant: Variant) => void;
@@ -90,6 +92,8 @@ export default function VariantImageDialog({
   onRemoveAll,
   files,
   setValue,
+  variant,
+  setVariant,
 }: //   variant,
 //   setVariant,
 Props) {
@@ -201,6 +205,20 @@ Props) {
     return null;
   }
   const hasFile = files.length > 0;
+  const handleSelectImageVariant = async (file: string | File) => {
+    console.log(file);
+    const newvariant = { ...variant, image: file };
+    setVariant(newvariant);
+  };
+
+  const animateVariants = {
+    clicked: {
+      scale: [1, 1.1, 1],
+      transition: {
+        duration: 0.3,
+      },
+    },
+  };
 
   return (
     <Portal>
@@ -235,11 +253,10 @@ Props) {
             <Iconify icon={'eva:close-fill'} width={20} height={20} />
           </IconButton>
         </Box>
-        <FormProvider methods={childMethod}>
-          {!!errors.afterSubmit && <Alert severity="error">{errors.afterSubmit.message}</Alert>}
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={12}>
-              {/* <Box
+        {!!errors.afterSubmit && <Alert severity="error">{errors.afterSubmit.message}</Alert>}
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={12}>
+            {/* <Box
                 sx={{
                   p: 3,
                   display: 'grid',
@@ -249,97 +266,106 @@ Props) {
                   gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
                 }}
               > */}
-              <>
-                <List disablePadding sx={{ ...(hasFile && { p: 3, my: 3 }) }}>
-                  <AnimatePresence>
-                    {files.map((file) => {
-                      const { key, name, size, preview } = getFileData(file as CustomFile);
+            <>
+              <List disablePadding sx={{ ...(hasFile && { p: 3, my: 3 }) }}>
+                <AnimatePresence>
+                  {files.map((file) => {
+                    const { key, name, size, preview } = getFileData(file as CustomFile);
 
-                      return (
-                        <ListItem
-                          key={key}
-                          component={m.div}
-                          {...varFade().inRight}
+                    return (
+                      <ListItem
+                        onClick={() => {
+                          handleSelectImageVariant(file);
+                        }}
+                        key={key}
+                        component={m.div}
+                        variants={animateVariants}
+                        whileTap="clicked"
+                        {...varFade().inRight}
+                        sx={{
+                          p: 0.5,
+                          m: 0.5,
+                          width: 80,
+                          height: 80,
+                          borderRadius: 1.25,
+                          overflow: 'hidden',
+                          position: 'relative',
+                          display: 'inline-flex',
+                          border: (theme) =>
+                            variant.image === file ||
+                            (typeof variant.image !== 'string' && variant.image.path == file)
+                              ? `solid 1px #0C68F4`
+                              : `solid 1px ${theme.palette.divider}`,
+                        }}
+                      >
+                        <Image alt="preview" src={isString(file) ? file : preview} ratio="1/1" />
+                        <IconButton
+                          size="small"
+                          onClick={() => onRemove(file)}
                           sx={{
-                            p: 0,
-                            m: 0.5,
-                            width: 80,
-                            height: 80,
-                            borderRadius: 1.25,
-                            overflow: 'hidden',
-                            position: 'relative',
-                            display: 'inline-flex',
-                            border: (theme) => `solid 1px ${theme.palette.divider}`,
+                            top: 6,
+                            p: '2px',
+                            right: 6,
+                            position: 'absolute',
+                            color: 'common.white',
+                            bgcolor: (theme) => alpha(theme.palette.grey[900], 0.72),
+                            '&:hover': {
+                              bgcolor: (theme) => alpha(theme.palette.grey[900], 0.48),
+                            },
                           }}
                         >
-                          <Image alt="preview" src={isString(file) ? file : preview} ratio="1/1" />
-                          <IconButton
-                            size="small"
-                            onClick={() => onRemove(file)}
-                            sx={{
-                              top: 6,
-                              p: '2px',
-                              right: 6,
-                              position: 'absolute',
-                              color: 'common.white',
-                              bgcolor: (theme) => alpha(theme.palette.grey[900], 0.72),
-                              '&:hover': {
-                                bgcolor: (theme) => alpha(theme.palette.grey[900], 0.48),
-                              },
-                            }}
-                          >
-                            <Iconify icon={'eva:close-fill'} />
-                          </IconButton>
-                        </ListItem>
-                      );
-                    })}
-                  </AnimatePresence>
-                </List>
-              </>
-            </Grid>
+                          <Iconify icon={'eva:close-fill'} />
+                        </IconButton>
+                      </ListItem>
+                    );
+                  })}
+                </AnimatePresence>
+              </List>
+            </>
           </Grid>
-          <Stack
-            alignItems="center"
-            flexDirection="row"
-            justifyContent="center"
-            sx={{ mt: 3, mb: 3 }}
-          >
-            <Stack flexDirection="row" sx={{ gap: 3 }}>
-              <Button
-                component="label"
-                variant="contained"
-                startIcon={<Iconify icon={'material-symbols:file-upload'} />}
-              >
-                Upload file
-                <VisuallyHiddenInput
-                  onChange={(event) => {
-                    const file = event?.target?.files && event.target.files[0];
-
-                    const existingImages = [...files];
-
-                    // Thêm các ảnh mới vào mảng hiện tại
-                    const updatedImages = Object.assign(file!, {
-                      preview: URL.createObjectURL(file!),
-                    });
-
-                    // Kết hợp ảnh cũ và ảnh mới
+        </Grid>
+        <Stack
+          alignItems="center"
+          flexDirection="row"
+          justifyContent="center"
+          sx={{ mt: 3, mb: 3 }}
+        >
+          <Stack flexDirection="row" sx={{ gap: 3 }}>
+            <Button
+              component="label"
+              variant="contained"
+              startIcon={<Iconify icon={'material-symbols:file-upload'} />}
+            >
+              Upload file
+              <VisuallyHiddenInput
+                onChange={(event) => {
+                  const file = event?.target?.files && event.target.files[0];
+                  const existingImages = [...files];
+                  // Thêm các ảnh mới vào mảng hiện tại
+                  const updatedImages = Object.assign(file!, {
+                    preview: URL.createObjectURL(file!),
+                  });
+                  if (
+                    !existingImages.some(
+                      (item: File | string) =>
+                        (typeof item === 'string' && item === updatedImages.name) ||
+                        (typeof item !== 'string' && item.name === updatedImages.name)
+                    )
+                  ) {
                     const allImages = existingImages.concat(updatedImages);
-
-                    // Cập nhật giá trị 'images' với mảng mới
                     setValue('images', allImages);
-                    
-                  }}
-                  type="file"
-                />
+                  }
+                }}
+                type="file"
+              />
+            </Button>
+            {hasFile && (
+              <Button type="button" variant="contained" onClick={onRemoveAll}>
+                Remove all
               </Button>
-              {hasFile && (
-                <Button type="button" variant="contained" onClick={onRemoveAll}>
-                  Remove all
-                </Button>
-              )}
-            </Stack>
+            )}
           </Stack>
-        </FormProvider>
+        </Stack>
       </RootStyle>
     </Portal>
   );

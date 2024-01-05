@@ -298,7 +298,17 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
       );
 
       // Kết hợp ảnh cũ và ảnh mới
-      const allImages = existingImages.concat(updatedImages);
+      const allImages = existingImages.concat(
+        updatedImages.filter((item: File ) => {
+          return !existingImages.some(
+            (exits: File | string) =>
+              (typeof exits=== 'string' && exits ===item.name) ||
+              (typeof exits!== 'string' && exits.name ===item.name)
+          );
+
+          // If it's not a File, exclude it from the filter
+        })
+      );
 
       // Cập nhật giá trị 'images' với mảng mới
       setValue('images', allImages);

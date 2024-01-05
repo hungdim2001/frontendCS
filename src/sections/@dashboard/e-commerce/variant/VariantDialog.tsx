@@ -79,7 +79,7 @@ export default function VariantDialog({
   const defaultValues = useMemo(() => {
     return {
       quantityVariant: variant?.quantity?.toString() || '',
-      imageVariant: variant?.image,
+      // imageVariant: variant?.image,
       priceVariant: variant?.price?.toString() || '',
       statusVariant: variant ? (variant.status ? 'Active' : 'InActive') : 'Active',
       descriptionVariant: variant?.description || '',
@@ -88,6 +88,7 @@ export default function VariantDialog({
   // const defaultValues = {
   //   quantityVariant: variant?.quantity?.toString() || '',
   //   imageVariant: variant?.image,
+
   //   priceVariant: variant?.price?.toString() || '',
   //   statusVariant: variant ? (variant.status ? 'Active' : 'InActive') : 'Active',
   //   descriptionVariant: variant?.description || '',
@@ -96,10 +97,10 @@ export default function VariantDialog({
   const variantSchema = Yup.object().shape({
     quantityVariant: Yup.number().required().moreThan(0, 'Quantity is required'),
     priceVariant: Yup.number().required().moreThan(0, 'Price should not be ₫0.00'),
-    imageVariant: Yup.mixed().required('Thumbnail is required'),
+    // imageVariant: Yup.mixed().required('Thumbnail is required'),
     statusVariant: Yup.string().required('Status is required'),
   });
-
+// 
   const childMethod = useForm<VariantForm>({
     resolver: yupResolver(variantSchema),
     defaultValues,
@@ -124,7 +125,7 @@ export default function VariantDialog({
     try {
       const newVariant: Variant = {
         ...variant,
-        image: data.imageVariant,
+        // image: data.imageVariant,
         description: data.descriptionVariant,
         quantity: +data.quantityVariant,
         price: +data.priceVariant,

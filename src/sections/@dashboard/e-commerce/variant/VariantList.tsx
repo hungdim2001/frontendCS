@@ -50,10 +50,16 @@ type Props = {
   onRemove: (file: File | string) => void;
   onRemoveAll: VoidFunction;
   files: (File | string)[];
-
 };
 
-export default function VariantList({ variants, productChars, setValue,onRemove,onRemoveAll, files  }: Props) {
+export default function VariantList({
+  variants,
+  productChars,
+  setValue,
+  onRemove,
+  onRemoveAll,
+  files,
+}: Props) {
   const ICON = {
     mr: 2,
     width: 20,
@@ -222,7 +228,28 @@ export default function VariantList({ variants, productChars, setValue,onRemove,
       );
   }, [variant]);
   const [openDialogImageVariant, setOpenDialogImageVariant] = useState(false);
-  const handleOpenImageVariant = () => {
+  const handleOpenImageVariant = (chars: number[]) => {
+    const variantEdited = variants.filter((variant) =>
+      variant.chars.every((char) => chars.includes(char))
+    )[0];
+    const name = !chars.includes(-1)
+      ? chars
+          .map((item) => {
+            const matchingProductChar = productChars.find((char) =>
+              char.productSpecCharValueDTOS?.some((value) => value.id === item)
+            );
+            if (matchingProductChar) {
+              const matchingValue = matchingProductChar.productSpecCharValueDTOS?.find(
+                (value) => value.id === item
+              );
+              if (matchingValue) {
+                return `${matchingProductChar.name}: ${matchingValue.value}`;
+              }
+            }
+          })
+          .join(',')
+      : 'default';
+    setVariant({ ...variantEdited, name: name });
     setOpenDialogImageVariant(true);
   };
   const handleCloseImageVariant = () => {
@@ -241,8 +268,11 @@ export default function VariantList({ variants, productChars, setValue,onRemove,
         onCloseCompose={handleCloseImageVariant}
         onRemove={onRemove}
         onRemoveAll={onRemoveAll}
-        files= {files}
+        files={files}
         setValue={setValue}
+        setVariant={setVariant}
+        variant={variant}
+
       />
       <VariantListToolbar
         numSelected={selected.length}
@@ -316,50 +346,49 @@ export default function VariantList({ variants, productChars, setValue,onRemove,
                         align="left"
                         sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
                       >
-                        <div
-                        onClick={handleOpenImageVariant}
-                          style={{
-                            position: 'relative',
-                            display: 'block',
-                            background: '#F4F6F8',
-                            width: '50px',
-                            padding: '0 0 50px',
-                            msFlexPositive: '0',
-                            flexGrow: '0',
-                            WebkitFlexShrink: '0',
-                            flexShrink: '0',
-                          }}
-                        >
-                          <svg
-                            width="20px"
-                            height="20px"
-                            viewBox="0 0 20 20"
-                            style={{
-                              position: 'absolute',
-                              maxWidth: '100%',
-                              maxHeight: '100%',
-                              display: 'block',
-                              top: 0,
-                              right: 0,
-                              bottom: 0,
-                              left: 0,
-                              margin: 'auto',
-                              color: '#cecece',
-                            }}
-                          >
-                            <path d="M14 9l-5 5-3-2-5 3v4h18v-6z"></path>
-                            <path d="M19 0H1C.448 0 0 .448 0 1v18c0 .552.448 1 1 1h18c.552 0 1-.448 1-1V1c0-.552-.448-1-1-1zM8 6c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm0 4c1.654 0 3-1.346 3-3S9.654 4 8 4 5 5.346 5 7s1.346 3 3 3zm-6 8v-2.434l3.972-2.383 2.473 1.65c.398.264.925.21 1.262-.126l4.367-4.367L18 13.48V18H2zM18 2v8.92l-3.375-2.7c-.398-.32-.973-.287-1.332.073l-4.42 4.42-2.318-1.545c-.322-.214-.74-.225-1.07-.025L2 13.233V2h16z"></path>
-                          </svg>
-                        </div>
-
                         {image ? (
                           <img
+                            onClick={()=>handleOpenImageVariant(chars) }
                             alt={name}
                             src={isString(image) ? image : image.preview}
                             style={{ borderRadius: 1.5, width: 64, height: 64 }}
                           />
                         ) : (
-                          <></>
+                          <div
+                            onClick={()=>handleOpenImageVariant(chars)}
+                            style={{
+                              position: 'relative',
+                              display: 'block',
+                              background: '#F4F6F8',
+                              width: '64px',
+                              padding: '0 0 64px',
+                              msFlexPositive: '0',
+                              flexGrow: '0',
+                              WebkitFlexShrink: '0',
+                              flexShrink: '0',
+                            }}
+                          >
+                            <svg
+                              width="40px"
+                              height="40px"
+                              viewBox="0 0 20 20"
+                              style={{
+                                position: 'absolute',
+                                maxWidth: '100%',
+                                maxHeight: '100%',
+                                display: 'block',
+                                top: 0,
+                                right: 0,
+                                bottom: 0,
+                                left: 0,
+                                margin: 'auto',
+                                color: '#cecece',
+                              }}
+                            >
+                              <path d="M14 9l-5 5-3-2-5 3v4h18v-6z"></path>
+                              <path d="M19 0H1C.448 0 0 .448 0 1v18c0 .552.448 1 1 1h18c.552 0 1-.448 1-1V1c0-.552-.448-1-1-1zM8 6c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm0 4c1.654 0 3-1.346 3-3S9.654 4 8 4 5 5.346 5 7s1.346 3 3 3zm-6 8v-2.434l3.972-2.383 2.473 1.65c.398.264.925.21 1.262-.126l4.367-4.367L18 13.48V18H2zM18 2v8.92l-3.375-2.7c-.398-.32-.973-.287-1.332.073l-4.42 4.42-2.318-1.545c-.322-.214-.74-.225-1.07-.025L2 13.233V2h16z"></path>
+                            </svg>
+                          </div>
                         )}
 
                         <Typography flexWrap="wrap">{name}</Typography>
