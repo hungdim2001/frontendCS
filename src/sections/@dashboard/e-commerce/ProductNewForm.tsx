@@ -59,6 +59,7 @@ import ProductCharListHead from './product-char/ProductCharListHead';
 import ProductCharToolbar from './product-char/ProductCharToolbar';
 import VariantList from './variant/VariantList';
 import { useDropzone } from 'react-dropzone';
+import { fil } from 'date-fns/locale';
 
 // ----------------------------------------------------------------------
 
@@ -230,7 +231,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
-      if (data.variants.some((item) => !item.price || !item.quantity)) {
+      if (data.variants.some((item) =>!item.image|| !item.price || !item.quantity)) {
         throw new Error('Image, Quantity and Price is not setted');
       }
       const formData = new FormData();
@@ -257,6 +258,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         const blob = new Blob([data.description], { type: 'text/html' });
         formData.append('description', blob, `${data.name.replace(/\s/g, '')}.html`);
       }
+      console.log(data.variants)
       if (data.variants) {
         for (const value of data.variants) {
           formData.append(
@@ -264,16 +266,10 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
             JSON.stringify({
               ...value,
               chars: value.chars.toString(),
-              image: value.image instanceof File ? value.image.path : value.image,
+              image: value.image instanceof File ? value.image.name : value.image,
             })
           );
-          if (value.image instanceof File) {
-            formData.append(
-              'variantImages',
-              value.image,
-              value.chars.join('') + '.' + value.image.name.split('.')[1]
-            );
-          }
+          
         }
       }
       await productApi.createProduct(formData);
@@ -334,9 +330,22 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
   const handleRemoveAll = () => {
     setValue('images', []);
+    const variants = values.variants;
+    const newVarians = variants.map(variant=>{
+       return {...variant, image:''}
+    })
+
   };
 
   const handleRemove = (file: File | string) => {
+    const variants = values.variants;
+    const newVarians = variants.map(variant=>{
+      if(variant.image=== file){
+       return {...variant, image:''} 
+      } 
+      return variant
+    })
+    setValue('variants',newVarians)
     const filteredItems = values.images?.filter((_file) => _file !== file);
     setValue('images', filteredItems);
   };
@@ -482,10 +491,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const handleMenuOpen = () => {
     setSearchText('');
   };
-  useEffect(() => {
-    console.log(getValues('variants'));
-  }, [getValues('variants')]);
-
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>

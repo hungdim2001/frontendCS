@@ -125,7 +125,6 @@ Props) {
   //       reset(defaultValues);
   //     }
   //   }, [variant]);
-
   const {
     reset,
     // setValue,
@@ -293,7 +292,7 @@ Props) {
                           display: 'inline-flex',
                           border: (theme) =>
                             variant.image === file ||
-                            (typeof variant.image !== 'string' && variant.image.path == file)
+                            (variant.image&&typeof variant.image !== 'string' && variant.image.path == file)
                               ? `solid 1px #0C68F4`
                               : `solid 1px ${theme.palette.divider}`,
                         }}
@@ -301,7 +300,8 @@ Props) {
                         <Image alt="preview" src={isString(file) ? file : preview} ratio="1/1" />
                         <IconButton
                           size="small"
-                          onClick={() => onRemove(file)}
+                          onClick={(e) => {e.stopPropagation()
+                            onRemove(file)}}
                           sx={{
                             top: 6,
                             p: '2px',

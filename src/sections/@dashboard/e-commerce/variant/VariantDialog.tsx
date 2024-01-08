@@ -81,7 +81,7 @@ export default function VariantDialog({
       quantityVariant: variant?.quantity?.toString() || '',
       // imageVariant: variant?.image,
       priceVariant: variant?.price?.toString() || '',
-      statusVariant: variant ? (variant.status ? 'Active' : 'InActive') : 'Active',
+      statusVariant: variant.status ? (variant.status ? 'Active' : 'InActive') : 'Active',
       descriptionVariant: variant?.description || '',
     };
   }, [variant]);

@@ -117,7 +117,6 @@ function AuthProvider({ children }: AuthProviderProps) {
   };
   const _initializeSilentRefreshToken = (timeOut: number) => {
     _clearSilentRefreshToken();
-    console.log(timeOut + "rf")
     _silentRefreshTokenId.current = setTimeout(async () => {
       try {
         await refreshToken();
@@ -139,12 +138,11 @@ function AuthProvider({ children }: AuthProviderProps) {
         await authApi.refreshToken({
           rfToken: oldRfToken,
         });
-
-      persistRefreshToken(refreshToken, refreshExpiresIn);
+      await persistRefreshToken(refreshToken, refreshExpiresIn);
       authApi.setSession({ accessToken });
 
       // storage
-      _initializeSilentRefreshToken(expiresIn);
+     await _initializeSilentRefreshToken(expiresIn);
     } catch (error) {
       //? For-Dev
       // console.log('refresh_token_error: ', error);
