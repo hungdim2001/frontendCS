@@ -13,7 +13,7 @@ export const getRefreshTokenExpTime = () => {
 };
 
 export const persistRefreshToken = (newRefreshToken: string, expiresIn: number) => {
-
+console.log("settoken")
   localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
   const expTime = Date.now() + expiresIn;
   localStorage.setItem(REFRESH_TOKEN_EXP_TIME, expTime + '');

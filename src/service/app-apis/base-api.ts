@@ -5,6 +5,7 @@ import { HOST_API } from 'src/config';
 import qs from 'qs';
 // utils
 import { concatPath } from 'src/utils/url';
+import { getRefreshToken, persistRefreshToken } from 'src/utils/refreshTokenStorage';
 
 // ----------------------------------------------------------------------
 
@@ -59,12 +60,12 @@ export class AppApiError extends Error {
 }
 
 hostApiIns.interceptors.response.use(
-  (response) => response?.data?.data ?? response?.data, //? first data is belong to axios, second data is belong to app-api
-  (error) => {
-    /* It's checking if error.response is not null, and then checking if error.response.data is not
-    null. */
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalConfig = error.config;
     const errorData = error.response && error.response.data;
-
     if (!errorData) {
       return Promise.reject(
         new AppApiError({
@@ -72,12 +73,69 @@ hostApiIns.interceptors.response.use(
         }).getInfo()
       );
     }
+    if (errorData.response) {
+      // Access Token was expired
+      if (errorData.response.status === 401 && !originalConfig._retry) {
+        originalConfig._retry = true;
 
-    //? For DEV
-    // console.log('error_response: ', errorData);
+        try {
+          const oldRfToken = await getRefreshToken()!;
+          const { accessToken, refreshToken, expiresIn, refreshExpiresIn } = await hostApiIns.post(
+            '/api/token/refreshToken',
+            {
+              rfToken: oldRfToken,
+            }
+          );
 
-    return Promise.reject(new AppApiError(errorData as ErrorResponse).getInfo());
+          await persistRefreshToken(refreshToken, refreshExpiresIn);
+          hostApiIns.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+          // storage
+          await _initializeSilentRefreshToken(expiresIn);
+
+          return await hostApiIns(originalConfig);
+        } catch (_error) {
+          return Promise.reject(_error);
+        }
+      }
+    }
   }
+  // response?.data?.data ?? response?.data, //? first data is belong to axios, second data is belong to app-api
+  // (error) => {
+  //   const originalConfig = error.config;
+  //   const errorData = error.response && error.response.data;
+  //   if (!errorData) {
+  //     return Promise.reject(
+  //       new AppApiError({
+  //         message: 'messages.errors.common',
+  //       }).getInfo()
+  //     );
+  //   }
+  //   if (originalConfig.url !== '/auth/signin' && errorData.response) {
+  //     // Access Token was expired
+  //     if (errorData.response.status === 401 && !originalConfig._retry) {
+  //       originalConfig._retry = true;
+
+  //       try {
+  //         const oldRfToken = await getRefreshToken()!;
+  //         const rs = await hostApiIns.post('/auth/refreshtoken', {
+  //           rfToken: oldRfToken,
+  //         });
+
+  //         const { accessToken } = rs.data;
+  //         TokenService.updateLocalAccessToken(accessToken);
+
+  //         return instance(originalConfig);
+  //       } catch (_error) {
+  //         return Promise.reject(_error);
+  //       }
+  //     }
+  //   }
+
+  //? For DEV
+  // console.log('error_response: ', errorData);
+
+  // return Promise.reject(new AppApiError(errorData as ErrorResponse).getInfo());
+  //
 );
 
 class BaseApi {
@@ -116,3 +174,6 @@ class BaseApi {
 }
 
 export { BaseApi };
+function _initializeSilentRefreshToken(expiresIn: number) {
+  throw new Error('Function not implemented.');
+}

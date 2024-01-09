@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useEffect, useReducer, useRef } from 'react';
+import { createContext, ReactNode, useEffect, useReducer, useRef, useState } from 'react';
 // utils
 import axios from '../utils/axios';
 import useAuth from '../hooks/useAuth';
@@ -7,7 +7,11 @@ import { isValidToken, setSession } from '../utils/jwt';
 // @types
 import { ActionMap, AuthState, AuthUser, JWTContextType } from '../@types/auth';
 import { authApi } from 'src/service/app-apis/auth';
-import { getRefreshToken, isValidPersistedRefreshToken, persistRefreshToken } from 'src/utils/refreshTokenStorage';
+import {
+  getRefreshToken,
+  isValidPersistedRefreshToken,
+  persistRefreshToken,
+} from 'src/utils/refreshTokenStorage';
 import { REFRESH_TOKEN_KEY, REFRESH_TOKEN_PRE_TIME } from 'src/config';
 import { email } from 'src/_mock/email';
 
@@ -99,7 +103,6 @@ const createAuthChannel = () => {
       window.removeEventListener('storage', handleAuthChannel);
     },
     triggerAuthRefreshing: () => {
-      console.log("refresh")
       window.localStorage.setItem(rfAuthEventKey, Date.now().toString());
     },
   };
@@ -111,7 +114,6 @@ function AuthProvider({ children }: AuthProviderProps) {
 
   const _clearSilentRefreshToken = () => {
     if (!!_silentRefreshTokenId.current) {
-
       clearTimeout(_silentRefreshTokenId.current);
     }
   };
@@ -131,18 +133,18 @@ function AuthProvider({ children }: AuthProviderProps) {
       setTimeout(() => dispatch({ type: Types.Logout }), 1500);
       throw new Error('Persisted refresh token is invalid.');
     }
-    const oldRfToken = getRefreshToken()!;
     try {
+      const oldRfToken = await getRefreshToken()!;
       // apis
-      const { accessToken, refreshToken, expiresIn, refreshExpiresIn } =
-        await authApi.refreshToken({
+      const { accessToken, refreshToken, expiresIn, refreshExpiresIn } = await authApi.refreshToken(
+        {
           rfToken: oldRfToken,
-        });
+        }
+      );
       await persistRefreshToken(refreshToken, refreshExpiresIn);
-      authApi.setSession({ accessToken });
-
+      await authApi.setSession({ accessToken });
       // storage
-     await _initializeSilentRefreshToken(expiresIn);
+      await _initializeSilentRefreshToken(expiresIn);
     } catch (error) {
       //? For-Dev
       // console.log('refresh_token_error: ', error);
@@ -150,52 +152,49 @@ function AuthProvider({ children }: AuthProviderProps) {
 
       throw error;
     }
+  };
+  // useEffect(() => {
+  //   const initialize = async () => {
+  //     try {
+  //       if (isValidPersistedRefreshToken()) {
+  //         await refreshToken();
+  //         const user = await authApi.whoAmI();
+  //         await dispatch({
+  //           type: Types.Initial,
+  //           payload: {
+  //             isAuthenticated: true,
+  //             user,
+  //           },
+  //         });
 
-  }
-  useEffect(() => {
-    const initialize = async () => {
-      try {
-        if (isValidPersistedRefreshToken()) {
-          await refreshToken();
-          const user = await authApi.whoAmI();
-          dispatch({
-            type: Types.Initial,
-            payload: {
-              isAuthenticated: true,
-              user,
-            },
-          });
+  //         return;
+  //       }
 
-          return;
-        }
+  //       dispatch({
+  //         type: Types.Initial,
+  //         payload: {
+  //           isAuthenticated: false,
+  //           user: null,
+  //         },
+  //       });
+  //     } catch (err) {
+  //       //? For-Dev
+  //       // console.error('_auth_initialize_error: ', err);
+  //       dispatch({
+  //         type: Types.Initial,
+  //         payload: {
+  //           isAuthenticated: false,
+  //           user: null,
+  //         },
+  //       });
+  //     }
+  //   };
 
-        dispatch({
-          type: Types.Initial,
-          payload: {
-            isAuthenticated: false,
-            user: null,
-          },
-        });
-      } catch (err) {
-        //? For-Dev
-        // console.error('_auth_initialize_error: ', err);
-        dispatch({
-          type: Types.Initial,
-          payload: {
-            isAuthenticated: false,
-            user: null,
-          },
-        });
-      }
-    };
-
-    initialize();
-    authChannel.subscribe();
-    return () => authChannel.unSubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-
+  //   initialize();
+  //   authChannel.subscribe();
+  //   return () => authChannel.unSubscribe();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
   const login = async (account: string, password: string, userInfo?: AuthUser) => {
     const isAfterRegister = !!userInfo;
 
@@ -226,23 +225,28 @@ function AuthProvider({ children }: AuthProviderProps) {
 
     // auth-channel
     authChannel.triggerAuthRefreshing();
-
   };
 
   const register = async (
-    id: number|null,
+    id: number | null,
     email: string,
     phone: string,
     areaCode: string,
-    role:string,
+    role: string,
     password: string,
     firstName: string,
-    lastName: string) => {
-    const response = await authApi.register({ id,
-      email, phone,
-      areaCode, role,password, firstName
-      , lastName
-    })
+    lastName: string
+  ) => {
+    const response = await authApi.register({
+      id,
+      email,
+      phone,
+      areaCode,
+      role,
+      password,
+      firstName,
+      lastName,
+    });
     await login(email, password, response);
     dispatch({
       type: Types.Register,
@@ -253,7 +257,7 @@ function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const logout = async () => {
-    const rftoken = localStorage.getItem(REFRESH_TOKEN_KEY)
+    const rftoken = localStorage.getItem(REFRESH_TOKEN_KEY);
     // apis
     await authApi.logout({
       token: rftoken!,
@@ -263,7 +267,7 @@ function AuthProvider({ children }: AuthProviderProps) {
     // storage
     _clearSilentRefreshToken();
     dispatch({ type: Types.Logout });
-     localStorage.removeItem(REFRESH_TOKEN_KEY)
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
 
     // auth-channel
     authChannel.triggerAuthRefreshing();
