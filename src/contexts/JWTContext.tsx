@@ -6,7 +6,7 @@ import useAuth from '../hooks/useAuth';
 import { isValidToken, setSession } from '../utils/jwt';
 // @types
 import { ActionMap, AuthState, AuthUser, JWTContextType } from '../@types/auth';
-import { authApi } from 'src/service/app-apis/auth';
+import { authApi, RefreshTokenBody } from 'src/service/app-apis/auth';
 import { getRefreshToken, isValidPersistedRefreshToken, persistRefreshToken } from 'src/utils/refreshTokenStorage';
 import { REFRESH_TOKEN_KEY, REFRESH_TOKEN_PRE_TIME } from 'src/config';
 import { email } from 'src/_mock/email';
@@ -137,17 +137,13 @@ function AuthProvider({ children }: AuthProviderProps) {
       const { accessToken, refreshToken, expiresIn, refreshExpiresIn } =
         await authApi.refreshToken({
           rfToken: oldRfToken,
-        });
+        } as RefreshTokenBody);
       await persistRefreshToken(refreshToken, refreshExpiresIn);
-      authApi.setSession({ accessToken });
-
-      // storage
+      authApi.setSession({ accessToken })
+      await  authApi.updateRefreshToken({rfToken:oldRfToken, newRFToken:refreshToken})
+     // storage
      await _initializeSilentRefreshToken(expiresIn);
     } catch (error) {
-      //? For-Dev
-      // console.log('refresh_token_error: ', error);
-      // logout();
-
       throw error;
     }
 

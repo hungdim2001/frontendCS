@@ -231,7 +231,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
-      if (data.variants.some((item) =>!item.image|| !item.price || !item.quantity)) {
+      if (data.variants.some((item) => !item.image || !item.price || !item.quantity)) {
         throw new Error('Image, Quantity and Price is not setted');
       }
       const formData = new FormData();
@@ -258,7 +258,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
         const blob = new Blob([data.description], { type: 'text/html' });
         formData.append('description', blob, `${data.name.replace(/\s/g, '')}.html`);
       }
-      console.log(data.variants)
+      console.log(data.variants);
       if (data.variants) {
         for (const value of data.variants) {
           formData.append(
@@ -269,7 +269,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
               image: value.image instanceof File ? value.image.name : value.image,
             })
           );
-          
         }
       }
       await productApi.createProduct(formData);
@@ -295,11 +294,11 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
 
       // Kết hợp ảnh cũ và ảnh mới
       const allImages = existingImages.concat(
-        updatedImages.filter((item: File ) => {
+        updatedImages.filter((item: File) => {
           return !existingImages.some(
             (exits: File | string) =>
-              (typeof exits=== 'string' && exits ===item.name) ||
-              (typeof exits!== 'string' && exits.name ===item.name)
+              (typeof exits === 'string' && exits === item.name) ||
+              (typeof exits !== 'string' && exits.name === item.name)
           );
 
           // If it's not a File, exclude it from the filter
@@ -331,21 +330,20 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const handleRemoveAll = () => {
     setValue('images', []);
     const variants = values.variants;
-    const newVarians = variants.map(variant=>{
-       return {...variant, image:''}
-    })
-
+    const newVarians = variants.map((variant) => {
+      return { ...variant, image: '' };
+    });
   };
 
   const handleRemove = (file: File | string) => {
     const variants = values.variants;
-    const newVarians = variants.map(variant=>{
-      if(variant.image=== file){
-       return {...variant, image:''} 
-      } 
-      return variant
-    })
-    setValue('variants',newVarians)
+    const newVarians = variants.map((variant) => {
+      if (variant.image === file) {
+        return { ...variant, image: '' };
+      }
+      return variant;
+    });
+    setValue('variants', newVarians);
     const filteredItems = values.images?.filter((_file) => _file !== file);
     setValue('images', filteredItems);
   };
@@ -1076,16 +1074,25 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                                       )
                                                                     );
                                                                   } else {
-                                                                    const newVariants =
-                                                                      variantsValues.filter(
-                                                                        (item) =>
-                                                                          !item.chars.includes(
-                                                                            option.id
-                                                                          )
-                                                                      );
+                                                                    // const newVariants =
+                                                                    //   variantsValues.filter(
+                                                                    //     (item) =>
+                                                                    //       !item.chars.includes(
+                                                                    //         option.id
+                                                                    //       )
+                                                                    //   );
+                                                                    variantsValues.forEach(
+                                                                      (variant) =>
+                                                                        (variant.chars =
+                                                                          variant.chars.filter(
+                                                                            (item) =>
+                                                                              item !== option.id
+                                                                          ))
+                                                                    );
+
                                                                     setValue(
                                                                       'variants',
-                                                                      newVariants.filter(
+                                                                      variantsValues.filter(
                                                                         (item) =>
                                                                           item.chars.length != 0
                                                                       )
@@ -1111,7 +1118,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                               }
                                                             />
 
-                                                            <ListItemText primary={'display'} />
+                                                            <ListItemText primary={'variant'} />
                                                           </Stack>
                                                         </Stack>
                                                       </MenuItem>

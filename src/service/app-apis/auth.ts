@@ -38,8 +38,9 @@ type LoginResponseData = {
   refreshExpiresIn: number;
   expiresIn: number;
 };
-type RefreshTokenBody = {
+export type RefreshTokenBody = {
   rfToken: string;
+  newRFToken:string;
 };
 type RefreshTokenResponseData = {
   accessToken: string;
@@ -57,6 +58,9 @@ const login = (bodyData: LoginRequestBody) => {
 const refreshToken = (bodyData: RefreshTokenBody) =>
   tokenApiIns.post<RefreshTokenResponseData>('/refreshToken', bodyData);
 const whoAmI = () => authApiIns.get<OrNull<UserAccount>>('/whoami');
+const updateRefreshToken = (bodyData: RefreshTokenBody) =>
+  tokenApiIns.post<RefreshTokenResponseData>('/updateRefreshToken', bodyData);
+
 
 // logout
 // --------------------
@@ -77,9 +81,7 @@ const setSession = (sessionParams: SessionParams) => {
     delete apiFormDataIns.defaults.headers.common.Authorization ;
     return;
   }
-
   const { accessToken } = sessionParams;
-
   apiInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
   apiFormDataIns.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 };
@@ -108,6 +110,7 @@ const authApi = {
   setSession,
   whoAmI,
   refreshToken,
+  updateRefreshToken,
   logout,
   verify,
   reSendCode,
