@@ -489,6 +489,9 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const handleMenuOpen = () => {
     setSearchText('');
   };
+  useEffect(()=>{
+    console.log(getValues('variants'))
+  }, [getValues('variants')])
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
@@ -743,12 +746,18 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                   )
                                                 );
                                               } else {
-                                                const newVariants = variantsValues.filter(
-                                                  (item) => !item.chars.includes(option)
+                                                // const newVariants = variantsValues.filter(
+                                                //   (item) => !item.chars.includes(option)
+                                                // );
+                                                  variantsValues.forEach(
+                                                  (variant) =>
+                                                    (variant.chars = variant.chars.filter(
+                                                      (item) => item !== option
+                                                    ))
                                                 );
                                                 setValue(
                                                   'variants',
-                                                  newVariants.filter(
+                                                  variantsValues.filter(
                                                     (item) => item.chars.length != 0
                                                   )
                                                 );
