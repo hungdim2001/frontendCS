@@ -33,6 +33,7 @@ import SocialsButton from '../../../../components/SocialsButton';
 import { ColorSinglePicker } from '../../../../components/color-utils';
 import { FormProvider, RHFSelect } from '../../../../components/hook-form';
 import { ICONS } from 'src/layouts/dashboard/navbar/NavConfig';
+import VariantPicker from 'src/components/variant/VariantPicker';
 
 // ----------------------------------------------------------------------
 
@@ -198,6 +199,25 @@ export default function ProductDetailsSummary({
               )}
             />
           </Stack>
+          <Stack direction="row" alignItems="start" sx={{ mb: 2 }}>
+            <Controller
+              name="color"
+              control={control}
+              render={({ field }) => (
+                <VariantPicker
+                  variants={['#343434', '#353535']}
+                  value={field.value}
+                  onChange={field.onChange}
+                  sx={{
+                    .../*colors.length*/ (2 > 4 && {
+                      maxWidth: 144,
+                      justifyContent: 'flex-end',
+                    }),
+                  }}
+                />
+              )}
+            />
+          </Stack>
 
           {/* <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
           <Rating value={5} precision={0.1} readOnly />
@@ -251,7 +271,7 @@ export default function ProductDetailsSummary({
               alignItems="center"
               sx={{ mb: 2 }}
             >
-              <Stack direction="row" flex={1} justifyContent="flex-start" sx={{mr:1}}>
+              <Stack direction="row" flex={1} justifyContent="flex-start" sx={{ mr: 1 }}>
                 <Typography variant="h6"> {fCurrency(price)}₫</Typography>
               </Stack>
               <Stack direction="row" justifyContent="flex-end">
