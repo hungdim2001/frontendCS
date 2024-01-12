@@ -88,11 +88,7 @@ export default function EcommerceProductDetails() {
   useEffect(() => {
     dispatch(getProduct(+id));
   }, [dispatch, id]);
-  useEffect(() => {
-    console.log(product);
-  }, [product]);
-
-  const handleAddCart = (product: CartItem) => {
+   const handleAddCart = (product: CartItem) => {
     dispatch(addCart(product));
   };
 

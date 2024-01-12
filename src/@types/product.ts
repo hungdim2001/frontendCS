@@ -59,7 +59,7 @@ export type ProductTypeState  = {
 
 export type ProductCharValue  = BaseDTO &{
   value: string;
-  isVariant: boolean;
+  variant: boolean;
 };
 export type Product = BaseDTO &{
   thumbnail: string;
@@ -93,6 +93,7 @@ export type CartItem = {
   name: string;
   cover: string;
   available: number;
+  variant: Variant;
   price: number;
   color: string;
   size: string;

@@ -25,7 +25,7 @@ import { PATH_DASHBOARD } from '../../../../routes/paths';
 // utils
 import { fShortenNumber, fCurrency } from '../../../../utils/formatNumber';
 // @types
-import { Product, CartItem } from '../../../../@types/product';
+import { Product, CartItem, Variant } from '../../../../@types/product';
 // components
 import Label from '../../../../components/Label';
 import Iconify from '../../../../components/Iconify';
@@ -34,6 +34,7 @@ import { ColorSinglePicker } from '../../../../components/color-utils';
 import { FormProvider, RHFSelect } from '../../../../components/hook-form';
 import { ICONS } from 'src/layouts/dashboard/navbar/NavConfig';
 import VariantPicker from 'src/components/variant/VariantPicker';
+import { useEffect } from 'react';
 
 // ----------------------------------------------------------------------
 
@@ -75,6 +76,7 @@ export default function ProductDetailsSummary({
     status,
     quantity,
     productSpecChars,
+    variants
     // colors,
     // available,
     // priceSale,
@@ -91,6 +93,8 @@ export default function ProductDetailsSummary({
   const defaultValues = {
     id,
     name,
+     variant:variants.length===1? variants.at(0):variants.find(item=> item.chars.includes(-1)),
+   // variant: product
     // cover,
     // available,
     price,
@@ -98,7 +102,9 @@ export default function ProductDetailsSummary({
     // size: sizes[4],
     quantity: quantity < 1 ? 0 : 1,
   };
-
+useEffect(()=> {
+console.log(defaultValues)
+},[defaultValues])
   const methods = useForm<FormValuesProps>({
     defaultValues,
   });
@@ -177,62 +183,30 @@ export default function ProductDetailsSummary({
               sold: 24
             </Typography>
           </Stack>
-          <Stack direction="row" alignItems="start" sx={{ mb: 2 }}>
-            <Typography variant="subtitle1" sx={{ mt: 0.5 }}>
-              Select color
-            </Typography>
-            <Controller
-              name="color"
-              control={control}
-              render={({ field }) => (
-                <ColorSinglePicker
-                  colors={['#FFFFFF', '#353535']}
-                  value={field.value}
-                  onChange={field.onChange}
-                  sx={{
-                    .../*colors.length*/ (2 > 4 && {
-                      maxWidth: 144,
-                      justifyContent: 'flex-end',
-                    }),
-                  }}
-                />
-              )}
-            />
-          </Stack>
-          <Stack direction="row" alignItems="start" sx={{ mb: 2 }}>
-            <Controller
-              name="color"
-              control={control}
-              render={({ field }) => (
-                <VariantPicker
-                  variants={['#343434', '#353535']}
-                  value={field.value}
-                  onChange={field.onChange}
-                  sx={{
-                    .../*colors.length*/ (2 > 4 && {
-                      maxWidth: 144,
-                      justifyContent: 'flex-end',
-                    }),
-                  }}
-                />
-              )}
-            />
-          </Stack>
-
-          {/* <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-          <Rating value={5} precision={0.1} readOnly />
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            ({fShortenNumber(5)} reviews)
-          </Typography>
-        </Stack> */}
-
-          {/* <Typography variant="h4" sx={{ mb: 3 }}>
-          <Box component="span" sx={{ color: 'text.disabled', textDecoration: 'line-through' }}>
-            {price && fCurrency(price)}₫
-          </Box>
-          &nbsp;{fCurrency(price)}₫
-        </Typography> */}
-
+       
+          {productSpecChars
+            .filter((char) => char.productSpecCharValueDTOS?.some((value) => value.variant))
+            .map((char,index) =>{
+                return (
+                  <Stack key = {index} direction="row" alignItems="start" sx={{ mb: 2 }}>
+                    <Controller
+                      name="variant"
+                      control={control}
+                      render={({ field }) => (
+                        <VariantPicker
+                          variants={char.productSpecCharValueDTOS?.map(value=> value.value)!}
+                          value={field.value}
+                          onChange={field.onChange}
+                          sx={{
+                              justifyContent: 'flex-end',
+                          }}
+                        />
+                      )}
+                    />
+                  </Stack>
+                );
+              })}
+          
           <List
             sx={{
               color: '#717171',

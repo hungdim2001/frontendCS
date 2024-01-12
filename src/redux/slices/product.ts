@@ -242,7 +242,6 @@ export function getProduct(id: number) {
     dispatch(slice.actions.startLoading());
     try {
       const response= await productApi.getProducts(id);
-      console.log(response)
       dispatch(slice.actions.getProductSuccess(response[0]));
     } catch (error) {
       console.error(error);
