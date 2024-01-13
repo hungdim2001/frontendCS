@@ -25,14 +25,15 @@ const RootStyle = styled('div')(({ theme }) => ({
 
 type Props = {
   product: Product;
+  current: number
 };
 
-export default function ProductDetailsCarousel({ product }: Props) {
+export default function ProductDetailsCarousel({ current, product }: Props) {
   const [openLightbox, setOpenLightbox] = useState(false);
 
   const [selectedImage, setSelectedImage] = useState<number>(0);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(current);
 
   const [nav1, setNav1] = useState<Slider>();
 
@@ -57,18 +58,23 @@ export default function ProductDetailsCarousel({ product }: Props) {
     slidesToScroll: 1,
     adaptiveHeight: true,
     beforeChange: (current: number, next: number) => setCurrentIndex(next),
-  };
+  }
 
   const settings2 = {
     dots: false,
     arrows: false,
-    centerMode: true,
-    swipeToSlide: true,
+    centermode: true,
+    swipetoslide: true,
     focusOnSelect: true,
     variableWidth: true,
     centerPadding: '0px',
     slidesToShow: product.images.length > 3 ? 3 : product.images.length,
   };
+  useEffect(() => {
+    if (slider2.current) {
+      slider2.current.slickGoTo(current);
+    }
+  }, [current, slider2]);
 
   useEffect(() => {
     if (slider1.current) {
@@ -132,8 +138,7 @@ export default function ProductDetailsCarousel({ product }: Props) {
               position: 'absolute',
               width: (THUMB_SIZE * 2) / 3,
               backgroundImage: (theme) =>
-                `linear-gradient(to left, ${alpha(theme.palette.background.paper, 0)} 0%, ${
-                  theme.palette.background.paper
+                `linear-gradient(to left, ${alpha(theme.palette.background.paper, 0)} 0%, ${theme.palette.background.paper
                 } 100%)`,
             },
             '&:after': { right: 0, transform: 'scaleX(-1)' },

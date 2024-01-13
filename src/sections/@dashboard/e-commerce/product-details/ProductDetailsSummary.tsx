@@ -54,6 +54,8 @@ type Props = {
   cart: CartItem[];
   onAddCart: (cartItem: CartItem) => void;
   onGotoStep: (step: number) => void;
+  setCurrentIndex: (currentInde: React.SetStateAction<number>) => void;
+  setVariant: (currentInde: React.SetStateAction<number[]>) => void;
 };
 
 export default function ProductDetailsSummary({
@@ -61,6 +63,8 @@ export default function ProductDetailsSummary({
   product,
   onAddCart,
   onGotoStep,
+  setCurrentIndex,
+  setVariant,
   ...other
 }: Props) {
   const theme = useTheme();
@@ -93,26 +97,32 @@ export default function ProductDetailsSummary({
   const defaultValues = {
     id,
     name,
-     variant:variants.length===1? variants.at(0):variants.find(item=> item.chars.includes(-1)),
-   // variant: product
-    // cover,
-    // available,
+    variant: variants.length === 1 ? variants.at(0)?.chars : variants.find(item => !item.chars.includes(-1))?.chars,
     price,
     // color: colors[0],
     // size: sizes[4],
-    quantity: quantity < 1 ? 0 : 1,
+    quantity: variants.length === 1
+      ? (variants.at(0)?.quantity ?? 0) < 1
+        ? 0
+        : 1
+      : (variants.find(item => !item.chars.includes(-1))?.quantity ?? 0) < 1
+        ? 0
+        : 1,
   };
-useEffect(()=> {
-console.log(defaultValues)
-},[defaultValues])
+
   const methods = useForm<FormValuesProps>({
     defaultValues,
   });
 
-  const { watch, control, setValue, handleSubmit } = methods;
+  const { watch, control, setValue, getValues, handleSubmit } = methods;
 
   const values = watch();
-
+  useEffect(() => {
+    const image = variants.find(variant => variant.chars.every(char => getValues('variant').includes(char)))?.image.toString()!
+    const currentIndex = product.images.indexOf(image);
+    setCurrentIndex(currentIndex)
+    setVariant(getValues('variant'))
+  }, [getValues('variant')])
   const onSubmit = async (data: FormValuesProps) => {
     try {
       if (!alreadyProduct) {
@@ -183,30 +193,34 @@ console.log(defaultValues)
               sold: 24
             </Typography>
           </Stack>
-       
+
           {productSpecChars
             .filter((char) => char.productSpecCharValueDTOS?.some((value) => value.variant))
-            .map((char,index) =>{
-                return (
-                  <Stack key = {index} direction="row" alignItems="start" sx={{ mb: 2 }}>
-                    <Controller
-                      name="variant"
-                      control={control}
-                      render={({ field }) => (
-                        <VariantPicker
-                          variants={char.productSpecCharValueDTOS?.map(value=> value.value)!}
-                          value={field.value}
-                          onChange={field.onChange}
-                          sx={{
-                              justifyContent: 'flex-end',
-                          }}
-                        />
-                      )}
-                    />
-                  </Stack>
-                );
-              })}
-          
+            .map((char, index) => {
+              return (
+                <Stack key={index} direction="row" alignItems="start" sx={{ mb: 2 }}>
+                  <Controller
+                    name="variant"
+                    control={control}
+                    render={({ field }) => (
+                      <VariantPicker
+                        charValues={char.productSpecCharValueDTOS!}
+                        value={field.value}
+                        onChange={(e) => {
+                          const oldValue = field.value.filter(old => !char.productSpecCharValueDTOS?.map(char => char.id).includes(old));
+                          setValue('variant', [...oldValue, Number(e.target.value)]);
+                        }}
+                        sx={{
+                          gap: 2
+                        }}
+                      />
+                    )}
+                  />
+
+                </Stack>
+              );
+            })}
+
           <List
             sx={{
               color: '#717171',
@@ -245,8 +259,8 @@ console.log(defaultValues)
               alignItems="center"
               sx={{ mb: 2 }}
             >
+              <Typography variant="h6"> {fCurrency(variants.find(variant => variant.chars.every(char => getValues('variant').includes(char)))?.price!)}₫</Typography>
               <Stack direction="row" flex={1} justifyContent="flex-start" sx={{ mr: 1 }}>
-                <Typography variant="h6"> {fCurrency(price)}₫</Typography>
               </Stack>
               <Stack direction="row" justifyContent="flex-end">
                 <Typography
@@ -307,7 +321,7 @@ console.log(defaultValues)
                 <Incrementer
                   name="quantity"
                   quantity={values.quantity}
-                  available={quantity}
+                  available={variants.find(variant => variant.chars.every(char => getValues('variant').includes(char)))?.quantity!}
                   onIncrementQuantity={() => setValue('quantity', values.quantity + 1)}
                   onDecrementQuantity={() => setValue('quantity', values.quantity - 1)}
                 />
@@ -316,7 +330,7 @@ console.log(defaultValues)
                   component="div"
                   sx={{ mt: 1, textAlign: 'right', color: 'text.secondary' }}
                 >
-                  Available: {quantity}
+                  Available:{variants.find(variant => variant.chars.every(char => getValues('variant').includes(char)))?.quantity!}
                 </Typography>
               </div>
             </Stack>

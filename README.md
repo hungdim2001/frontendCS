@@ -49,3 +49,4 @@ You can find detailed instructions on using Create React App and many tips in [i
 
 set NODE_OPTIONS=--openssl-legacy-provider
 export NODE_OPTIONS=--openssl-legacy-provider
+$env:NODE_OPTIONS = '--openssl-legacy-provider'

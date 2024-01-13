@@ -21,7 +21,7 @@ import { getProduct, addCart, onGotoStep } from '../../redux/slices/product';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // @types
-import { CartItem } from '../../@types/product';
+import { CartItem, ProductCharValue } from '../../@types/product';
 // hooks
 import useSettings from '../../hooks/useSettings';
 // components
@@ -84,14 +84,18 @@ export default function EcommerceProductDetails() {
   const { id = '' } = useParams();
 
   const { product, error, checkout } = useSelector((state) => state.product);
-
+  const [currentIndex, setCurrentIndex] = useState<number>(product?.variants.length === 1 ? product?.images.indexOf(product?.variants.at(0)?.image.toString()!) : product?.images.indexOf(product?.variants.find(item => !item.chars.includes(-1))?.image.toString()!)!);
   useEffect(() => {
     dispatch(getProduct(+id));
   }, [dispatch, id]);
-   const handleAddCart = (product: CartItem) => {
+  const handleAddCart = (product: CartItem) => {
+
     dispatch(addCart(product));
   };
-
+  const [variant, setVariant] = useState<number[]>([]);
+  useEffect(() => {
+    console.log(variant)
+  }, [variant])
   const handleGotoStep = (step: number) => {
     dispatch(onGotoStep(step));
   };
@@ -124,11 +128,13 @@ export default function EcommerceProductDetails() {
           <>
             <Grid container>
               <Grid item xs={12} md={4} lg={4}>
-                <ProductDetailsCarousel product={product} />
+                <ProductDetailsCarousel current={currentIndex} product={product} />
               </Grid>
               <Grid item xs={12} md={8} lg={8}>
                 <ProductDetailsSummary
                   product={product}
+                  setCurrentIndex={setCurrentIndex}
+                  setVariant={setVariant}
                   cart={checkout.cart}
                   onAddCart={handleAddCart}
                   onGotoStep={handleGotoStep}
@@ -181,28 +187,48 @@ export default function EcommerceProductDetails() {
                         color: '#717171',
                       }}
                     >
-                      {product.productSpecChars.map((char:any, index) => (
-                        <ListItem
-                          key={char.id}
-                          sx={{
-                            p: 2,
-                            backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'transparent',
-                          }}
-                        >
-                          <Grid container justifyContent="flex-start" alignItems="center">
-                            <Grid item xs={4} sm={4} md={4}>
-                              <Typography sx={{ color: '#717171' }} variant="h6">
-                                {char.name}
-                              </Typography>
+                      {product.productSpecChars.map((char: any, index) => {
+                        // console.log(char.name + char.productSpecCharValueDTOS.some((value: ProductCharValue) => value.variant))
+                        if (char.productSpecCharValueDTOS.some((value: ProductCharValue) => value.variant)) {
+                          if (char.productSpecCharValueDTOS.find((value: ProductCharValue) => {
+
+                            return variant.length > 0 && variant.includes(value.id!)
+                          }))
+                            console.log(char.productSpecCharValueDTOS.find((value: ProductCharValue) => {
+
+                              return variant.length > 0 && variant.includes(value.id!)
+                            }).id)
+                        }
+
+                        return (
+                          <ListItem
+                            key={char.id}
+                            sx={{
+                              p: 2,
+                              backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'transparent',
+                            }}
+                          >
+                            <Grid container justifyContent="flex-start" alignItems="center">
+                              <Grid item xs={4} sm={4} md={4}>
+                                <Typography sx={{ color: '#717171' }} variant="h6">
+                                  {char.name}
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={8} sm={8} md={8}>
+                                <Typography variant="body1" sx={{ color: '#2D2D2D' }}>
+                                  {
+                                    char.productSpecCharValueDTOS.some((value: ProductCharValue) => value.variant) ?
+                                      char.productSpecCharValueDTOS.find((value: ProductCharValue) => variant.includes(value.id!))&&char.productSpecCharValueDTOS.find((value: ProductCharValue) => variant.includes(value.id!)).value 
+                                      : char.productSpecCharValueDTOS!.map((value: any) => value.value).join(', ')
+                                  }
+                                  {/* char.productSpecCharValueDTOS!.map((value: any) => value.value).join(', ')} */}
+                                </Typography>
+
+                              </Grid>
                             </Grid>
-                            <Grid item xs={8} sm={8} md={8}>
-                              <Typography variant="body1" sx={{ color: '#2D2D2D' }}>
-                                {char.productSpecCharValueDTOS!.map((value:any) => value.value)}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                        </ListItem>
-                      ))}
+                          </ListItem>
+                        )
+                      })}
                     </List>
                   </Box>
                 </TabPanel>

@@ -1,51 +1,54 @@
 // @mui
 import { Box, Radio, RadioGroup, RadioGroupProps, BoxProps } from '@mui/material';
+import { values } from 'lodash';
 import { useEffect } from 'react';
+import { ProductCharValue, Variant } from 'src/@types/product';
 
 // ----------------------------------------------------------------------
 
 interface Props extends RadioGroupProps {
-  variants: string[];
+  charValues: ProductCharValue[];
 }
 
-export default function VariantPicker({ variants, value, ...other }: Props) {
-  useEffect(() => {
-    console.log(value);
-  }, [value]);
+export default function VariantPicker({ charValues, value, ...other }: Props) {
+  
+// defaultValue={charValues.find(char => value.includes(char.id))?.id}
   return (
-    <RadioGroup row {...other}>
-      {variants.map((variant) => {
-        return (
-          <Radio
-            key={variant}
-            value={variant}
-            icon={<IconColor variant={variant} />}
-            checkedIcon={
-              <IconColor
-                sx={{
-                  color: 'black',
-                  border: `2px solid #0C68F4`,
-                }}
-                variant={variant}
-              />
-            }
-            sx={{
-              padding: 0,
-              mr: 2,
-              '&:hover': { opacity: 0.72 },
-            }}
-          />
-        );
-      })}
+    <RadioGroup  row {...other}>
+      {charValues.map((charValue) => (
+        <Radio
+          checked={value.includes(charValue.id)}
+          key={charValue.id}
+          value={charValue.id}
+          icon={<IconColor charValue={charValue} variant={value} />}
+          checkedIcon={
+            <IconColor
+              sx={{
+                color: 'black',
+                border: `2px solid #0C68F4`,
+              }}
+              charValue={charValue}
+              variant={value}
+            />
+          }
+          sx={{
+            padding: 0,
+            '&:hover': { opacity: 0.72 },
+          }}
+        />
+      ))}
     </RadioGroup>
   );
 }
 
 // ----------------------------------------------------------------------
 interface BoxProps1 extends BoxProps {
-  variant: string;
+  charValue: ProductCharValue;
+  variant: number[];
 }
-function IconColor({ variant, sx }: BoxProps1) {
+
+function IconColor({ charValue, variant, sx }: BoxProps1) {
+  // const isCharValueInChars = variant.some((char) => char === charValue.id);
   return (
     <Box
       sx={{
@@ -54,7 +57,7 @@ function IconColor({ variant, sx }: BoxProps1) {
         display: 'flex',
         fontWeight: 500,
         fontSize: '14px',
-        border: `1px solid #D5D5D5`,
+        border: '1px solid #D5D5D5',
         borderRadius: 1,
         position: 'relative',
         alignItems: 'center',
@@ -66,7 +69,7 @@ function IconColor({ variant, sx }: BoxProps1) {
         ...sx,
       }}
     >
-      {variant}
+      {charValue.value}
     </Box>
   );
 }
