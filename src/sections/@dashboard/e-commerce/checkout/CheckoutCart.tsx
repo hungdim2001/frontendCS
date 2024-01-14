@@ -61,7 +61,7 @@ export default function CheckoutCart() {
           <CardHeader
             title={
               <Typography variant="h6">
-                Card
+                Cart
                 <Typography component="span" sx={{ color: 'text.secondary' }}>
                   &nbsp;({totalItems} item)
                 </Typography>

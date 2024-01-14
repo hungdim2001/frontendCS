@@ -93,7 +93,7 @@ export type CartItem = {
   name: string;
   cover: string;
   available: number;
-  variant: number[];
+  variant: Variant;
   price: number;
   color: string;
   size: string;

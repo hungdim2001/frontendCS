@@ -55,7 +55,7 @@ type Props = {
   onAddCart: (cartItem: CartItem) => void;
   onGotoStep: (step: number) => void;
   setCurrentIndex: (currentInde: React.SetStateAction<number>) => void;
-  setVariant: (currentInde: React.SetStateAction<number[]>) => void;
+  setVariant: (currentInde: React.SetStateAction<Variant>) => void;
 };
 
 export default function ProductDetailsSummary({
@@ -97,10 +97,8 @@ export default function ProductDetailsSummary({
   const defaultValues = {
     id,
     name,
-    variant: variants.length === 1 ? variants.at(0)?.chars : variants.find(item => !item.chars.includes(-1))?.chars,
+    variant: variants.length === 1 ? variants.at(0) : variants.find(item => !item.chars.includes(-1)),
     price,
-    // color: colors[0],
-    // size: sizes[4],
     quantity: variants.length === 1
       ? (variants.at(0)?.quantity ?? 0) < 1
         ? 0
@@ -118,7 +116,7 @@ export default function ProductDetailsSummary({
 
   const values = watch();
   useEffect(() => {
-    const image = variants.find(variant => variant.chars.every(char => getValues('variant').includes(char)))?.image.toString()!
+    const image = variants.find(variant => variant.chars.every(char => getValues('variant').chars.includes(char)))?.image.toString()!
     const currentIndex = product.images.indexOf(image);
     setCurrentIndex(currentIndex)
     setVariant(getValues('variant'))
@@ -207,8 +205,8 @@ export default function ProductDetailsSummary({
                         charValues={char.productSpecCharValueDTOS!}
                         value={field.value}
                         onChange={(e) => {
-                          const oldValue = field.value.filter(old => !char.productSpecCharValueDTOS?.map(char => char.id).includes(old));
-                          setValue('variant', [...oldValue, Number(e.target.value)]);
+                          const oldValue = field.value.chars.filter(old => !char.productSpecCharValueDTOS?.map(char => char.id).includes(old));
+                          setValue('variant', variants.find(variant=> variant.chars.every(char=> [...oldValue, Number(e.target.value)].includes(char)))!);
                         }}
                         sx={{
                           gap: 2
@@ -259,7 +257,7 @@ export default function ProductDetailsSummary({
               alignItems="center"
               sx={{ mb: 2 }}
             >
-              <Typography variant="h6"> {fCurrency(variants.find(variant => variant.chars.every(char => getValues('variant').includes(char)))?.price!)}₫</Typography>
+              <Typography variant="h6"> {fCurrency(getValues('variant').price!)}₫</Typography>
               <Stack direction="row" flex={1} justifyContent="flex-start" sx={{ mr: 1 }}>
               </Stack>
               <Stack direction="row" justifyContent="flex-end">
@@ -321,7 +319,7 @@ export default function ProductDetailsSummary({
                 <Incrementer
                   name="quantity"
                   quantity={values.quantity}
-                  available={variants.find(variant => variant.chars.every(char => getValues('variant').includes(char)))?.quantity!}
+                  available={getValues('variant').quantity}
                   onIncrementQuantity={() => setValue('quantity', values.quantity + 1)}
                   onDecrementQuantity={() => setValue('quantity', values.quantity - 1)}
                 />
@@ -330,7 +328,7 @@ export default function ProductDetailsSummary({
                   component="div"
                   sx={{ mt: 1, textAlign: 'right', color: 'text.secondary' }}
                 >
-                  Available:{variants.find(variant => variant.chars.every(char => getValues('variant').includes(char)))?.quantity!}
+                  Available:{getValues('variant').quantity}
                 </Typography>
               </div>
             </Stack>
