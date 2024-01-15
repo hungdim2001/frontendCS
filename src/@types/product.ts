@@ -89,14 +89,15 @@ export type Product = BaseDTO &{
 };
 
 export type CartItem = {
-  id: number|null;
+  // id: number|null;
   name: string;
-  cover: string;
-  available: number;
+  // cover: string;
+  // available: number;
   variant: Variant;
-  price: number;
-  color: string;
-  size: string;
+  productChars: ProductChar[]
+  // price: number;
+  // color: string;
+  // size: string;
   quantity: number;
   subtotal: number;
 };

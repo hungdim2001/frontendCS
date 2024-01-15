@@ -80,7 +80,7 @@ export default function ProductDetailsSummary({
     status,
     quantity,
     productSpecChars,
-    variants
+    variants,
     // colors,
     // available,
     // priceSale,
@@ -89,21 +89,22 @@ export default function ProductDetailsSummary({
     // inventoryType,
   } = product;
 
-  const alreadyProduct = cart.map((item) => item.id).includes(id);
+  const alreadyProduct = cart.map((item) => item.variant.id).includes(id);
 
   const isMaxQuantity =
-    cart.filter((item) => item.id === id).map((item) => item.quantity)[0] >= quantity;
+    cart.filter((item) => item.variant.id=== id).map((item) => item.quantity)[0] >= quantity;
 
   const defaultValues = {
     id,
     name,
-    variant: variants.length === 1 ? variants.at(0) : variants.find(item => !item.chars.includes(-1)),
-    price,
-    quantity: variants.length === 1
-      ? (variants.at(0)?.quantity ?? 0) < 1
-        ? 0
-        : 1
-      : (variants.find(item => !item.chars.includes(-1))?.quantity ?? 0) < 1
+    variant:
+      variants.length === 1 ? variants.at(0) : variants.find((item) => !item.chars.includes(-1)),
+    quantity:
+      variants.length === 1
+        ? (variants.at(0)?.quantity ?? 0) < 1
+          ? 0
+          : 1
+        : (variants.find((item) => !item.chars.includes(-1))?.quantity ?? 0) < 1
         ? 0
         : 1,
   };
@@ -116,17 +117,20 @@ export default function ProductDetailsSummary({
 
   const values = watch();
   useEffect(() => {
-    const image = variants.find(variant => variant.chars.every(char => getValues('variant').chars.includes(char)))?.image.toString()!
+    const image = variants
+      .find((variant) => variant.chars.every((char) => getValues('variant').chars.includes(char)))
+      ?.image.toString()!;
     const currentIndex = product.images.indexOf(image);
-    setCurrentIndex(currentIndex)
-    setVariant(getValues('variant'))
-  }, [getValues('variant')])
+    setCurrentIndex(currentIndex);
+    setVariant(getValues('variant'));
+  }, [getValues('variant')]);
   const onSubmit = async (data: FormValuesProps) => {
     try {
       if (!alreadyProduct) {
+        let charValue
         onAddCart({
           ...data,
-          subtotal: data.price * data.quantity,
+          subtotal: data.variant.quantity * data.quantity,
         });
       }
       onGotoStep(0);
@@ -140,7 +144,7 @@ export default function ProductDetailsSummary({
     try {
       onAddCart({
         ...values,
-        subtotal: values.price * values.quantity,
+        subtotal: values.variant.quantity * values.quantity,
       });
     } catch (error) {
       console.error(error);
@@ -205,16 +209,25 @@ export default function ProductDetailsSummary({
                         charValues={char.productSpecCharValueDTOS!}
                         value={field.value}
                         onChange={(e) => {
-                          const oldValue = field.value.chars.filter(old => !char.productSpecCharValueDTOS?.map(char => char.id).includes(old));
-                          setValue('variant', variants.find(variant=> variant.chars.every(char=> [...oldValue, Number(e.target.value)].includes(char)))!);
+                          const oldValue = field.value.chars.filter(
+                            (old) =>
+                              !char.productSpecCharValueDTOS?.map((char) => char.id).includes(old)
+                          );
+                          setValue(
+                            'variant',
+                            variants.find((variant) =>
+                              variant.chars.every((char) =>
+                                [...oldValue, Number(e.target.value)].includes(char)
+                              )
+                            )!
+                          );
                         }}
                         sx={{
-                          gap: 2
+                          gap: 2,
                         }}
                       />
                     )}
                   />
-
                 </Stack>
               );
             })}
@@ -258,8 +271,7 @@ export default function ProductDetailsSummary({
               sx={{ mb: 2 }}
             >
               <Typography variant="h6"> {fCurrency(getValues('variant').price!)}₫</Typography>
-              <Stack direction="row" flex={1} justifyContent="flex-start" sx={{ mr: 1 }}>
-              </Stack>
+              <Stack direction="row" flex={1} justifyContent="flex-start" sx={{ mr: 1 }}></Stack>
               <Stack direction="row" justifyContent="flex-end">
                 <Typography
                   variant="h6"
