@@ -78,7 +78,7 @@ const slice = createSlice({
     getCart(state, action) {
       const cart = action.payload;
 
-      const subtotal = sum(cart.map((cartItem: CartItem) => cartItem.price * cartItem.quantity));
+      const subtotal = sum(cart.map((cartItem: CartItem) => cartItem.variant.price * cartItem.quantity));
       const discount = cart.length === 0 ? 0 : state.checkout.discount;
       const shipping = cart.length === 0 ? 0 : state.checkout.shipping;
       const billing = cart.length === 0 ? null : state.checkout.billing;
@@ -94,12 +94,11 @@ const slice = createSlice({
     addCart(state, action) {
       const product = action.payload;
       const isEmptyCart = state.checkout.cart.length === 0;
-
       if (isEmptyCart) {
         state.checkout.cart = [...state.checkout.cart, product];
       } else {
         state.checkout.cart = state.checkout.cart.map((_product) => {
-          const isExisted = _product.id === product.id;
+          const isExisted = _product.variant.id=== product.variant.id
           if (isExisted) {
             return {
               ..._product,
@@ -109,11 +108,11 @@ const slice = createSlice({
           return _product;
         });
       }
-      state.checkout.cart = uniqBy([...state.checkout.cart, product], 'id');
+      state.checkout.cart = uniqBy([...state.checkout.cart, product], 'variant.id');
     },
 
     deleteCart(state, action) {
-      const updateCart = state.checkout.cart.filter((item) => item.id !== action.payload);
+      const updateCart = state.checkout.cart.filter((item) => item.variant.id!== action.payload);
 
       state.checkout.cart = updateCart;
     },
@@ -144,7 +143,7 @@ const slice = createSlice({
     increaseQuantity(state, action) {
       const productId = action.payload;
       const updateCart = state.checkout.cart.map((product) => {
-        if (product.id === productId) {
+        if (product.variant.id=== productId) {
           return {
             ...product,
             quantity: product.quantity + 1,
@@ -159,7 +158,7 @@ const slice = createSlice({
     decreaseQuantity(state, action) {
       const productId = action.payload;
       const updateCart = state.checkout.cart.map((product) => {
-        if (product.id === productId) {
+        if (product.variant.id=== productId) {
           return {
             ...product,
             quantity: product.quantity - 1,

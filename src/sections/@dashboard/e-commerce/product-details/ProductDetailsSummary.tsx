@@ -95,7 +95,6 @@ export default function ProductDetailsSummary({
     cart.filter((item) => item.variant.id=== id).map((item) => item.quantity)[0] >= quantity;
 
   const defaultValues = {
-    id,
     name,
     variant:
       variants.length === 1 ? variants.at(0) : variants.find((item) => !item.chars.includes(-1)),

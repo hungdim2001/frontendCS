@@ -63,14 +63,15 @@ export default function CheckoutProductList({
 
         <TableBody>
           {products.map((product) => {
-            const { id, name, size, price, color, cover, quantity, available } = product;
+            const { variant, name, quantity} = product;
+            console.log(product)
             return (
-              <TableRow key={id}>
+              <TableRow key={variant.id}>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Image
                       alt="product image"
-                      src={cover}
+                      src={variant.image.toString()}
                       sx={{ width: 64, height: 64, borderRadius: 1.5, mr: 2 }}
                     />
                     <Box>
@@ -84,7 +85,7 @@ export default function CheckoutProductList({
                           alignItems: 'center',
                         }}
                       >
-                        <Typography variant="body2">
+                        {/* <Typography variant="body2">
                           <Typography
                             component="span"
                             variant="body2"
@@ -104,27 +105,27 @@ export default function CheckoutProductList({
                             color:&nbsp;
                           </Typography>
                           {getColorName(color)}
-                        </Typography>
+                        </Typography> */}
                       </Box>
                     </Box>
                   </Box>
                 </TableCell>
 
-                <TableCell align="left">{fCurrency(price)}</TableCell>
+                <TableCell align="left">{fCurrency(variant.price)}</TableCell>
 
                 <TableCell align="left">
                   <Incrementer
                     quantity={quantity}
-                    available={available}
-                    onDecrease={() => onDecreaseQuantity(id)}
-                    onIncrease={() => onIncreaseQuantity(id)}
+                    available={variant.quantity}
+                    onDecrease={() => onDecreaseQuantity(variant.id)}
+                    onIncrease={() => onIncreaseQuantity(variant.id)}
                   />
                 </TableCell>
 
-                <TableCell align="right">{fCurrency(price * quantity)}</TableCell>
+                <TableCell align="right">{fCurrency(variant.price * quantity)}</TableCell>
 
                 <TableCell align="right">
-                  <IconButton onClick={() => onDelete(id)}>
+                  <IconButton onClick={() => onDelete(variant.id)}>
                     <Iconify icon={'eva:trash-2-outline'} width={20} height={20} />
                   </IconButton>
                 </TableCell>

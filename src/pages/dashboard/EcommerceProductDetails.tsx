@@ -38,6 +38,7 @@ import {
 } from '../../sections/@dashboard/e-commerce/product-details';
 import CartWidget from '../../sections/@dashboard/e-commerce/CartWidget';
 import LoadingScreen from 'src/components/LoadingScreen';
+import productChar from 'src/redux/slices/product-char';
 
 // ----------------------------------------------------------------------
 
@@ -89,13 +90,10 @@ export default function EcommerceProductDetails() {
     dispatch(getProduct(+id));
   }, [dispatch, id]);
   const handleAddCart = (product: CartItem) => {
-
     dispatch(addCart(product));
   };
   const [variant, setVariant] = useState<Variant>({} as Variant);
-  useEffect(() => {
-    console.log(variant)
-  }, [variant])
+
   const handleGotoStep = (step: number) => {
     dispatch(onGotoStep(step));
   };
@@ -189,7 +187,7 @@ export default function EcommerceProductDetails() {
                     >
                       {product.productSpecChars.map((char: any, index) => {
                         // console.log(char.name + char.productSpecCharValueDTOS.some((value: ProductCharValue) => value.variant))
-                       
+
 
                         return (
                           <ListItem
@@ -209,7 +207,7 @@ export default function EcommerceProductDetails() {
                                 <Typography variant="body1" sx={{ color: '#2D2D2D' }}>
                                   {
                                     char.productSpecCharValueDTOS.some((value: ProductCharValue) => value.variant) ?
-                                      char.productSpecCharValueDTOS.find((value: ProductCharValue) => variant?.chars?.includes(value.id!))&&char.productSpecCharValueDTOS.find((value: ProductCharValue) => variant?.chars?.includes(value.id!)).value 
+                                      char.productSpecCharValueDTOS.find((value: ProductCharValue) => variant?.chars?.includes(value.id!)) && char.productSpecCharValueDTOS.find((value: ProductCharValue) => variant?.chars?.includes(value.id!)).value
                                       : char.productSpecCharValueDTOS!.map((value: any) => value.value).join(', ')
                                   }
                                   {/* char.productSpecCharValueDTOS!.map((value: any) => value.value).join(', ')} */}
