@@ -11,6 +11,8 @@ import {
   Typography,
   IconButton,
   TableContainer,
+  Card,
+  Grid,
 } from '@mui/material';
 // utils
 import getColorName from '../../../../utils/getColorName';
@@ -37,9 +39,9 @@ const IncrementerStyle = styled('div')(({ theme }) => ({
 
 type Props = {
   products: CartItem[];
-  onDelete: (id: number|null) => void;
-  onDecreaseQuantity: (id: number|null) => void;
-  onIncreaseQuantity: (id: number|null) => void;
+  onDelete: (id: number | null) => void;
+  onDecreaseQuantity: (id: number | null) => void;
+  onIncreaseQuantity: (id: number | null) => void;
 };
 
 export default function CheckoutProductList({
@@ -49,92 +51,119 @@ export default function CheckoutProductList({
   onDecreaseQuantity,
 }: Props) {
   return (
-    <TableContainer sx={{ minWidth: 720 }}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Product</TableCell>
-            <TableCell align="left">Price</TableCell>
-            <TableCell align="left">Quantity</TableCell>
-            <TableCell align="right">Total Price</TableCell>
-            <TableCell align="right" />
-          </TableRow>
-        </TableHead>
-
-        <TableBody>
-          {products.map((product) => {
-            const { variant, name, quantity} = product;
-            console.log(product)
-            return (
-              <TableRow key={variant.id}>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Image
-                      alt="product image"
-                      src={variant.image.toString()}
-                      sx={{ width: 64, height: 64, borderRadius: 1.5, mr: 2 }}
-                    />
-                    <Box>
-                      <Typography noWrap variant="subtitle2" sx={{ maxWidth: 240 }}>
-                        {name}
-                      </Typography>
-
-                      <Box
+    <>
+      {products.map((product, index) => {
+        const { variant, name, quantity } = product;
+        return (
+          <>
+            <Card key={index} sx={{ padding: 2 }}>
+              <Grid container >
+                <Grid item lg={3} md={4}>  <Image
+                  alt="product image"
+                  src={variant.image.toString()}
+                // sx={{ width: 64, height: 64, borderRadius: 1.5, mr: 2 }}
+                /></Grid>
+                <Grid item lg={9} md={8} container
+                  direction="column"
+                  justifyContent="space-between"
+                  alignItems="flex-start"
+                >
+                  <Typography noWrap variant="h6" >
+                    {name}
+                  </Typography>
+                  <Grid>  {Object.entries(variant.charValues).map(([key, value], index) => (
+                    <Typography key={index} sx={{
+                      fontSize: 14,
+                      fontWeight: 400,
+                      color: '#717170'
+                    }}>
+                      <Typography
+                        component="span"
+                        variant="subtitle1"
                         sx={{
-                          display: 'flex',
-                          alignItems: 'center',
+                          color: 'text.primary', fontSize: 14,
+                          fontWeight: 400,
+                          mt:'0.5'
                         }}
                       >
-                        {/* <Typography variant="body2">
-                          <Typography
-                            component="span"
-                            variant="body2"
-                            sx={{ color: 'text.secondary' }}
-                          >
-                            size:&nbsp;
-                          </Typography>
-                          {size}
-                        </Typography>
-                        <Divider orientation="vertical" sx={{ mx: 1, height: 16 }} />
-                        <Typography variant="body2">
-                          <Typography
-                            component="span"
-                            variant="body2"
-                            sx={{ color: 'text.secondary' }}
-                          >
-                            color:&nbsp;
-                          </Typography>
-                          {getColorName(color)}
-                        </Typography> */}
-                      </Box>
-                    </Box>
+                        {key}:&nbsp;
+                      </Typography>
+                      {value}
+                    </Typography>
+                  ))}</Grid>
+
+                  <Typography
+                    variant='body1'
+                  >{fCurrency(variant.price)}
+                  </Typography>
+                </Grid>
+
+                <Grid item lg={3}></Grid>
+              </Grid>
+
+
+
+            </Card>
+
+            {/* <TableRow key={variant.id}>
+              <TableCell>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+
+                  <Box>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                   </Box>
                   </Box>
-                </TableCell>
+                </Box>
+              </TableCell>
 
-                <TableCell align="left">{fCurrency(variant.price)}</TableCell>
+              <TableCell align="left">{fCurrency(variant.price)}</TableCell>
 
-                <TableCell align="left">
-                  <Incrementer
-                    quantity={quantity}
-                    available={variant.quantity}
-                    onDecrease={() => onDecreaseQuantity(variant.id)}
-                    onIncrease={() => onIncreaseQuantity(variant.id)}
-                  />
-                </TableCell>
+              <TableCell align="left">
+                <Incrementer
+                  quantity={quantity}
+                  available={variant.quantity}
+                  onDecrease={() => onDecreaseQuantity(variant.id)}
+                  onIncrease={() => onIncreaseQuantity(variant.id)}
+                />
+              </TableCell>
 
-                <TableCell align="right">{fCurrency(variant.price * quantity)}</TableCell>
+              <TableCell align="right">{fCurrency(variant.price * quantity)}</TableCell>
 
-                <TableCell align="right">
-                  <IconButton onClick={() => onDelete(variant.id)}>
-                    <Iconify icon={'eva:trash-2-outline'} width={20} height={20} />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+              <TableCell align="right">
+                <IconButton onClick={() => onDelete(variant.id)}>
+                  <Iconify icon={'eva:trash-2-outline'} width={20} height={20} />
+                </IconButton>
+              </TableCell>
+            </TableRow> */}
+
+          </>
+
+
+        );
+      })}
+
+    </>
+    // <TableContainer sx={{ minWidth: 720 }}>
+    //   <Table>
+    //     {/* <TableHead>
+    //       <TableRow>
+    //         <TableCell>Product</TableCell>
+    //         <TableCell align="left">Price</TableCell>
+    //         <TableCell align="left">Quantity</TableCell>
+    //         <TableCell align="right">Total Price</TableCell>
+    //         <TableCell align="right" />
+    //       </TableRow>
+    //     </TableHead> */}
+
+    //     <TableBody>
+    //    </TableBody>
+    //   </Table>
+    // </TableContainer>
   );
 }
 

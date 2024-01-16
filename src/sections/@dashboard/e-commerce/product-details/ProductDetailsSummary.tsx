@@ -35,6 +35,7 @@ import { FormProvider, RHFSelect } from '../../../../components/hook-form';
 import { ICONS } from 'src/layouts/dashboard/navbar/NavConfig';
 import VariantPicker from 'src/components/variant/VariantPicker';
 import { useEffect } from 'react';
+import productChar from 'src/redux/slices/product-char';
 
 // ----------------------------------------------------------------------
 
@@ -88,9 +89,8 @@ export default function ProductDetailsSummary({
     // totalReview,
     // inventoryType,
   } = product;
-
+  console.log(variants)
   const alreadyProduct = cart.map((item) => item.variant.id).includes(id);
-
   const isMaxQuantity =
     cart.filter((item) => item.variant.id=== id).map((item) => item.quantity)[0] >= quantity;
 
@@ -126,10 +126,9 @@ export default function ProductDetailsSummary({
   const onSubmit = async (data: FormValuesProps) => {
     try {
       if (!alreadyProduct) {
-        let charValue
         onAddCart({
           ...data,
-          subtotal: data.variant.quantity * data.quantity,
+          subtotal: data.variant.price * data.quantity,
         });
       }
       onGotoStep(0);
@@ -143,7 +142,7 @@ export default function ProductDetailsSummary({
     try {
       onAddCart({
         ...values,
-        subtotal: values.variant.quantity * values.quantity,
+        subtotal: values.variant.price * values.quantity,
       });
     } catch (error) {
       console.error(error);
@@ -313,7 +312,7 @@ export default function ProductDetailsSummary({
               sx={{
                 mb: 2,
                 color: '#717171',
-                fontWeight: 500,
+                fontWeight: 300,
                 lineHeight: 22 / 14,
                 fontSize: 14,
               }}

@@ -58,7 +58,7 @@ export default function CheckoutCart() {
     <Grid container spacing={3}>
       <Grid item xs={12} md={8}>
         <Card sx={{ mb: 3 }}>
-          <CardHeader
+          {/* <CardHeader
             title={
               <Typography variant="h6">
                 Cart
@@ -68,7 +68,7 @@ export default function CheckoutCart() {
               </Typography>
             }
             sx={{ mb: 3 }}
-          />
+          /> */}
 
           {!isEmptyCart ? (
             <Scrollbar>

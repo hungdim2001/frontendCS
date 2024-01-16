@@ -30,6 +30,7 @@ export type ProductReview = {
   helpful: number;
   postedAt: Date | string | number;
 };
+type CharValues = Record<string, string>;
 
 
 export type Variant = BaseDTO & {
@@ -38,6 +39,7 @@ export type Variant = BaseDTO & {
   quantity: number;
   price: number;
   image:string|CustomFile;
+  charValues:CharValues;
 };
 
 export type ProductChar = BaseDTO & {
