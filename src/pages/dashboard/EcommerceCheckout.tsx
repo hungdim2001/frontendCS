@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 // @mui
 import { styled } from '@mui/material/styles';
-import { Box, Grid, Step, Stepper, Container, StepLabel, StepConnector } from '@mui/material';
+import { Box, Grid, Step, Stepper, Container, StepLabel, StepConnector, StepIconProps, stepConnectorClasses } from '@mui/material';
 // redux
 import { useDispatch, useSelector } from '../../redux/store';
 import { getCart, createBilling } from '../../redux/slices/product';
@@ -21,15 +21,71 @@ import {
   CheckoutOrderComplete,
   CheckoutBillingAddress,
 } from '../../sections/@dashboard/e-commerce/checkout';
+import { Check } from '@mui/icons-material';
+import SvgIconStyle from 'src/components/SvgIconStyle';
+import SvgIconStep from 'src/components/SvgIconStep';
 
 // ----------------------------------------------------------------------
 
-const STEPS = ['Cart', 'Billing & address', 'Payment'];
+const STEPS = ['', '', ''];
+
+const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
+  [`&.${stepConnectorClasses.alternativeLabel}`]: {
+    top: 22,
+  },
+  [`&.${stepConnectorClasses.active}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      backgroundColor:
+        theme.palette.primary.main
+
+    },
+  },
+  [`&.${stepConnectorClasses.completed}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      backgroundColor:
+        theme.palette.divider,
+
+    },
+  },
+  [`& .${stepConnectorClasses.line}`]: {
+    height: 3,
+    border: 0,
+    backgroundColor:
+      theme.palette.mode === 'dark' ? theme.palette.grey[800] : '#eaeaf0',
+    borderRadius: 1,
+  },
+}));
+
+const ColorlibStepIconRoot = styled('div')<{
+  ownerState: { completed?: boolean; active?: boolean };
+}>(({ theme, ownerState }) => ({
+  backgroundColor: '#9e9e9e',
+  zIndex: 1,
+  color: '#fff',
+  width: 48,
+  height: 48,
+  display: 'flex',
+  borderRadius: '50%',
+  justifyContent: 'center',
+  alignItems: 'center',
+  ...(ownerState.active && {
+    backgroundColor: '#fff',
+    color: theme.palette.primary.main,
+    border: `3px solid ${theme.palette.primary.main}`,
+    borderRadius: '50%'
+  }),
+  ...(ownerState.completed && {
+    color: '#fff',
+    backgroundColor: '#0c68f4bf'
+
+  }),
+}));
+
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
-  top: 10,
-  left: 'calc(-50% + 20px)',
-  right: 'calc(50% + 20px)',
+  top: '24px',
+  left: 'calc(-50% + 24px)',
+  right: 'calc(50% + 24px)',
   '& .MuiStepConnector-line': {
     borderTopWidth: 2,
     borderColor: theme.palette.divider,
@@ -40,38 +96,23 @@ const QontoConnector = styled(StepConnector)(({ theme }) => ({
     },
   },
 }));
+function ColorlibStepIcon(props: StepIconProps) {
+  const { active, completed, className } = props;
 
-function QontoStepIcon({ active, completed }: { active: boolean; completed: boolean }) {
+  const icons: { [index: string]: React.ReactElement } = {
+    1: <SvgIconStep active={active!} src={'/icons/ic_bag_happy.svg'} />,
+    2: <SvgIconStep active={active!} src={'/icons/ic_truck.svg'} />,
+    3: <SvgIconStep active={active!} src={'/icons/ic_card.svg'} />,
+  };
+
   return (
-    <Box
-      sx={{
-        zIndex: 9,
-        width: 24,
-        height: 24,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: active ? 'primary.main' : 'text.disabled',
-      }}
-    >
-      {completed ? (
-        <Iconify
-          icon={'eva:checkmark-fill'}
-          sx={{ zIndex: 1, width: 20, height: 20, color: 'primary.main' }}
-        />
-      ) : (
-        <Box
-          sx={{
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            backgroundColor: 'currentColor',
-          }}
-        />
-      )}
-    </Box>
+    <ColorlibStepIconRoot ownerState={{ completed, active }} className={className}>
+      {icons[String(props.icon)]}
+    </ColorlibStepIconRoot>
   );
 }
+
+
 
 export default function EcommerceCheckout() {
   const { themeStretch } = useSettings();
@@ -115,20 +156,12 @@ export default function EcommerceCheckout() {
 
         <Grid container justifyContent={isComplete ? 'center' : 'flex-start'}>
           <Grid item xs={12} md={8} sx={{ mb: 5 }}>
-            <Stepper alternativeLabel activeStep={activeStep} connector={<QontoConnector />}>
-              {STEPS.map((label) => (
-                <Step key={label}>
-                  <StepLabel
-                    StepIconComponent={QontoStepIcon}
-                    sx={{
-                      '& .MuiStepLabel-label': {
-                        typography: 'subtitle2',
-                        color: 'text.disabled',
-                      },
-                    }}
-                  >
-                    {label}
-                  </StepLabel>
+            <Stepper sx={{
+              alignItems:'center'
+            }} alternativeLabel activeStep={activeStep} connector={<QontoConnector />}>
+              {STEPS.map((label, index) => (
+                <Step key={index}>
+                  <StepLabel StepIconComponent={ColorlibStepIcon}>{label}</StepLabel>
                 </Step>
               ))}
             </Stepper>

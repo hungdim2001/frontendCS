@@ -16,8 +16,8 @@ const locationStateInit = {
 };
 const initialState: LocationContextProps = {
   locationState: locationStateInit,
-  onSubmit: () => {},
-  handleLocationSelect: () => {},
+  onSubmit: () => { },
+  handleLocationSelect: () => { },
 };
 const LocationContext = createContext(initialState);
 

@@ -55,19 +55,19 @@ export default function CheckoutSummary({
       />
 
       <CardContent>
-        <Stack spacing={2}>
+        <Stack spacing={1}>
           <Stack direction="row" justifyContent="space-between">
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Sub Total
             </Typography>
-            <Typography variant="subtitle2">{fCurrency(subtotal)}</Typography>
+            <Typography variant="subtitle2">{fCurrency(subtotal)}₫</Typography>
           </Stack>
 
           <Stack direction="row" justifyContent="space-between">
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Discount
             </Typography>
-            <Typography variant="subtitle2">{discount ? fCurrency(-discount) : '-'}</Typography>
+            <Typography variant="subtitle2">{discount ?`${fCurrency(-discount)}₫`: '-'}</Typography>
           </Stack>
 
           <Stack direction="row" justifyContent="space-between">
@@ -75,7 +75,7 @@ export default function CheckoutSummary({
               Shipping
             </Typography>
             <Typography variant="subtitle2">
-              {shipping ? fCurrency(shipping) : displayShipping}
+              {shipping ? `${fCurrency(-shipping)}₫`: displayShipping}
             </Typography>
           </Stack>
 
@@ -85,7 +85,7 @@ export default function CheckoutSummary({
             <Typography variant="subtitle1">Total</Typography>
             <Box sx={{ textAlign: 'right' }}>
               <Typography variant="subtitle1" sx={{ color: 'error.main' }}>
-                {fCurrency(total)}
+                {fCurrency(total)}₫
               </Typography>
               <Typography variant="caption" sx={{ fontStyle: 'italic' }}>
                 (VAT included if applicable)

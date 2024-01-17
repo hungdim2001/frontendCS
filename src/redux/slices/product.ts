@@ -102,7 +102,7 @@ const slice = createSlice({
           if (isExisted) {
             return {
               ..._product,
-              quantity: _product.quantity + 1,
+              quantity: _product.quantity + product.quantity,
             };
           }
           return _product;

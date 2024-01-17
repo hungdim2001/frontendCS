@@ -36,6 +36,9 @@ import { ICONS } from 'src/layouts/dashboard/navbar/NavConfig';
 import VariantPicker from 'src/components/variant/VariantPicker';
 import { useEffect } from 'react';
 import productChar from 'src/redux/slices/product-char';
+import useIsMountedRef from 'src/hooks/useIsMountedRef';
+import { useDispatch, useSelector } from 'src/redux/store';
+import { getCart } from 'src/redux/slices/product';
 
 // ----------------------------------------------------------------------
 
@@ -89,10 +92,9 @@ export default function ProductDetailsSummary({
     // totalReview,
     // inventoryType,
   } = product;
-  console.log(variants)
   const alreadyProduct = cart.map((item) => item.variant.id).includes(id);
   const isMaxQuantity =
-    cart.filter((item) => item.variant.id=== id).map((item) => item.quantity)[0] >= quantity;
+    cart.filter((item) => item.variant.id === id).map((item) => item.quantity)[0] >= quantity;
 
   const defaultValues = {
     name,
@@ -104,8 +106,8 @@ export default function ProductDetailsSummary({
           ? 0
           : 1
         : (variants.find((item) => !item.chars.includes(-1))?.quantity ?? 0) < 1
-        ? 0
-        : 1,
+          ? 0
+          : 1,
   };
 
   const methods = useForm<FormValuesProps>({
@@ -113,7 +115,17 @@ export default function ProductDetailsSummary({
   });
 
   const { watch, control, setValue, getValues, handleSubmit } = methods;
+  const isMountedRef = useIsMountedRef();
 
+  const { checkout } = useSelector((state) => state.product);
+
+  const { cart: currentCart } = checkout;
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (isMountedRef.current) {
+      dispatch(getCart(currentCart));
+    }
+  }, [dispatch, isMountedRef, cart]);
   const values = watch();
   useEffect(() => {
     const image = variants
@@ -140,10 +152,19 @@ export default function ProductDetailsSummary({
 
   const handleAddCart = async () => {
     try {
-      onAddCart({
-        ...values,
-        subtotal: values.variant.price * values.quantity,
-      });
+      console.log((currentCart.find(item => item.variant.id === values.variant.id)?.quantity ?? 0) +
+        values.variant.quantity)
+      if (
+        (currentCart.find(item => item.variant.id === values.variant.id)?.quantity ?? 0) +
+        values.quantity <
+        (variants.find(variant => variant.id === values.variant.id)?.quantity ?? 0)
+      ) {
+        onAddCart({
+          ...values,
+          subtotal: values.variant.price * values.quantity,
+        });
+      }
+
     } catch (error) {
       console.error(error);
     }

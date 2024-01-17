@@ -25,15 +25,17 @@ import {
   RHFTextField,
   RHFRadioGroup,
 } from '../../../../components/hook-form';
+import useLocationContext from 'src/hooks/useLocation';
+import { areaResponse } from 'src/service/app-apis/location';
 
 // ----------------------------------------------------------------------
 
 interface FormValuesProps extends BillingAddress {
+  province: string;
+  district: string;
   address: string;
-  city: string;
-  state: string;
-  country: string;
-  zipcode: string;
+  precinct: string;
+  streetBlock: string;
 }
 
 type Props = {
@@ -61,14 +63,23 @@ export default function CheckoutNewAddressForm({
     addressType: 'Home',
     receiver: '',
     phone: '',
-    address: '',
-    city: '',
-    state: '',
-    country: countries[0].label,
+    streetBlock: '',
+    province: '',
+    district: '',
+    precinct: '',
     zipcode: '',
     isDefault: true,
   };
+  const { locationState,
 
+    handleLocationSelect,
+  } = useLocationContext();
+  const {
+    provinces,
+    districts,
+    precincts,
+    streetBlocks,
+  } = locationState;
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(NewAddressSchema),
     defaultValues,
@@ -76,21 +87,53 @@ export default function CheckoutNewAddressForm({
 
   const {
     handleSubmit,
+    setValue,
+    resetField,
     formState: { isSubmitting },
   } = methods;
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
       onNextStep();
-      onCreateBilling({
-        receiver: data.receiver,
-        phone: data.phone,
-        fullAddress: `${data.address}, ${data.city}, ${data.state}, ${data.country}, ${data.zipcode}`,
-        addressType: data.addressType,
-        isDefault: data.isDefault,
-      });
+      // onCreateBilling({
+      //   receiver: data.receiver,
+      //   phone: data.phone,
+      //   // fullAddress: `${data.address}, ${data.city}, ${data.state}, ${data.country}, ${data.zipcode}`,
+      //   addressType: data.addressType,
+      //   isDefault: data.isDefault,
+      // });
     } catch (error) {
       console.error(error);
+    }
+  };
+  type Field = "province" | "district" | "precinct" | "streetBlock";
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, field: Field) => {
+    const selectedValue = e.target.value;
+    let option: areaResponse | undefined
+    setValue(field, selectedValue, { shouldValidate: true });
+    if (field === 'province') {
+      option = provinces.find((c) => c.areaCode === selectedValue)
+      resetField("district")
+      resetField("precinct")
+      resetField("streetBlock")
+      handleLocationSelect(option, field);
+
+    } else if (field === 'district') {
+      option = districts.find((c) => c.areaCode === selectedValue)
+      resetField("precinct")
+      resetField("streetBlock")
+      handleLocationSelect(option, field);
+      console.log(option)
+      console.log(field)
+
+    } else if (field === 'precinct') {
+      option = precincts.find((c) => c.areaCode === selectedValue)
+      resetField("streetBlock")
+      handleLocationSelect(option, field);
+
+    } else {
+      handleLocationSelect(option, field);
+
     }
   };
 
@@ -115,29 +158,80 @@ export default function CheckoutNewAddressForm({
               <RHFTextField name="phone" label="Phone Number" />
             </Box>
 
-            <RHFTextField name="address" label="Address" />
 
             <Box
               sx={{
                 display: 'grid',
                 rowGap: 3,
                 columnGap: 2,
-                gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(3, 1fr)' },
+                gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
               }}
             >
-              <RHFTextField name="city" label="Town / City" />
-              <RHFTextField name="state" label="State" />
-              <RHFTextField name="zipcode" label="Zip / Postal Code" />
+              <RHFSelect
+                disabled={provinces.length === 0}
+                name="province" label="Province" placeholder="Province"
+                onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'province')}
+              >
+                <option value="" />
+                {provinces.map((option) => (
+                  <
+                    option key={option.areaCode} value={option.areaCode!} >
+                    {option.name}
+                  </option>
+                ))}
+
+              </RHFSelect>
+              <RHFSelect
+                onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'district')}
+                disabled={districts.length === 0}
+                name="district" label="District" placeholder="District"
+              >  <option value="" />
+                {districts.map((option) => (
+                  <option key={option.areaCode} value={option.areaCode!}>
+                    {option.name}
+                  </option>
+                ))}
+              </RHFSelect>
+            </Box>
+            <Box
+              sx={{
+                display: 'grid',
+                rowGap: 3,
+                columnGap: 2,
+                gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
+              }}
+            >
+              <RHFSelect
+                onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'precinct')}
+                disabled={precincts.length === 0}
+                name="precinct"
+                label="Precinct"
+                placeholder="Precinct"
+              >  <option value="" />
+                {precincts.map((option) => (
+                  <option key={option.areaCode} value={option.areaCode!}>
+                    {option.name}
+                  </option>
+                ))}
+              </RHFSelect>
+
+
+              <RHFSelect
+                onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'streetBlock')}
+                disabled={streetBlocks.length === 0}
+                name="streetBlock"
+                label="Street Block"
+                placeholder="Street Block"
+              >  <option value="" />
+                {streetBlocks.map((option) => (
+                  <option key={option.areaCode} value={option.areaCode!}>
+                    {option.name}
+                  </option>
+                ))}
+              </RHFSelect>
             </Box>
 
-            <RHFSelect name="country" label="Country">
-              {countries.map((option) => (
-                <option key={option.code} value={option.label}>
-                  {option.label}
-                </option>
-              ))}
-            </RHFSelect>
-
+            <RHFTextField name="address" label="Address" />
             <RHFCheckbox name="isDefault" label="Use this address as default." sx={{ mt: 3 }} />
           </Stack>
         </DialogContent>
