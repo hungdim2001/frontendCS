@@ -1,6 +1,5 @@
-
-import { CustomFile } from "src/components/upload";
-import { BaseDTO } from "./common";
+import { CustomFile } from 'src/components/upload';
+import { BaseDTO } from './common';
 
 export type PaymentType = 'paypal' | 'credit_card' | 'cash';
 
@@ -12,7 +11,7 @@ export type ProductCategory = 'Accessories' | 'Apparel' | 'Shoes' | string;
 
 export type ProductGender = 'Men' | 'Women' | 'Kids' | string;
 
-export type OnCreateBilling = (address: BillingAddress) => void;
+export type OnCreateBilling = (address: Address) => void;
 
 export type ProductRating = {
   name: string;
@@ -32,47 +31,49 @@ export type ProductReview = {
 };
 type CharValues = Record<string, string>;
 
-
 export type Variant = BaseDTO & {
   name: string;
-  chars:number[];
+  chars: number[];
   quantity: number;
   price: number;
-  image:string|CustomFile;
-  charValues:CharValues;
+  image: string | CustomFile;
+  charValues: CharValues;
 };
 
 export type ProductChar = BaseDTO & {
   name: string;
-  productSpecCharValueDTOS: ProductCharValue[]|null;
+  productSpecCharValueDTOS: ProductCharValue[] | null;
 };
 export type ProductType = BaseDTO & {
   icon: string;
   name: string;
 };
-export type ProductCharState  = {
-  productChars :ProductChar[]|[]
-  productChar: ProductChar
+export type ProductCharState = {
+  productChars: ProductChar[] | [];
+  productChar: ProductChar;
 };
 
-export type ProductTypeState  = {
-  productTypes: ProductType[]
-}
+export type ProductTypeState = {
+  productTypes: ProductType[];
+};
+export type AddressState = {
+  adresss: Address[];
+};
 
-export type ProductCharValue  = BaseDTO &{
+export type ProductCharValue = BaseDTO & {
   value: string;
   variant: boolean;
 };
-export type Product = BaseDTO &{
+export type Product = BaseDTO & {
   thumbnail: string;
   images: string[];
   name: string;
   price: number;
   quantity: number;
-  productType:ProductType;
-  productSpecChars:ProductChar[];
-  valueSelected:(ProductCharValue)[];
-  variants: Variant[]
+  productType: ProductType;
+  productSpecChars: ProductChar[];
+  valueSelected: ProductCharValue[];
+  variants: Variant[];
   // tags: string[];
   // priceSale: number | null;
   // totalRating: number;
@@ -83,7 +84,7 @@ export type Product = BaseDTO &{
   // status: ProductStatus;
   // inventoryType: ProductInventoryType;
   // sizes: string[];
- 
+
   // sold: number;
   // createdAt: Date | string | number;
   // category: ProductCategory;
@@ -100,12 +101,23 @@ export type CartItem = {
 export type BillingAddress = {
   receiver: string;
   phone: string;
-  fullAddress: string;
   addressType: string;
   isDefault: boolean;
 };
 
-
+export type Address = BaseDTO & {
+  receiver: string;
+  phone: string;
+  userId: number;
+  addressType: string;
+  isDefault: boolean;
+  province: string;
+  district: string;
+  areaCode: string;
+  address: string;
+  precinct: string;
+  streetBlock: string;
+};
 export type ProductState = {
   isLoading: boolean;
   error: Error | string | null;

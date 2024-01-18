@@ -35,7 +35,7 @@ export default function CheckoutBillingInfo({ onBackStep }: Props) {
         </Typography>
 
         <Typography variant="body2" gutterBottom>
-          {billing?.fullAddress}
+          {billing?.addressType}
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {billing?.phone}

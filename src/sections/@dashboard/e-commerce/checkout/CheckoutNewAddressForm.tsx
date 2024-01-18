@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // @types
-import { OnCreateBilling, BillingAddress } from '../../../../@types/product';
+import { OnCreateBilling, BillingAddress, Address } from '../../../../@types/product';
 // _mock
 import { countries } from '../../../../_mock';
 import {
@@ -27,6 +27,8 @@ import {
 } from '../../../../components/hook-form';
 import useLocationContext from 'src/hooks/useLocation';
 import { areaResponse } from 'src/service/app-apis/location';
+import { addressApi } from 'src/service/app-apis/address';
+import useAuth from 'src/hooks/useAuth';
 
 // ----------------------------------------------------------------------
 
@@ -53,10 +55,14 @@ export default function CheckoutNewAddressForm({
 }: Props) {
   const NewAddressSchema = Yup.object().shape({
     receiver: Yup.string().required('Fullname is required'),
-    phone: Yup.string().required('Phone is required'),
+    phone: Yup.string()
+      .required('Phone number is required')
+      .matches(/^0[1-9]\d{8}$/, 'This is not a valid phone number'),
     address: Yup.string().required('Address is required'),
-    city: Yup.string().required('City is required'),
-    state: Yup.string().required('State is required'),
+    province: Yup.string().required('Province is required'),
+    district: Yup.string().required('District is required'),
+    precinct: Yup.string().required('Precinct is required'),
+    streetBlock: Yup.string().required('Street block is required'),
   });
 
   const defaultValues = {
@@ -70,21 +76,17 @@ export default function CheckoutNewAddressForm({
     zipcode: '',
     isDefault: true,
   };
-  const { locationState,
+  const {
+    locationState,
 
     handleLocationSelect,
   } = useLocationContext();
-  const {
-    provinces,
-    districts,
-    precincts,
-    streetBlocks,
-  } = locationState;
+  const { provinces, districts, precincts, streetBlocks } = locationState;
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(NewAddressSchema),
     defaultValues,
   });
-
+  const { user } = useAuth();
   const {
     handleSubmit,
     setValue,
@@ -94,7 +96,21 @@ export default function CheckoutNewAddressForm({
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
-      onNextStep();
+      // onNextStep();
+
+      const address: Address = {
+        receiver: data.receiver,
+        areaCode: data.province + data.district + data.precinct,
+        addressType: data.addressType,
+        phone: data.phone,
+        isDefault: data.isDefault,
+        userId: user?.id,
+        createUser: user?.id,
+        createDatetime: new Date(),
+        address: data.address,
+      } as Address;
+      // addressApi.createOrUpdate();
+
       // onCreateBilling({
       //   receiver: data.receiver,
       //   phone: data.phone,
@@ -106,34 +122,30 @@ export default function CheckoutNewAddressForm({
       console.error(error);
     }
   };
-  type Field = "province" | "district" | "precinct" | "streetBlock";
+  type Field = 'province' | 'district' | 'precinct' | 'streetBlock';
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, field: Field) => {
     const selectedValue = e.target.value;
-    let option: areaResponse | undefined
+    let option: areaResponse | undefined;
     setValue(field, selectedValue, { shouldValidate: true });
     if (field === 'province') {
-      option = provinces.find((c) => c.areaCode === selectedValue)
-      resetField("district")
-      resetField("precinct")
-      resetField("streetBlock")
+      option = provinces.find((c) => c.areaCode === selectedValue);
+      resetField('district');
+      resetField('precinct');
+      resetField('streetBlock');
       handleLocationSelect(option, field);
-
     } else if (field === 'district') {
-      option = districts.find((c) => c.areaCode === selectedValue)
-      resetField("precinct")
-      resetField("streetBlock")
+      option = districts.find((c) => c.areaCode === selectedValue);
+      resetField('precinct');
+      resetField('streetBlock');
       handleLocationSelect(option, field);
-      console.log(option)
-      console.log(field)
-
+      console.log(option);
+      console.log(field);
     } else if (field === 'precinct') {
-      option = precincts.find((c) => c.areaCode === selectedValue)
-      resetField("streetBlock")
+      option = precincts.find((c) => c.areaCode === selectedValue);
+      resetField('streetBlock');
       handleLocationSelect(option, field);
-
     } else {
       handleLocationSelect(option, field);
-
     }
   };
 
@@ -158,7 +170,6 @@ export default function CheckoutNewAddressForm({
               <RHFTextField name="phone" label="Phone Number" />
             </Box>
 
-
             <Box
               sx={{
                 display: 'grid',
@@ -169,23 +180,27 @@ export default function CheckoutNewAddressForm({
             >
               <RHFSelect
                 disabled={provinces.length === 0}
-                name="province" label="Province" placeholder="Province"
+                name="province"
+                label="Province"
+                placeholder="Province"
                 onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'province')}
               >
                 <option value="" />
                 {provinces.map((option) => (
-                  <
-                    option key={option.areaCode} value={option.areaCode!} >
+                  <option key={option.areaCode} value={option.areaCode!}>
                     {option.name}
                   </option>
                 ))}
-
               </RHFSelect>
               <RHFSelect
                 onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'district')}
                 disabled={districts.length === 0}
-                name="district" label="District" placeholder="District"
-              >  <option value="" />
+                name="district"
+                label="District"
+                placeholder="District"
+              >
+                {' '}
+                <option value="" />
                 {districts.map((option) => (
                   <option key={option.areaCode} value={option.areaCode!}>
                     {option.name}
@@ -207,7 +222,9 @@ export default function CheckoutNewAddressForm({
                 name="precinct"
                 label="Precinct"
                 placeholder="Precinct"
-              >  <option value="" />
+              >
+                {' '}
+                <option value="" />
                 {precincts.map((option) => (
                   <option key={option.areaCode} value={option.areaCode!}>
                     {option.name}
@@ -215,14 +232,17 @@ export default function CheckoutNewAddressForm({
                 ))}
               </RHFSelect>
 
-
               <RHFSelect
-                onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'streetBlock')}
+                onChange={(e) =>
+                  handleChange(e as React.ChangeEvent<HTMLInputElement>, 'streetBlock')
+                }
                 disabled={streetBlocks.length === 0}
                 name="streetBlock"
                 label="Street Block"
                 placeholder="Street Block"
-              >  <option value="" />
+              >
+                {' '}
+                <option value="" />
                 {streetBlocks.map((option) => (
                   <option key={option.areaCode} value={option.areaCode!}>
                     {option.name}
@@ -230,8 +250,7 @@ export default function CheckoutNewAddressForm({
                 ))}
               </RHFSelect>
             </Box>
-
-            <RHFTextField name="address" label="Address" />
+d            <RHFTextField name="address" label="Address" />
             <RHFCheckbox name="isDefault" label="Use this address as default." sx={{ mt: 3 }} />
           </Stack>
         </DialogContent>
@@ -240,7 +259,7 @@ export default function CheckoutNewAddressForm({
 
         <DialogActions>
           <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-            Deliver to this Address
+            Add Address
           </LoadingButton>
           <Button color="inherit" variant="outlined" onClick={onClose}>
             Cancel

@@ -1,9 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { ProductChar, ProductTypeState } from 'src/@types/product';
-import { dispatch } from '../store';
-import axios from '../../utils/axios';
-import { productSpecCharApi } from 'src/service/app-apis/product-char';
+import { ProductTypeState } from 'src/@types/product';
 import { productTypeApi } from 'src/service/app-apis/product-type';
+import { dispatch } from '../store';
 
 const initialState: ProductTypeState = {
   productTypes: [],
