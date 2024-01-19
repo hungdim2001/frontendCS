@@ -16,6 +16,7 @@ import CheckoutSummary from './CheckoutSummary';
 import CheckoutNewAddressForm from './CheckoutNewAddressForm';
 import useAuth from 'src/hooks/useAuth';
 import address, { getAddressSucess } from 'src/redux/slices/address';
+import Maps from 'src/components/GoogleMap';
 
 // ----------------------------------------------------------------------
 
@@ -58,7 +59,8 @@ export default function CheckoutBillingAddress() {
     <>
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
-          {addresss.adresss ? (
+          <Maps selectPosition={null}></Maps>
+          {addresss.adresss.length>0 ? (
             addresss.adresss.map((address, index) => (
               <AddressItem
                 key={index}
@@ -133,6 +135,7 @@ function AddressItem({ addressProp, onNextStep, onCreateBilling }: AddressItemPr
           </Label>
         )}
       </Box>
+      
       <Typography variant="body2" gutterBottom>
         {address}
       </Typography>

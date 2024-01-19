@@ -1,4 +1,3 @@
-import { sentenceCase } from 'change-case';
 import { useNavigate } from 'react-router-dom';
 // form
 import { Controller, useForm } from 'react-hook-form';
@@ -39,6 +38,7 @@ import productChar from 'src/redux/slices/product-char';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import { useDispatch, useSelector } from 'src/redux/store';
 import { getCart } from 'src/redux/slices/product';
+import Maps from 'src/components/GoogleMap';
 
 // ----------------------------------------------------------------------
 
@@ -99,10 +99,10 @@ export default function ProductDetailsSummary({
   const defaultValues = {
     name,
     variant:
-      variants.length === 1 ? variants.at(0) : variants.find((item) => !item.chars.includes(-1)),
+      variants.length === 1 ? variants[0] : variants.find((item) => !item.chars.includes(-1)),
     quantity:
       variants.length === 1
-        ? (variants.at(0)?.quantity ?? 0) < 1
+        ? (variants[0]?.quantity ?? 0) < 1
           ? 0
           : 1
         : (variants.find((item) => !item.chars.includes(-1))?.quantity ?? 0) < 1
@@ -177,6 +177,7 @@ export default function ProductDetailsSummary({
           <Typography variant="h5" paragraph>
             {name}
           </Typography>
+          <Maps selectPosition={null}></Maps>
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
             <Label
               sx={{
