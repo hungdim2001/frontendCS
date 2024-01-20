@@ -59,7 +59,6 @@ export default function CheckoutBillingAddress() {
     <>
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
-          <Maps selectPosition={null}></Maps>
           {addresss.adresss.length>0 ? (
             addresss.adresss.map((address, index) => (
               <AddressItem

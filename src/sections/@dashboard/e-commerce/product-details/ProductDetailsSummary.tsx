@@ -177,7 +177,6 @@ export default function ProductDetailsSummary({
           <Typography variant="h5" paragraph>
             {name}
           </Typography>
-          <Maps selectPosition={null}></Maps>
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
             <Label
               sx={{

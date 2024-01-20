@@ -29,6 +29,8 @@ import useLocationContext from 'src/hooks/useLocation';
 import { areaResponse } from 'src/service/app-apis/location';
 import { addressApi } from 'src/service/app-apis/address';
 import useAuth from 'src/hooks/useAuth';
+import Maps from 'src/components/GoogleMap';
+import { useState } from 'react';
 
 // ----------------------------------------------------------------------
 
@@ -148,6 +150,7 @@ export default function CheckoutNewAddressForm({
       handleLocationSelect(option, field);
     }
   };
+  const [selectPosition, setSelectPosition] = useState<{ lat: number; lon: number } | null>(null);
 
   return (
     <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose}>
@@ -250,7 +253,18 @@ export default function CheckoutNewAddressForm({
                 ))}
               </RHFSelect>
             </Box>
-d            <RHFTextField name="address" label="Address" />
+            <RHFTextField name="address" label="Address" />
+            <Box sx={{
+              display: 'grid',
+              rowGap: 3,
+              // columnGap: 2,
+              gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(1, 1fr)' },
+            }}>
+
+            <Maps  selectPosition={selectPosition} setSelectPosition={setSelectPosition}></Maps>
+
+            </Box>
+
             <RHFCheckbox name="isDefault" label="Use this address as default." sx={{ mt: 3 }} />
           </Stack>
         </DialogContent>
