@@ -35,7 +35,7 @@ const rootReducer = combineReducers({
   product: persistReducer(productPersistConfig, productReducer),
   productChars: productCharsReducer,
   productTypes: productTypeReducer,
-  addresss:addressReducer,
+  addresses:addressReducer,
 });
 
 export { rootPersistConfig, rootReducer };

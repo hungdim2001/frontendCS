@@ -111,12 +111,15 @@ export type Address = BaseDTO & {
   userId: number;
   addressType: string;
   isDefault: boolean;
+  fullName: string;
   province: string;
   district: string;
   areaCode: string;
   address: string;
   precinct: string;
   streetBlock: string;
+  lon:number;
+  lat:number;
 };
 export type ProductState = {
   isLoading: boolean;

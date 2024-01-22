@@ -21,7 +21,7 @@ function ResetCenterView(props: ResetCenterViewProps) {
   const map = useMap();
   map.zoomControl.setPosition('bottomright')
   useEffect(() => {
-    if (selectPosition) {
+    if (selectPosition?.lat&& selectPosition?.lon) {
       const { lat, lon } = selectPosition;
       map.setView(L.latLng(lat, lon), map.getZoom(), {
         animate: true,
@@ -147,7 +147,6 @@ export function SearchBox(props: MapsProps) {
       .then((response) => response.json())
       .then((result) => {
         const parsedResult: Place[] = result;
-        console.log(parsedResult);
         setListPlace(parsedResult);
       })
       .catch((err) => console.log("err: ", err));

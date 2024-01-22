@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Alert,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // @types
@@ -30,7 +31,10 @@ import { areaResponse } from 'src/service/app-apis/location';
 import { addressApi } from 'src/service/app-apis/address';
 import useAuth from 'src/hooks/useAuth';
 import Maps from 'src/components/GoogleMap';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import useIsMountedRef from 'src/hooks/useIsMountedRef';
+import { getAddressSucess } from 'src/redux/slices/address';
+import { useDispatch } from 'src/redux/store';
 
 // ----------------------------------------------------------------------
 
@@ -40,10 +44,16 @@ interface FormValuesProps extends BillingAddress {
   address: string;
   precinct: string;
   streetBlock: string;
+  afterSubmit?: string;
+  receiver: string;
+  phone: string;
+  addressType: string;
+  isDefault: boolean;
 }
 
 type Props = {
   open: boolean;
+  addressEdit: Address;
   onClose: VoidFunction;
   onNextStep: VoidFunction;
   onCreateBilling: OnCreateBilling;
@@ -52,6 +62,7 @@ type Props = {
 export default function CheckoutNewAddressForm({
   open,
   onClose,
+  addressEdit,
   onNextStep,
   onCreateBilling,
 }: Props) {
@@ -66,23 +77,25 @@ export default function CheckoutNewAddressForm({
     precinct: Yup.string().required('Precinct is required'),
     streetBlock: Yup.string().required('Street block is required'),
   });
-
-  const defaultValues = {
-    addressType: 'Home',
-    receiver: '',
-    phone: '',
-    streetBlock: '',
-    province: '',
-    district: '',
-    precinct: '',
-    zipcode: '',
-    isDefault: true,
-  };
-  const {
-    locationState,
-
-    handleLocationSelect,
-  } = useLocationContext();
+  const dispatch = useDispatch();
+  const defaultValues = useMemo(
+    () => ({
+      addressType: addressEdit.addressType || 'Home',
+      receiver: addressEdit.receiver || '',
+      phone: addressEdit.phone || '',
+      address: addressEdit.address || '',
+      streetBlock: addressEdit.streetBlock || '',
+      province: addressEdit.province || '',
+      district: addressEdit.district || '',
+      precinct: addressEdit.precinct || '',
+      isDefault: addressEdit.isDefault || false,
+    }),
+    [addressEdit]
+  );
+  useEffect(() => {
+    console.log(defaultValues);
+  }, [defaultValues]);
+  const { locationState, handleLocationSelect } = useLocationContext();
   const { provinces, districts, precincts, streetBlocks } = locationState;
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(NewAddressSchema),
@@ -93,16 +106,19 @@ export default function CheckoutNewAddressForm({
     handleSubmit,
     setValue,
     resetField,
-    formState: { isSubmitting },
+    setError,
+    formState: { isSubmitting, errors },
   } = methods;
-
+  const isMountedRef = useIsMountedRef();
   const onSubmit = async (data: FormValuesProps) => {
     try {
       // onNextStep();
-
+      if (!selectPosition) {
+        throw new Error('location has not been selected');
+      }
       const address: Address = {
         receiver: data.receiver,
-        areaCode: data.province + data.district + data.precinct,
+        areaCode: data.streetBlock,
         addressType: data.addressType,
         phone: data.phone,
         isDefault: data.isDefault,
@@ -110,18 +126,16 @@ export default function CheckoutNewAddressForm({
         createUser: user?.id,
         createDatetime: new Date(),
         address: data.address,
+        lat: selectPosition.lat,
+        lon: selectPosition.lon,
       } as Address;
-      // addressApi.createOrUpdate();
-
-      // onCreateBilling({
-      //   receiver: data.receiver,
-      //   phone: data.phone,
-      //   // fullAddress: `${data.address}, ${data.city}, ${data.state}, ${data.country}, ${data.zipcode}`,
-      //   addressType: data.addressType,
-      //   isDefault: data.isDefault,
-      // });
+      const response = await addressApi.createOrUpdate(address);
+      dispatch(getAddressSucess(response));
     } catch (error) {
       console.error(error);
+      if (isMountedRef.current) {
+        setError('afterSubmit', { type: 'custom', message: error.message });
+      }
     }
   };
   type Field = 'province' | 'district' | 'precinct' | 'streetBlock';
@@ -140,8 +154,6 @@ export default function CheckoutNewAddressForm({
       resetField('precinct');
       resetField('streetBlock');
       handleLocationSelect(option, field);
-      console.log(option);
-      console.log(field);
     } else if (field === 'precinct') {
       option = precincts.find((c) => c.areaCode === selectedValue);
       resetField('streetBlock');
@@ -151,16 +163,17 @@ export default function CheckoutNewAddressForm({
     }
   };
   const [selectPosition, setSelectPosition] = useState<{ lat: number; lon: number } | null>(null);
-
+  useEffect(() => {
+    setSelectPosition(addressEdit ? { lat: addressEdit.lat, lon: addressEdit.lon } : null);
+  }, [addressEdit]);
   return (
     <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose}>
       <DialogTitle>Add new address</DialogTitle>
-
+      {!!errors.afterSubmit && <Alert severity="error">{errors.afterSubmit.message}</Alert>}
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
         <DialogContent>
           <Stack spacing={3}>
             <RHFRadioGroup name="addressType" options={['Home', 'Office']} />
-
             <Box
               sx={{
                 display: 'grid',
@@ -254,15 +267,15 @@ export default function CheckoutNewAddressForm({
               </RHFSelect>
             </Box>
             <RHFTextField name="address" label="Address" />
-            <Box sx={{
-              display: 'grid',
-              rowGap: 3,
-              // columnGap: 2,
-              gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(1, 1fr)' },
-            }}>
-
-            <Maps  selectPosition={selectPosition} setSelectPosition={setSelectPosition}></Maps>
-
+            <Box
+              sx={{
+                display: 'grid',
+                rowGap: 3,
+                // columnGap: 2,
+                gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(1, 1fr)' },
+              }}
+            >
+              <Maps selectPosition={selectPosition} setSelectPosition={setSelectPosition}></Maps>
             </Box>
 
             <RHFCheckbox name="isDefault" label="Use this address as default." sx={{ mt: 3 }} />
