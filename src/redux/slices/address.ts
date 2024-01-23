@@ -33,7 +33,16 @@ export function getAddress(userId: number) {
     }
   };
 }
-
+export function deleteAddress(userId: number) {
+  return async () => {
+    try {
+      const response = await addressApi.deleteAddress(userId);
+        dispatch(slice.actions.getAddressSucess(response));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+}
 // export function deleteAddress(ids: number[]) {
 //   return async () => {
 //     try {

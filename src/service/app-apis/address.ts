@@ -5,6 +5,8 @@ import useId from '@mui/material/utils/useId';
 
 const addressIns = new BaseApi('/api/address');
 
+const deleteAddress = (id: number) =>
+  addressIns.delete<Address[]>(`/${id}`);
 const createOrUpdate= (billingAddress:BillingAddress) =>
   addressIns.post<Address[]>('', billingAddress);
 const getByUserId = (userId: number) => {
@@ -12,7 +14,8 @@ const getByUserId = (userId: number) => {
 };
 const addressApi = {
   createOrUpdate,
-  getByUserId
+  getByUserId,
+  deleteAddress
 };
 
 Object.freeze(addressApi);

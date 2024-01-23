@@ -35,7 +35,6 @@ import { useEffect, useMemo, useState } from 'react';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import { getAddressSucess } from 'src/redux/slices/address';
 import { useDispatch } from 'src/redux/store';
-import { options } from 'numeral';
 
 // ----------------------------------------------------------------------
 
@@ -87,9 +86,9 @@ export default function CheckoutNewAddressForm({
       address: addressEdit.address || '',
       streetBlock:
         addressEdit.province +
-          addressEdit.district +
-          addressEdit.precinct +
-          addressEdit.streetBlock || '',
+        addressEdit.district +
+        addressEdit.precinct +
+        addressEdit.streetBlock || '',
       province: addressEdit.province || '',
       district: addressEdit.province + addressEdit.district || '',
       precinct: addressEdit.province + addressEdit.district + addressEdit.precinct || '',
@@ -99,30 +98,17 @@ export default function CheckoutNewAddressForm({
   );
   const { locationState, handleLocationSelect, initFromOld } = useLocationContext();
   const { provinces, districts, precincts, streetBlocks } = locationState;
-  const methods =  useForm<FormValuesProps>({
+  const methods = useForm<FormValuesProps>({
     resolver: yupResolver(NewAddressSchema),
     defaultValues,
   });
-  useEffect(() => {
-    // if (
-    //   defaultValues.province &&
-    //   defaultValues.district &&
-    //   defaultValues.precinct &&
-    //   defaultValues.streetBlock
-    // )
-    //   initFromOld(
-    //     defaultValues.province,
-    //     defaultValues.district,
-    //     defaultValues.precinct,
-    //     defaultValues.precinct
-    //   );
-  }, [defaultValues]);
   const { user } = useAuth();
   const {
     handleSubmit,
     setValue,
     resetField,
     setError,
+    reset,
     formState: { isSubmitting, errors },
   } = methods;
   const isMountedRef = useIsMountedRef();
@@ -132,21 +118,45 @@ export default function CheckoutNewAddressForm({
       if (!selectPosition) {
         throw new Error('location has not been selected');
       }
-      const address: Address = {
-        receiver: data.receiver,
-        areaCode: data.streetBlock,
-        addressType: data.addressType,
-        phone: data.phone,
-        isDefault: data.isDefault,
-        userId: user?.id,
-        createUser: user?.id,
-        createDatetime: new Date(),
-        address: data.address,
-        lat: selectPosition.lat,
-        lon: selectPosition.lon,
-      } as Address;
-      const response = await addressApi.createOrUpdate(address);
-      dispatch(getAddressSucess(response));
+      if (addressEdit.id) {
+        const address = {
+          ...addressEdit,
+          receiver: data.receiver,
+          areaCode: data.streetBlock,
+          addressType: data.addressType,
+          phone: data.phone,
+          isDefault: data.isDefault,
+          userId: user?.id,
+          updateUser: user?.id,
+          updateDatetime: new Date(),
+          address: data.address,
+          lat: selectPosition.lat,
+          lon: selectPosition.lon,
+        }
+        const response = await addressApi.createOrUpdate(address);
+        console.log(response)
+        dispatch(getAddressSucess(response));
+      }
+      else {
+        const address: Address = {
+          receiver: data.receiver,
+          areaCode: data.streetBlock,
+          addressType: data.addressType,
+          phone: data.phone,
+          isDefault: data.isDefault,
+          userId: user?.id,
+          createUser: user?.id,
+          createDatetime: new Date(),
+          address: data.address,
+          lat: selectPosition.lat,
+          lon: selectPosition.lon,
+        } as Address;
+        const response = await addressApi.createOrUpdate(address);
+        console.log(response)
+        dispatch(getAddressSucess(response));
+      }
+      reset();
+      onClose()
     } catch (error) {
       console.error(error);
       if (isMountedRef.current) {
@@ -180,7 +190,7 @@ export default function CheckoutNewAddressForm({
   const [selectPosition, setSelectPosition] = useState<{ lat: number; lon: number } | null>(null);
   useEffect(() => {
     setSelectPosition(addressEdit ? { lat: addressEdit.lat, lon: addressEdit.lon } : null);
-  }, [addressEdit]) 
+  }, [addressEdit])
   return (
     <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose}>
       <DialogTitle>Add new address</DialogTitle>

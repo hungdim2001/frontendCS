@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 // @mui
-import { Box, Button, Card, Grid, Typography } from '@mui/material';
+import { Box, Button, Card, Grid, IconButton, Typography } from '@mui/material';
 // @types
 import { Address, OnCreateBilling } from '../../../../@types/product';
 // redux
@@ -12,10 +12,12 @@ import Iconify from '../../../../components/Iconify';
 import Label from '../../../../components/Label';
 //
 import useAuth from 'src/hooks/useAuth';
-import { getAddress } from 'src/redux/slices/address';
+import { deleteAddress, getAddress } from 'src/redux/slices/address';
 import CheckoutNewAddressForm from './CheckoutNewAddressForm';
 import CheckoutSummary from './CheckoutSummary';
 import useLocationContext from 'src/hooks/useLocation';
+import SvgIconStyle from 'src/components/SvgIconStyle';
+import AddressPicker from 'src/components/address/AddressPicker';
 // ----------------------------------------------------------------------
 
 export default function CheckoutBillingAddress() {
@@ -35,6 +37,9 @@ export default function CheckoutBillingAddress() {
   }, [dispatch]);
 
   const { initFromOld } = useLocationContext();
+  const handleDelete = async (id: number) => {
+    dispatch(deleteAddress(id))
+  }
   const handleClickOpen = async (address: Address) => {
     if (address.province && address.district && address.precinct && address.streetBlock)
       await initFromOld(
@@ -68,15 +73,17 @@ export default function CheckoutBillingAddress() {
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
           {addresses.adresss.length > 0 ? (
-            addresses.adresss.map((address, index) => (
-              <AddressItem
-                key={index}
-                handleClickOpen={handleClickOpen}
-                addressProp={address}
-                onNextStep={handleNextStep}
-                onCreateBilling={handleCreateBilling}
-              />
-            ))
+            <AddressPicker value={null} addresses={addresses.adresss}></AddressPicker>
+            // addresses.adresss.map((address, index) => (
+            //   <AddressItem
+            //     deleteAddress={handleDelete}
+            //     key={index}
+            //     handleClickOpen={handleClickOpen}
+            //     addressProp={address}
+            //     onNextStep={handleNextStep}
+            //     onCreateBilling={handleCreateBilling}
+            //   />
+            // ))
           ) : (
             <></>
           )}
@@ -125,6 +132,7 @@ type AddressItemProps = {
   onNextStep: VoidFunction;
   onCreateBilling: OnCreateBilling;
   handleClickOpen: (address: Address) => void;
+  deleteAddress: (id: number) => void;
 };
 
 function AddressItem({
@@ -132,9 +140,9 @@ function AddressItem({
   handleClickOpen,
   onNextStep,
   onCreateBilling,
+  deleteAddress
 }: AddressItemProps) {
   const { fullName, receiver, address, addressType, phone, isDefault } = addressProp;
-
   const handleCreateBilling = () => {
     // onCreateBilling(address);
     onNextStep();
@@ -163,7 +171,8 @@ function AddressItem({
 
       <Box
         sx={{
-          mt: 3,
+          // mt: 3,
+          gap: 1,
           display: 'flex',
           position: { sm: 'absolute' },
           right: { sm: 24 },
@@ -171,22 +180,20 @@ function AddressItem({
         }}
       >
         {!isDefault && (
-          <Button variant="outlined" size="small" color="inherit">
-            Delete
-          </Button>
+          <IconButton
+            onClick={() => deleteAddress(addressProp.id!)}
+            sx={{ color: '#C91433', p: '10px' }} type="button" aria-label="current location">
+            <SvgIconStyle src={'/icons/ic_trash.svg'} />
+          </IconButton>
         )}
-        <Button
+        <IconButton
           onClick={() => handleClickOpen(addressProp)}
-          variant="outlined"
-          size="small"
-          color="inherit"
-        >
-          Edit
-        </Button>
-        <Box sx={{ mx: 0.5 }} />
-        <Button variant="outlined" size="small" onClick={handleCreateBilling}>
+          sx={{ color: '#0C68F4', p: '10px' }} type="button" aria-label="current location">
+          <SvgIconStyle src={'/icons/ic_edit.svg'} />
+        </IconButton>
+        {/* <Button variant="outlined" size="small" onClick={handleCreateBilling}>
           Deliver to this Address
-        </Button>
+        </Button> */}
       </Box>
     </Card>
   );

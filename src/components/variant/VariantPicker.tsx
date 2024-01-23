@@ -11,7 +11,6 @@ interface Props extends RadioGroupProps {
 }
 
 export default function VariantPicker({ charValues, value, ...other }: Props) {
-// defaultValue={charValues.find(char => value.includes(char.id))?.id}
   return (
     <RadioGroup  row {...other}>
       {charValues.map((charValue) => (
