@@ -489,9 +489,6 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const handleMenuOpen = () => {
     setSearchText('');
   };
-  useEffect(()=>{
-    console.log(getValues('variants'))
-  }, [getValues('variants')])
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>

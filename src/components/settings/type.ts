@@ -31,7 +31,7 @@ export type LocationContextProps = {
   onSubmit:(event: Event) => void;
   handleLocationSelect: (option: areaResponse|undefined, selectedField: string) =>void;
   locationState:locationObject 
-
+  initFromOld:(province:string, district:string, precinct:string, streetBlock:string)=>void;
 }
 export type SettingsContextProps = {
   themeMode: ThemeMode;

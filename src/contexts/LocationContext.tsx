@@ -16,8 +16,9 @@ const locationStateInit = {
 };
 const initialState: LocationContextProps = {
   locationState: locationStateInit,
-  onSubmit: () => { },
-  handleLocationSelect: () => { },
+  onSubmit: () => {},
+  handleLocationSelect: () => {},
+  initFromOld: (province: string, district: string, precinct: string, streetBlock: string) => {},
 };
 const LocationContext = createContext(initialState);
 
@@ -63,7 +64,6 @@ function LocationProvider({ children }: LocationProviderProps) {
   useEffect(() => {
     (async () => {
       if (!province?.areaCode) return;
-
       const options = await locationApi.area(province.areaCode);
       setLocationState({ ...locationState, districts: options });
     })();
@@ -87,7 +87,6 @@ function LocationProvider({ children }: LocationProviderProps) {
     const updatedState: Partial<locationObject> = {
       [selectedField]: option,
     };
-
     if (selectedField === 'province') {
       updatedState.districts = [];
       updatedState.precincts = [];
@@ -98,8 +97,33 @@ function LocationProvider({ children }: LocationProviderProps) {
     } else if (selectedField === 'precinct') {
       updatedState.streetBlocks = [];
     }
-
     setLocationState({ ...locationState, ...updatedState });
+  };
+  const initFromOld = async (
+    province: string,
+    district: string,
+    precinct: string,
+    streetBlock: string
+  ) => {
+    const provinces = await locationApi.area(null);
+    const provinceSelected = await provinces.find((item) => item.areaCode === province);
+    const districts = await locationApi.area(province);
+    const districtSelected = await districts.find((item) => item.areaCode === district);
+    const precincts = await locationApi.area(district);
+    const precintsSelected = await precincts.find((item) => item.areaCode === precinct);
+    const streetBlocks = await locationApi.area(precinct);
+    const streetBlockSelected = await streetBlocks.find((item) => item.areaCode === streetBlock);
+    const newState = {
+      province: provinceSelected,
+      district: districtSelected,
+      precinct: precintsSelected,
+      streetBlock: streetBlockSelected,
+      provinces: provinces,
+      districts: districts,
+      precincts: precincts,
+      streetBlocks: streetBlocks,
+    };
+    setLocationState(newState);
   };
 
   const onSubmit = (e: Event) => {
@@ -113,6 +137,7 @@ function LocationProvider({ children }: LocationProviderProps) {
         locationState,
         onSubmit,
         handleLocationSelect,
+        initFromOld,
       }}
     >
       {children}

@@ -35,6 +35,7 @@ import { useEffect, useMemo, useState } from 'react';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import { getAddressSucess } from 'src/redux/slices/address';
 import { useDispatch } from 'src/redux/store';
+import { options } from 'numeral';
 
 // ----------------------------------------------------------------------
 
@@ -84,23 +85,38 @@ export default function CheckoutNewAddressForm({
       receiver: addressEdit.receiver || '',
       phone: addressEdit.phone || '',
       address: addressEdit.address || '',
-      streetBlock: addressEdit.streetBlock || '',
+      streetBlock:
+        addressEdit.province +
+          addressEdit.district +
+          addressEdit.precinct +
+          addressEdit.streetBlock || '',
       province: addressEdit.province || '',
-      district: addressEdit.district || '',
-      precinct: addressEdit.precinct || '',
+      district: addressEdit.province + addressEdit.district || '',
+      precinct: addressEdit.province + addressEdit.district + addressEdit.precinct || '',
       isDefault: addressEdit.isDefault || false,
     }),
     [addressEdit]
   );
-  useEffect(() => {
-    console.log(defaultValues);
-  }, [defaultValues]);
-  const { locationState, handleLocationSelect } = useLocationContext();
+  const { locationState, handleLocationSelect, initFromOld } = useLocationContext();
   const { provinces, districts, precincts, streetBlocks } = locationState;
-  const methods = useForm<FormValuesProps>({
+  const methods =  useForm<FormValuesProps>({
     resolver: yupResolver(NewAddressSchema),
     defaultValues,
   });
+  useEffect(() => {
+    // if (
+    //   defaultValues.province &&
+    //   defaultValues.district &&
+    //   defaultValues.precinct &&
+    //   defaultValues.streetBlock
+    // )
+    //   initFromOld(
+    //     defaultValues.province,
+    //     defaultValues.district,
+    //     defaultValues.precinct,
+    //     defaultValues.precinct
+    //   );
+  }, [defaultValues]);
   const { user } = useAuth();
   const {
     handleSubmit,
@@ -139,13 +155,12 @@ export default function CheckoutNewAddressForm({
     }
   };
   type Field = 'province' | 'district' | 'precinct' | 'streetBlock';
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, field: Field) => {
-    const selectedValue = e.target.value;
+  const handleChange = (value: any, field: Field) => {
+    const selectedValue = value;
     let option: areaResponse | undefined;
     setValue(field, selectedValue, { shouldValidate: true });
     if (field === 'province') {
       option = provinces.find((c) => c.areaCode === selectedValue);
-      resetField('district');
       resetField('precinct');
       resetField('streetBlock');
       handleLocationSelect(option, field);
@@ -165,7 +180,7 @@ export default function CheckoutNewAddressForm({
   const [selectPosition, setSelectPosition] = useState<{ lat: number; lon: number } | null>(null);
   useEffect(() => {
     setSelectPosition(addressEdit ? { lat: addressEdit.lat, lon: addressEdit.lon } : null);
-  }, [addressEdit]);
+  }, [addressEdit]) 
   return (
     <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose}>
       <DialogTitle>Add new address</DialogTitle>
@@ -199,7 +214,7 @@ export default function CheckoutNewAddressForm({
                 name="province"
                 label="Province"
                 placeholder="Province"
-                onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'province')}
+                onChange={(e) => handleChange(e.target.value, 'province')}
               >
                 <option value="" />
                 {provinces.map((option) => (
@@ -209,7 +224,7 @@ export default function CheckoutNewAddressForm({
                 ))}
               </RHFSelect>
               <RHFSelect
-                onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'district')}
+                onChange={(e) => handleChange(e.target.value, 'district')}
                 disabled={districts.length === 0}
                 name="district"
                 label="District"
@@ -233,13 +248,12 @@ export default function CheckoutNewAddressForm({
               }}
             >
               <RHFSelect
-                onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>, 'precinct')}
+                onChange={(e) => handleChange(e.target.value, 'precinct')}
                 disabled={precincts.length === 0}
                 name="precinct"
                 label="Precinct"
                 placeholder="Precinct"
               >
-                {' '}
                 <option value="" />
                 {precincts.map((option) => (
                   <option key={option.areaCode} value={option.areaCode!}>
@@ -249,9 +263,7 @@ export default function CheckoutNewAddressForm({
               </RHFSelect>
 
               <RHFSelect
-                onChange={(e) =>
-                  handleChange(e as React.ChangeEvent<HTMLInputElement>, 'streetBlock')
-                }
+                onChange={(e) => handleChange(e.target.value, 'streetBlock')}
                 disabled={streetBlocks.length === 0}
                 name="streetBlock"
                 label="Street Block"

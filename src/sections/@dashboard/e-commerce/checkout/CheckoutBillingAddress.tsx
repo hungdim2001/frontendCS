@@ -15,6 +15,7 @@ import useAuth from 'src/hooks/useAuth';
 import { getAddress } from 'src/redux/slices/address';
 import CheckoutNewAddressForm from './CheckoutNewAddressForm';
 import CheckoutSummary from './CheckoutSummary';
+import useLocationContext from 'src/hooks/useLocation';
 // ----------------------------------------------------------------------
 
 export default function CheckoutBillingAddress() {
@@ -32,9 +33,19 @@ export default function CheckoutBillingAddress() {
   useEffect(() => {
     dispatch(getAddress(user?.id!));
   }, [dispatch]);
-  const handleClickOpen = (address: Address) => {
-    setAddressEdit(address)
-    setOpen(true);
+
+  const { initFromOld } = useLocationContext();
+  const handleClickOpen = async (address: Address) => {
+    if (address.province && address.district && address.precinct && address.streetBlock)
+      await initFromOld(
+        address.province,
+        address.province + address.district,
+        address.province + address.district + address.precinct,
+        address.province + address.district + address.precinct + address.streetBlock
+      );
+    await setAddressEdit(address);
+    console.log(address);
+    await setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
@@ -80,7 +91,7 @@ export default function CheckoutBillingAddress() {
             </Button>
             <Button
               size="small"
-              onClick={()=>handleClickOpen ({} as Address)}
+              onClick={() => handleClickOpen({} as Address)}
               startIcon={<Iconify icon={'eva:plus-fill'} />}
             >
               Add new address
@@ -92,14 +103,17 @@ export default function CheckoutBillingAddress() {
           <CheckoutSummary subtotal={subtotal} total={total} discount={discount} />
         </Grid>
       </Grid>
-
-      <CheckoutNewAddressForm
-        addressEdit={addressEdit}
-        open={open}
-        onClose={handleClose}
-        onNextStep={handleNextStep}
-        onCreateBilling={handleCreateBilling}
-      />
+      {open ? (
+        <CheckoutNewAddressForm
+          addressEdit={addressEdit}
+          open={open}
+          onClose={handleClose}
+          onNextStep={handleNextStep}
+          onCreateBilling={handleCreateBilling}
+        />
+      ) : (
+        <></>
+      )}
     </>
   );
 }
@@ -120,7 +134,7 @@ function AddressItem({
   onCreateBilling,
 }: AddressItemProps) {
   const { fullName, receiver, address, addressType, phone, isDefault } = addressProp;
-  
+
   const handleCreateBilling = () => {
     // onCreateBilling(address);
     onNextStep();
@@ -161,7 +175,12 @@ function AddressItem({
             Delete
           </Button>
         )}
-        <Button onClick={()=>handleClickOpen(addressProp)} variant="outlined" size="small" color="inherit">
+        <Button
+          onClick={() => handleClickOpen(addressProp)}
+          variant="outlined"
+          size="small"
+          color="inherit"
+        >
           Edit
         </Button>
         <Box sx={{ mx: 0.5 }} />
