@@ -47,7 +47,6 @@ export default function EcommerceShop() {
     priceRange: filters.priceRange,
     rating: filters.rating,
   };
-
   const methods = useForm({
     defaultValues,
   });
@@ -166,7 +165,10 @@ export default function EcommerceShop() {
           )}
         </Stack>
 
-        <ShopProductList products={filteredProducts.filter(item=> item.status)} loading={!products.length && isDefault} />
+        <ShopProductList
+          products={filteredProducts.filter((item) => item.status)}
+          loading={!products.length && isDefault}
+        />
         <CartWidget />
       </Container>
     </Page>
