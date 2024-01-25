@@ -78,7 +78,9 @@ const slice = createSlice({
     getCart(state, action) {
       const cart = action.payload;
 
-      const subtotal = sum(cart.map((cartItem: CartItem) => cartItem.variant.price * cartItem.quantity));
+      const subtotal = sum(
+        cart.map((cartItem: CartItem) => cartItem.variant.price * cartItem.quantity)
+      );
       const discount = cart.length === 0 ? 0 : state.checkout.discount;
       const shipping = cart.length === 0 ? 0 : state.checkout.shipping;
       const billing = cart.length === 0 ? null : state.checkout.billing;
@@ -98,7 +100,7 @@ const slice = createSlice({
         state.checkout.cart = [...state.checkout.cart, product];
       } else {
         state.checkout.cart = state.checkout.cart.map((_product) => {
-          const isExisted = _product.variant.id=== product.variant.id
+          const isExisted = _product.variant.id === product.variant.id;
           if (isExisted) {
             return {
               ..._product,
@@ -112,7 +114,7 @@ const slice = createSlice({
     },
 
     deleteCart(state, action) {
-      const updateCart = state.checkout.cart.filter((item) => item.variant.id!== action.payload);
+      const updateCart = state.checkout.cart.filter((item) => item.variant.id !== action.payload);
 
       state.checkout.cart = updateCart;
     },
@@ -143,7 +145,7 @@ const slice = createSlice({
     increaseQuantity(state, action) {
       const productId = action.payload;
       const updateCart = state.checkout.cart.map((product) => {
-        if (product.variant.id=== productId) {
+        if (product.variant.id === productId) {
           return {
             ...product,
             quantity: product.quantity + 1,
@@ -158,7 +160,7 @@ const slice = createSlice({
     decreaseQuantity(state, action) {
       const productId = action.payload;
       const updateCart = state.checkout.cart.map((product) => {
-        if (product.variant.id=== productId) {
+        if (product.variant.id === productId) {
           return {
             ...product,
             quantity: product.quantity - 1,
@@ -214,21 +216,21 @@ export function deleteProducts(ids: number[]) {
   return async () => {
     try {
       await productApi.deleteProducts(ids);
-      const response =  await productApi.getProducts(null)
+      const response = await productApi.getProducts(null);
       dispatch(slice.actions.getProductsSuccess(response));
     } catch (error) {
       console.log(error);
     }
   };
 }
-  
+
 export function getProducts() {
   return async () => {
     dispatch(slice.actions.startLoading());
     try {
       const response = await productApi.getProducts(null);
       dispatch(slice.actions.getProductsSuccess(response));
-  } catch (error) {
+    } catch (error) {
       dispatch(slice.actions.hasError(error));
     }
   };
@@ -240,7 +242,7 @@ export function getProduct(id: number) {
   return async () => {
     dispatch(slice.actions.startLoading());
     try {
-      const response= await productApi.getProducts(id);
+      const response = await productApi.getProducts(id);
       dispatch(slice.actions.getProductSuccess(response[0]));
     } catch (error) {
       console.error(error);

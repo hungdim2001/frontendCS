@@ -38,7 +38,7 @@ export default function AddressPicker({ name, addresses, ...other }: Props) {
                 <FormGroup>
                   <FormControlLabel
                     key={address.id}
-                    control={<Radio />}
+                    control={<Radio  />}
                     value={address.id}
                     label={
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>

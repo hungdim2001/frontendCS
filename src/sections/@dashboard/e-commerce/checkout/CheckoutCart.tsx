@@ -114,7 +114,7 @@ export default function CheckoutCart() {
           disabled={cart.length === 0}
           onClick={handleNextStep}
         >
-          Check Out
+         Procced  to checkout 
         </Button>
       </Grid>
     </Grid>

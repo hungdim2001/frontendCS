@@ -55,16 +55,12 @@ type Props = {
   open: boolean;
   addressEdit: Address;
   onClose: VoidFunction;
-  onNextStep: VoidFunction;
-  onCreateBilling: OnCreateBilling;
 };
 
 export default function CheckoutNewAddressForm({
   open,
   onClose,
   addressEdit,
-  onNextStep,
-  onCreateBilling,
 }: Props) {
   const NewAddressSchema = Yup.object().shape({
     receiver: Yup.string().required('Fullname is required'),

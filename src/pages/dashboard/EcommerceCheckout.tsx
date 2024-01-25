@@ -1,7 +1,17 @@
 import { useEffect } from 'react';
 // @mui
 import { styled } from '@mui/material/styles';
-import { Box, Grid, Step, Stepper, Container, StepLabel, StepConnector, StepIconProps, stepConnectorClasses } from '@mui/material';
+import {
+  Box,
+  Grid,
+  Step,
+  Stepper,
+  Container,
+  StepLabel,
+  StepConnector,
+  StepIconProps,
+  stepConnectorClasses,
+} from '@mui/material';
 // redux
 import { useDispatch, useSelector } from '../../redux/store';
 import { getCart, createBilling } from '../../redux/slices/product';
@@ -35,23 +45,18 @@ const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   },
   [`&.${stepConnectorClasses.active}`]: {
     [`& .${stepConnectorClasses.line}`]: {
-      backgroundColor:
-        theme.palette.primary.main
-
+      backgroundColor: theme.palette.primary.main,
     },
   },
   [`&.${stepConnectorClasses.completed}`]: {
     [`& .${stepConnectorClasses.line}`]: {
-      backgroundColor:
-        theme.palette.divider,
-
+      backgroundColor: theme.palette.divider,
     },
   },
   [`& .${stepConnectorClasses.line}`]: {
     height: 3,
     border: 0,
-    backgroundColor:
-      theme.palette.mode === 'dark' ? theme.palette.grey[800] : '#eaeaf0',
+    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[800] : '#eaeaf0',
     borderRadius: 1,
   },
 }));
@@ -72,15 +77,13 @@ const ColorlibStepIconRoot = styled('div')<{
     backgroundColor: '#fff',
     color: theme.palette.primary.main,
     border: `3px solid ${theme.palette.primary.main}`,
-    borderRadius: '50%'
+    borderRadius: '50%',
   }),
   ...(ownerState.completed && {
     color: '#fff',
-    backgroundColor: '#0c68f4bf'
-
+    backgroundColor: '#0c68f4bf',
   }),
 }));
-
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   top: '24px',
@@ -112,8 +115,6 @@ function ColorlibStepIcon(props: StepIconProps) {
   );
 }
 
-
-
 export default function EcommerceCheckout() {
   const { themeStretch } = useSettings();
 
@@ -126,7 +127,6 @@ export default function EcommerceCheckout() {
   const { cart, billing, activeStep } = checkout;
 
   const isComplete = activeStep === STEPS.length;
-
   useEffect(() => {
     if (isMountedRef.current) {
       dispatch(getCart(cart));
@@ -156,9 +156,14 @@ export default function EcommerceCheckout() {
 
         <Grid container justifyContent={isComplete ? 'center' : 'flex-start'}>
           <Grid item xs={12} md={8} sx={{ mb: 5 }}>
-            <Stepper sx={{
-              alignItems:'center'
-            }} alternativeLabel activeStep={activeStep} connector={<QontoConnector />}>
+            <Stepper
+              sx={{
+                alignItems: 'center',
+              }}
+              alternativeLabel
+              activeStep={activeStep}
+              connector={<QontoConnector />}
+            >
               {STEPS.map((label, index) => (
                 <Step key={index}>
                   <StepLabel StepIconComponent={ColorlibStepIcon}>{label}</StepLabel>

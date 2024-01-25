@@ -76,7 +76,6 @@ type FormValuesProps = {
 
 export default function CheckoutPayment() {
   const dispatch = useDispatch();
-
   const { checkout } = useSelector((state) => state.product);
 
   const { total, discount, subtotal, shipping } = checkout;
