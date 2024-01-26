@@ -35,6 +35,7 @@ import { useEffect, useMemo, useState } from 'react';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import { getAddressSucess } from 'src/redux/slices/address';
 import { useDispatch } from 'src/redux/store';
+import { ghnAddress, ghnApi } from 'src/service/app-apis/ghn';
 
 // ----------------------------------------------------------------------
 
@@ -42,8 +43,7 @@ interface FormValuesProps extends BillingAddress {
   province: string;
   district: string;
   address: string;
-  precinct: string;
-  streetBlock: string;
+  ward: string;
   afterSubmit?: string;
   receiver: string;
   phone: string;
@@ -57,11 +57,7 @@ type Props = {
   onClose: VoidFunction;
 };
 
-export default function CheckoutNewAddressForm({
-  open,
-  onClose,
-  addressEdit,
-}: Props) {
+export default function CheckoutNewAddressForm({ open, onClose, addressEdit }: Props) {
   const NewAddressSchema = Yup.object().shape({
     receiver: Yup.string().required('Fullname is required'),
     phone: Yup.string()
@@ -70,8 +66,8 @@ export default function CheckoutNewAddressForm({
     address: Yup.string().required('Address is required'),
     province: Yup.string().required('Province is required'),
     district: Yup.string().required('District is required'),
-    precinct: Yup.string().required('Precinct is required'),
-    streetBlock: Yup.string().required('Street block is required'),
+    ward: Yup.string().required('Ward is required'),
+    // streetBlock: Yup.string().required('Street block is required'),
   });
   const dispatch = useDispatch();
   const defaultValues = useMemo(
@@ -82,9 +78,9 @@ export default function CheckoutNewAddressForm({
       address: addressEdit.address || '',
       streetBlock:
         addressEdit.province +
-        addressEdit.district +
-        addressEdit.precinct +
-        addressEdit.streetBlock || '',
+          addressEdit.district +
+          addressEdit.precinct +
+          addressEdit.streetBlock || '',
       province: addressEdit.province || '',
       district: addressEdit.province + addressEdit.district || '',
       precinct: addressEdit.province + addressEdit.district + addressEdit.precinct || '',
@@ -92,8 +88,21 @@ export default function CheckoutNewAddressForm({
     }),
     [addressEdit]
   );
-  const { locationState, handleLocationSelect, initFromOld } = useLocationContext();
-  const { provinces, districts, precincts, streetBlocks } = locationState;
+  // const { locationState, handleLocationSelect, initFromOld } = useLocationContext();
+  // const { provinces, districts, precincts, streetBlocks } = locationState;
+  const [provinces, setProvinces] = useState<ghnAddress[]>([]);
+  const [districts, setDistricts] = useState<ghnAddress[]>([]);
+  const [wards, setWards] = useState<ghnAddress[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await ghnApi.getProvince();
+      await setProvinces(data);
+    };
+    fetchData();
+  }, []);
+  useEffect(() => {
+    console.log(wards);
+  }, [wards]);
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(NewAddressSchema),
     defaultValues,
@@ -118,7 +127,7 @@ export default function CheckoutNewAddressForm({
         const address = {
           ...addressEdit,
           receiver: data.receiver,
-          areaCode: data.streetBlock,
+          // areaCode: data.streetBlock,
           addressType: data.addressType,
           phone: data.phone,
           isDefault: data.isDefault,
@@ -128,15 +137,14 @@ export default function CheckoutNewAddressForm({
           address: data.address,
           lat: selectPosition.lat,
           lon: selectPosition.lon,
-        }
+        };
         const response = await addressApi.createOrUpdate(address);
-        console.log(response)
+        console.log(response);
         dispatch(getAddressSucess(response));
-      }
-      else {
+      } else {
         const address: Address = {
           receiver: data.receiver,
-          areaCode: data.streetBlock,
+          // areaCode: data.streetBlock,
           addressType: data.addressType,
           phone: data.phone,
           isDefault: data.isDefault,
@@ -148,11 +156,11 @@ export default function CheckoutNewAddressForm({
           lon: selectPosition.lon,
         } as Address;
         const response = await addressApi.createOrUpdate(address);
-        console.log(response)
+        console.log(response);
         dispatch(getAddressSucess(response));
       }
       reset();
-      onClose()
+      onClose();
     } catch (error) {
       console.error(error);
       if (isMountedRef.current) {
@@ -160,33 +168,36 @@ export default function CheckoutNewAddressForm({
       }
     }
   };
-  type Field = 'province' | 'district' | 'precinct' | 'streetBlock';
-  const handleChange = (value: any, field: Field) => {
+  type Field = 'province' | 'district' | 'ward';
+  const handleChange = async (value: any, field: Field) => {
     const selectedValue = value;
-    let option: areaResponse | undefined;
+    let option: number;
     setValue(field, selectedValue, { shouldValidate: true });
     if (field === 'province') {
-      option = provinces.find((c) => c.areaCode === selectedValue);
-      resetField('precinct');
-      resetField('streetBlock');
-      handleLocationSelect(option, field);
+      option = provinces.find((c) => c.ProvinceID == selectedValue)?.ProvinceID!;
+      setDistricts([]);
+      setWards([]);
+      await resetField('district');
+      await resetField('ward');
+      const response = await ghnApi.getDistrict(option);
+      await setDistricts(response);
     } else if (field === 'district') {
-      option = districts.find((c) => c.areaCode === selectedValue);
-      resetField('precinct');
-      resetField('streetBlock');
-      handleLocationSelect(option, field);
-    } else if (field === 'precinct') {
-      option = precincts.find((c) => c.areaCode === selectedValue);
-      resetField('streetBlock');
-      handleLocationSelect(option, field);
+      option = districts.find((c) => c.DistrictID == selectedValue)?.DistrictID!;
+      resetField('ward');
+      setWards([]);
+      const response = await ghnApi.getWard(option);
+      await setWards(response);
+    } else if (field === 'ward') {
+      // option = precincts.find((c) => c.areaCode === selectedValue);
+      // handleLocationSelect(option, field);
     } else {
-      handleLocationSelect(option, field);
+      // handleLocationSelect(option, field);
     }
   };
   const [selectPosition, setSelectPosition] = useState<{ lat: number; lon: number } | null>(null);
   useEffect(() => {
     setSelectPosition(addressEdit ? { lat: addressEdit.lat, lon: addressEdit.lon } : null);
-  }, [addressEdit])
+  }, [addressEdit]);
   return (
     <Dialog fullWidth maxWidth="sm" open={open} onClose={onClose}>
       <DialogTitle>Add new address</DialogTitle>
@@ -224,8 +235,8 @@ export default function CheckoutNewAddressForm({
               >
                 <option value="" />
                 {provinces.map((option) => (
-                  <option key={option.areaCode} value={option.areaCode!}>
-                    {option.name}
+                  <option key={option.ProvinceID} value={option.ProvinceID}>
+                    {option.ProvinceName}
                   </option>
                 ))}
               </RHFSelect>
@@ -239,8 +250,8 @@ export default function CheckoutNewAddressForm({
                 {' '}
                 <option value="" />
                 {districts.map((option) => (
-                  <option key={option.areaCode} value={option.areaCode!}>
-                    {option.name}
+                  <option key={option.DistrictID} value={option.DistrictID!}>
+                    {option.DistrictName}
                   </option>
                 ))}
               </RHFSelect>
@@ -254,21 +265,21 @@ export default function CheckoutNewAddressForm({
               }}
             >
               <RHFSelect
-                onChange={(e) => handleChange(e.target.value, 'precinct')}
-                disabled={precincts.length === 0}
-                name="precinct"
-                label="Precinct"
-                placeholder="Precinct"
+                onChange={(e) => handleChange(e.target.value, 'ward')}
+                disabled={wards.length === 0}
+                name="ward"
+                label="Ward"
+                placeholder="Ward"
               >
                 <option value="" />
-                {precincts.map((option) => (
-                  <option key={option.areaCode} value={option.areaCode!}>
-                    {option.name}
+                {wards.length>0&&wards.map((option) => (
+                  <option key={option.WardCode} value={option.WardCode!}>
+                    {option.WardName}
                   </option>
                 ))}
               </RHFSelect>
 
-              <RHFSelect
+              {/* <RHFSelect
                 onChange={(e) => handleChange(e.target.value, 'streetBlock')}
                 disabled={streetBlocks.length === 0}
                 name="streetBlock"
@@ -282,9 +293,11 @@ export default function CheckoutNewAddressForm({
                     {option.name}
                   </option>
                 ))}
-              </RHFSelect>
+              </RHFSelect> */}
+
+              <RHFTextField name="address" label="Address" />
             </Box>
-            <RHFTextField name="address" label="Address" />
+            {/* <RHFTextField name="address" label="Address" /> */}
             <Box
               sx={{
                 display: 'grid',
