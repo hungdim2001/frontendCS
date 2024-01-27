@@ -14,9 +14,6 @@ const slice = createSlice({
     getAddressSucess(state, action) {
       state.adresss = action.payload;
     },
-    // deleteAddress(state, action) {
-    //   state.adresss = action.payload;
-    // },
   },
 });
 
@@ -43,14 +40,3 @@ export function deleteAddress(userId: number) {
     }
   };
 }
-// export function deleteAddress(ids: number[]) {
-//   return async () => {
-//     try {
-//       await productTypeApi.deleteproductTypes(ids);
-//       dispatch(slice.actions.getAddressSucess(ids))
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
-  
-// }

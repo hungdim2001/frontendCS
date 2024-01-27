@@ -39,8 +39,7 @@ export default function CheckoutSummary({
   enableEdit = false,
   enableDiscount = false,
 }: Props) {
-  const displayShipping = shipping !== null ? 'Free' : '-';
-
+  const displayShipping = shipping === 0 ? 'Free' : '-';
   return (
     <Card sx={{ mb: 3 }}>
       <CardHeader
@@ -67,7 +66,7 @@ export default function CheckoutSummary({
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Discount
             </Typography>
-            <Typography variant="subtitle2">{discount ?`${fCurrency(-discount)}₫`: '-'}</Typography>
+            <Typography variant="subtitle2">{discount ? `${fCurrency(-discount)}₫` : '-'}</Typography>
           </Stack>
 
           <Stack direction="row" justifyContent="space-between">
@@ -75,7 +74,7 @@ export default function CheckoutSummary({
               Shipping
             </Typography>
             <Typography variant="subtitle2">
-              {shipping ? `${fCurrency(-shipping)}₫`: displayShipping}
+              {shipping && shipping != 0 ? `${fCurrency(-shipping)}₫` : displayShipping}
             </Typography>
           </Stack>
 

@@ -112,12 +112,10 @@ export type Address = BaseDTO & {
   addressType: string;
   isDefault: boolean;
   fullName: string;
-  province: string;
-  district: string;
-  areaCode: string;
+  province: number;
+  district: number;
+  ward: number;
   address: string;
-  precinct: string;
-  streetBlock: string;
   lon:number;
   lat:number;
 };

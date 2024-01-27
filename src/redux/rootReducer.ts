@@ -10,6 +10,7 @@ import kanbanReducer from './slices/kanban';
 import productCharsReducer from './slices/product-char';
 import productTypeReducer from './slices/product-type';
 import addressReducer from './slices/address';
+import deliveryService from './slices/deliveryService';
 
 // ----------------------------------------------------------------------
 
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   productChars: productCharsReducer,
   productTypes: productTypeReducer,
   addresses:addressReducer,
+  deliveryServices:deliveryService
 });
 
 export { rootPersistConfig, rootReducer };

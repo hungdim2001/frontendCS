@@ -123,6 +123,8 @@ export default function CheckoutPayment() {
     }
   };
 
+  const { deliveryServices } = useSelector((state) => state);
+  console.log(deliveryServices)
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={3}>

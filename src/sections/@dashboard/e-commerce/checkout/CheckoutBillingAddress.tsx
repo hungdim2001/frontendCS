@@ -30,11 +30,8 @@ import { deleteAddress, getAddress } from 'src/redux/slices/address';
 import CheckoutNewAddressForm from './CheckoutNewAddressForm';
 import CheckoutSummary from './CheckoutSummary';
 import { ghnAddress, ghnApi } from 'src/service/app-apis/ghn';
+import { getDelverySucess } from 'src/redux/slices/deliveryService';
 // ----------------------------------------------------------------------
-interface FormValuesProps {
-  address: number;
-}
-
 export default function CheckoutBillingAddress() {
   const dispatch = useDispatch();
   const { checkout } = useSelector((state) => state.product);
@@ -48,20 +45,31 @@ export default function CheckoutBillingAddress() {
   useEffect(() => {
     dispatch(getAddress(user?.id!));
   }, [dispatch]);
-
-  const { initFromOld } = useLocationContext();
   const handleDelete = async (id: number) => {
     if (id === addressSelected?.id) setAddressSelected(undefined);
     dispatch(deleteAddress(id));
   };
+  const [provinces, setProvinces] = useState<ghnAddress[]>([]);
+  const [districts, setDistricts] = useState<ghnAddress[]>([]);
+  const [wards, setWards] = useState<ghnAddress[]>([]);
+  const [province, setProvince] = useState<ghnAddress>();
+  const [district, setDistrict] = useState<ghnAddress>();
+  const [ward, setWard] = useState<ghnAddress>();
   const handleClickOpen = async (address: Address) => {
-    if (address.province && address.district && address.precinct && address.streetBlock)
-      await initFromOld(
-        address.province,
-        address.province + address.district,
-        address.province + address.district + address.precinct,
-        address.province + address.district + address.precinct + address.streetBlock
-      );
+    if (address.province && address.district && address.ward) {
+      const provinces = await ghnApi.getProvince();
+      const province = provinces.find((c) => c.ProvinceID == address.province)!
+      setProvinces(provinces);
+      setProvince(province)
+      const districts = await ghnApi.getDistrict(address.province);
+      const district = districts.find((c) => c.DistrictID == address.district)!
+      setDistricts(districts);
+      setDistrict(district)
+      const wards = await ghnApi.getWard(address.district);
+      const ward = wards.find((c) => c.WardCode == address.ward)!
+      setWards(wards);
+      setWard(ward)
+    }
     await setAddressEdit(address);
     await setOpen(true);
   };
@@ -82,10 +90,23 @@ export default function CheckoutBillingAddress() {
   };
   const [addressSelected, setAddressSelected] = useState<Address>();
   useEffect(() => {
+    const getService = async () => {
+      if (addressSelected?.district) {
+        const deliveryServices = await ghnApi.getService({
+          shop_id: 4875027,
+          from_district: 3440,
+          to_district: addressSelected?.district!
+        })
+        dispatch(getDelverySucess(deliveryServices))
+      }
+    }
+    getService()
+  }, [addressSelected])
+  useEffect(() => {
     if (!addressSelected) setAddressSelected(addresses.adresss.find((item) => item.isDefault)!);
   }, [addresses]);
   const [addressEdit, setAddressEdit] = useState<Address>({} as Address);
-  
+
   return (
     <>
       <Grid container spacing={3}>
@@ -140,7 +161,18 @@ export default function CheckoutBillingAddress() {
         </Grid>
       </Grid>
       {open ? (
-        <CheckoutNewAddressForm addressEdit={addressEdit} open={open} onClose={handleClose} />
+        <CheckoutNewAddressForm addressEdit={addressEdit} open={open} onClose={handleClose} provinces={provinces}
+          districts={districts}
+          wards={wards}
+          setProvinces={setProvinces}
+          setDistricts={setDistricts}
+          setWards={setWards}
+          province={province}
+          district={district}
+          ward={ward}
+          setProvince={setProvince}
+          setDistrict={setDistrict}
+          setWard={setWard} />
       ) : (
         <></>
       )}

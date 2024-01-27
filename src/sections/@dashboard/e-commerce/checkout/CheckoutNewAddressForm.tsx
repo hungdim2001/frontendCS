@@ -40,10 +40,10 @@ import { ghnAddress, ghnApi } from 'src/service/app-apis/ghn';
 // ----------------------------------------------------------------------
 
 interface FormValuesProps extends BillingAddress {
-  province: string;
-  district: string;
+  province: number;
+  district: number;
   address: string;
-  ward: string;
+  ward: number;
   afterSubmit?: string;
   receiver: string;
   phone: string;
@@ -55,9 +55,35 @@ type Props = {
   open: boolean;
   addressEdit: Address;
   onClose: VoidFunction;
+  provinces: ghnAddress[];
+  districts: ghnAddress[];
+  wards: ghnAddress[];
+  province?: ghnAddress;
+  district?: ghnAddress;
+  ward?: ghnAddress;
+  setProvinces: React.Dispatch<React.SetStateAction<ghnAddress[]>>;
+  setDistricts: React.Dispatch<React.SetStateAction<ghnAddress[]>>;
+  setWards: React.Dispatch<React.SetStateAction<ghnAddress[]>>;
+  setProvince: React.Dispatch<React.SetStateAction<ghnAddress | undefined>>;
+  setDistrict: React.Dispatch<React.SetStateAction<ghnAddress | undefined>>;
+  setWard: React.Dispatch<React.SetStateAction<ghnAddress | undefined>>;
 };
 
-export default function CheckoutNewAddressForm({ open, onClose, addressEdit }: Props) {
+export default function CheckoutNewAddressForm({ open,
+  addressEdit,
+  onClose,
+  provinces,
+  districts,
+  wards,
+  province,
+  district,
+  ward,
+  setProvinces,
+  setDistricts,
+  setWards,
+  setProvince,
+  setDistrict,
+  setWard, }: Props) {
   const NewAddressSchema = Yup.object().shape({
     receiver: Yup.string().required('Fullname is required'),
     phone: Yup.string()
@@ -70,29 +96,22 @@ export default function CheckoutNewAddressForm({ open, onClose, addressEdit }: P
     // streetBlock: Yup.string().required('Street block is required'),
   });
   const dispatch = useDispatch();
+  console.log(addressEdit)
   const defaultValues = useMemo(
     () => ({
       addressType: addressEdit.addressType || 'Home',
       receiver: addressEdit.receiver || '',
       phone: addressEdit.phone || '',
       address: addressEdit.address || '',
-      streetBlock:
-        addressEdit.province +
-          addressEdit.district +
-          addressEdit.precinct +
-          addressEdit.streetBlock || '',
-      province: addressEdit.province || '',
-      district: addressEdit.province + addressEdit.district || '',
-      precinct: addressEdit.province + addressEdit.district + addressEdit.precinct || '',
+      province: addressEdit.province,
+      district: addressEdit.district,
+      ward: addressEdit.ward,
       isDefault: addressEdit.isDefault || false,
     }),
     [addressEdit]
   );
   // const { locationState, handleLocationSelect, initFromOld } = useLocationContext();
   // const { provinces, districts, precincts, streetBlocks } = locationState;
-  const [provinces, setProvinces] = useState<ghnAddress[]>([]);
-  const [districts, setDistricts] = useState<ghnAddress[]>([]);
-  const [wards, setWards] = useState<ghnAddress[]>([]);
   useEffect(() => {
     const fetchData = async () => {
       const data = await ghnApi.getProvince();
@@ -100,9 +119,6 @@ export default function CheckoutNewAddressForm({ open, onClose, addressEdit }: P
     };
     fetchData();
   }, []);
-  useEffect(() => {
-    console.log(wards);
-  }, [wards]);
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(NewAddressSchema),
     defaultValues,
@@ -127,7 +143,9 @@ export default function CheckoutNewAddressForm({ open, onClose, addressEdit }: P
         const address = {
           ...addressEdit,
           receiver: data.receiver,
-          // areaCode: data.streetBlock,
+          province: data.province,
+          district: data.district,
+          ward: data.ward,
           addressType: data.addressType,
           phone: data.phone,
           isDefault: data.isDefault,
@@ -136,6 +154,7 @@ export default function CheckoutNewAddressForm({ open, onClose, addressEdit }: P
           updateDatetime: new Date(),
           address: data.address,
           lat: selectPosition.lat,
+          fullName: ward?.WardName! + " " + district?.DistrictName! + " " + province?.ProvinceName,
           lon: selectPosition.lon,
         };
         const response = await addressApi.createOrUpdate(address);
@@ -144,11 +163,14 @@ export default function CheckoutNewAddressForm({ open, onClose, addressEdit }: P
       } else {
         const address: Address = {
           receiver: data.receiver,
-          // areaCode: data.streetBlock,
+          province: data.province,
+          district: data.district,
+          ward: data.ward,
           addressType: data.addressType,
           phone: data.phone,
           isDefault: data.isDefault,
           userId: user?.id,
+          fullName: ward?.WardName! + " " + district?.DistrictName! + " " + province?.ProvinceName,
           createUser: user?.id,
           createDatetime: new Date(),
           address: data.address,
@@ -171,27 +193,29 @@ export default function CheckoutNewAddressForm({ open, onClose, addressEdit }: P
   type Field = 'province' | 'district' | 'ward';
   const handleChange = async (value: any, field: Field) => {
     const selectedValue = value;
-    let option: number;
+    let option: ghnAddress;
     setValue(field, selectedValue, { shouldValidate: true });
     if (field === 'province') {
-      option = provinces.find((c) => c.ProvinceID == selectedValue)?.ProvinceID!;
-      setDistricts([]);
-      setWards([]);
+      option = provinces.find((c) => c.ProvinceID == selectedValue)!
       await resetField('district');
       await resetField('ward');
-      const response = await ghnApi.getDistrict(option);
+      const response = await ghnApi.getDistrict(option.ProvinceID);
       await setDistricts(response);
+      setDistrict(undefined);
+      setWard(undefined)
+      setWards([])
+      setProvince(option)
     } else if (field === 'district') {
-      option = districts.find((c) => c.DistrictID == selectedValue)?.DistrictID!;
+      option = districts.find((c) => c.DistrictID == selectedValue)!;
       resetField('ward');
-      setWards([]);
-      const response = await ghnApi.getWard(option);
+      const response = await ghnApi.getWard(option.DistrictID);
       await setWards(response);
-    } else if (field === 'ward') {
-      // option = precincts.find((c) => c.areaCode === selectedValue);
-      // handleLocationSelect(option, field);
+      setWard(undefined)
+      setDistrict(option)
     } else {
-      // handleLocationSelect(option, field);
+      option = wards.find((c) => c.WardCode == selectedValue)!;
+
+      setWard(option)
     }
   };
   const [selectPosition, setSelectPosition] = useState<{ lat: number; lon: number } | null>(null);
@@ -272,7 +296,7 @@ export default function CheckoutNewAddressForm({ open, onClose, addressEdit }: P
                 placeholder="Ward"
               >
                 <option value="" />
-                {wards.length>0&&wards.map((option) => (
+                {wards.length > 0 && wards.map((option) => (
                   <option key={option.WardCode} value={option.WardCode!}>
                     {option.WardName}
                   </option>
