@@ -12,16 +12,17 @@ export type DeliveryService = {
   service_id: number;
   short_name: number;
   service_type_id: number;
+  leadtime:number;
 }
 const slice = createSlice({
   name: 'deliveryService',
   initialState,
   reducers: {
-    getDelverySucess(state, action) {
+    createDeliveryService(state, action) {
       state.deliveryServices= action.payload;
     },
   },
 });
 
 export default slice.reducer;
-export const {getDelverySucess,} = slice.actions;
+export const {} = slice.actions;

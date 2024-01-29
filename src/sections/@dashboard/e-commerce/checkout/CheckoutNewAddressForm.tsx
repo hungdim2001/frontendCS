@@ -69,7 +69,8 @@ type Props = {
   setWard: React.Dispatch<React.SetStateAction<ghnAddress | undefined>>;
 };
 
-export default function CheckoutNewAddressForm({ open,
+export default function CheckoutNewAddressForm({
+  open,
   addressEdit,
   onClose,
   provinces,
@@ -83,7 +84,8 @@ export default function CheckoutNewAddressForm({ open,
   setWards,
   setProvince,
   setDistrict,
-  setWard, }: Props) {
+  setWard,
+}: Props) {
   const NewAddressSchema = Yup.object().shape({
     receiver: Yup.string().required('Fullname is required'),
     phone: Yup.string()
@@ -96,7 +98,6 @@ export default function CheckoutNewAddressForm({ open,
     // streetBlock: Yup.string().required('Street block is required'),
   });
   const dispatch = useDispatch();
-  console.log(addressEdit)
   const defaultValues = useMemo(
     () => ({
       addressType: addressEdit.addressType || 'Home',
@@ -154,7 +155,7 @@ export default function CheckoutNewAddressForm({ open,
           updateDatetime: new Date(),
           address: data.address,
           lat: selectPosition.lat,
-          fullName: ward?.WardName! + " " + district?.DistrictName! + " " + province?.ProvinceName,
+          fullName: ward?.WardName! + ' ' + district?.DistrictName! + ' ' + province?.ProvinceName,
           lon: selectPosition.lon,
         };
         const response = await addressApi.createOrUpdate(address);
@@ -170,7 +171,7 @@ export default function CheckoutNewAddressForm({ open,
           phone: data.phone,
           isDefault: data.isDefault,
           userId: user?.id,
-          fullName: ward?.WardName! + " " + district?.DistrictName! + " " + province?.ProvinceName,
+          fullName: ward?.WardName! + ' ' + district?.DistrictName! + ' ' + province?.ProvinceName,
           createUser: user?.id,
           createDatetime: new Date(),
           address: data.address,
@@ -196,26 +197,26 @@ export default function CheckoutNewAddressForm({ open,
     let option: ghnAddress;
     setValue(field, selectedValue, { shouldValidate: true });
     if (field === 'province') {
-      option = provinces.find((c) => c.ProvinceID == selectedValue)!
+      option = provinces.find((c) => c.ProvinceID == selectedValue)!;
       await resetField('district');
       await resetField('ward');
       const response = await ghnApi.getDistrict(option.ProvinceID);
       await setDistricts(response);
       setDistrict(undefined);
-      setWard(undefined)
-      setWards([])
-      setProvince(option)
+      setWard(undefined);
+      setWards([]);
+      setProvince(option);
     } else if (field === 'district') {
       option = districts.find((c) => c.DistrictID == selectedValue)!;
       resetField('ward');
       const response = await ghnApi.getWard(option.DistrictID);
       await setWards(response);
-      setWard(undefined)
-      setDistrict(option)
+      setWard(undefined);
+      setDistrict(option);
     } else {
       option = wards.find((c) => c.WardCode == selectedValue)!;
 
-      setWard(option)
+      setWard(option);
     }
   };
   const [selectPosition, setSelectPosition] = useState<{ lat: number; lon: number } | null>(null);
@@ -258,11 +259,15 @@ export default function CheckoutNewAddressForm({ open,
                 onChange={(e) => handleChange(e.target.value, 'province')}
               >
                 <option value="" />
-                {provinces.map((option) => (
-                  <option key={option.ProvinceID} value={option.ProvinceID}>
-                    {option.ProvinceName}
-                  </option>
-                ))}
+                {provinces &&
+                  provinces.length > 0 &&
+                  provinces
+                    .sort((a, b) => a.ProvinceName.localeCompare(b.ProvinceName))
+                    .map((option) => (
+                      <option key={option.ProvinceID} value={option.ProvinceID}>
+                        {option.ProvinceName}
+                      </option>
+                    ))}
               </RHFSelect>
               <RHFSelect
                 onChange={(e) => handleChange(e.target.value, 'district')}
@@ -273,11 +278,15 @@ export default function CheckoutNewAddressForm({ open,
               >
                 {' '}
                 <option value="" />
-                {districts.map((option) => (
-                  <option key={option.DistrictID} value={option.DistrictID!}>
-                    {option.DistrictName}
-                  </option>
-                ))}
+                {districts &&
+                  districts.length > 0 &&
+                  districts
+                    .sort((a, b) => a.DistrictName.localeCompare(b.DistrictName))
+                    .map((option) => (
+                      <option key={option.DistrictID} value={option.DistrictID!}>
+                        {option.DistrictName}
+                      </option>
+                    ))}
               </RHFSelect>
             </Box>
             <Box
@@ -296,29 +305,16 @@ export default function CheckoutNewAddressForm({ open,
                 placeholder="Ward"
               >
                 <option value="" />
-                {wards.length > 0 && wards.map((option) => (
-                  <option key={option.WardCode} value={option.WardCode!}>
-                    {option.WardName}
-                  </option>
-                ))}
+                {wards &&
+                  wards.length > 0 &&
+                  wards
+                    .sort((a, b) => a.WardName.localeCompare(b.WardName))
+                    .map((option) => (
+                      <option key={option.WardCode} value={option.WardCode!}>
+                        {option.WardName}
+                      </option>
+                    ))}
               </RHFSelect>
-
-              {/* <RHFSelect
-                onChange={(e) => handleChange(e.target.value, 'streetBlock')}
-                disabled={streetBlocks.length === 0}
-                name="streetBlock"
-                label="Street Block"
-                placeholder="Street Block"
-              >
-                {' '}
-                <option value="" />
-                {streetBlocks.map((option) => (
-                  <option key={option.areaCode} value={option.areaCode!}>
-                    {option.name}
-                  </option>
-                ))}
-              </RHFSelect> */}
-
               <RHFTextField name="address" label="Address" />
             </Box>
             {/* <RHFTextField name="address" label="Address" /> */}

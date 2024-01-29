@@ -116,8 +116,14 @@ export type Address = BaseDTO & {
   district: number;
   ward: number;
   address: string;
-  lon:number;
-  lat:number;
+  lon: number;
+  lat: number;
+};
+export type DeliveryService = {
+  service_id: number;
+  short_name: number;
+  service_type_id: number;
+  estimate_delivery_time: number;
 };
 export type ProductState = {
   isLoading: boolean;
@@ -133,13 +139,14 @@ export type ProductState = {
     rating: string;
   };
   checkout: {
+    deliveryServices: DeliveryService[];
     activeStep: number;
     cart: CartItem[];
     subtotal: number;
     total: number;
     discount: number;
     shipping: number;
-    billing: BillingAddress | null;
+    billing: Address | null;
   };
 };
 

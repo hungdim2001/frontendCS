@@ -14,6 +14,7 @@ import {
   onBackStep,
   onNextStep,
   applyShipping,
+  getDelevirySerives,
 } from '../../../../redux/slices/product';
 // components
 import Iconify from '../../../../components/Iconify';
@@ -23,6 +24,7 @@ import CheckoutSummary from './CheckoutSummary';
 import CheckoutDelivery from './CheckoutDelivery';
 import CheckoutBillingInfo from './CheckoutBillingInfo';
 import CheckoutPaymentMethods from './CheckoutPaymentMethods';
+import { useEffect } from 'react';
 
 // ----------------------------------------------------------------------
 
@@ -123,15 +125,18 @@ export default function CheckoutPayment() {
     }
   };
 
-  const { deliveryServices } = useSelector((state) => state);
-  console.log(deliveryServices)
+  const { billing, deliveryServices } = useSelector((state) => state.product.checkout);
+  useEffect(() => {
+    if (billing?.district) dispatch(getDelevirySerives(billing?.district, billing.ward));
+  }, [billing]);
+  console.log(shipping)
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
           <CheckoutDelivery
+            deliveryServices={deliveryServices}
             onApplyShipping={handleApplyShipping}
-            deliveryOptions={DELIVERY_OPTIONS}
           />
           <CheckoutPaymentMethods cardOptions={CARDS_OPTIONS} paymentOptions={PAYMENT_OPTIONS} />
           <Button

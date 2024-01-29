@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 // @mui
 
 import {
@@ -10,9 +10,10 @@ import {
   IconButton,
   Radio,
   Typography,
+  styled,
 } from '@mui/material';
 // @types
-import { Address, OnCreateBilling } from '../../../../@types/product';
+import { Address } from '../../../../@types/product';
 // redux
 import { createBilling, onBackStep, onNextStep } from '../../../../redux/slices/product';
 import { useDispatch, useSelector } from '../../../../redux/store';
@@ -21,16 +22,12 @@ import { useDispatch, useSelector } from '../../../../redux/store';
 import Iconify from '../../../../components/Iconify';
 import Label from '../../../../components/Label';
 //
-import { useForm } from 'react-hook-form';
 import SvgIconStyle from 'src/components/SvgIconStyle';
-import { FormProvider } from 'src/components/hook-form';
 import useAuth from 'src/hooks/useAuth';
-import useLocationContext from 'src/hooks/useLocation';
 import { deleteAddress, getAddress } from 'src/redux/slices/address';
+import { ghnAddress, ghnApi } from 'src/service/app-apis/ghn';
 import CheckoutNewAddressForm from './CheckoutNewAddressForm';
 import CheckoutSummary from './CheckoutSummary';
-import { ghnAddress, ghnApi } from 'src/service/app-apis/ghn';
-import { getDelverySucess } from 'src/redux/slices/deliveryService';
 // ----------------------------------------------------------------------
 export default function CheckoutBillingAddress() {
   const dispatch = useDispatch();
@@ -58,17 +55,17 @@ export default function CheckoutBillingAddress() {
   const handleClickOpen = async (address: Address) => {
     if (address.province && address.district && address.ward) {
       const provinces = await ghnApi.getProvince();
-      const province = provinces.find((c) => c.ProvinceID == address.province)!
+      const province = provinces.find((c) => c.ProvinceID == address.province)!;
       setProvinces(provinces);
-      setProvince(province)
+      setProvince(province);
       const districts = await ghnApi.getDistrict(address.province);
-      const district = districts.find((c) => c.DistrictID == address.district)!
+      const district = districts.find((c) => c.DistrictID == address.district)!;
       setDistricts(districts);
-      setDistrict(district)
+      setDistrict(district);
       const wards = await ghnApi.getWard(address.district);
-      const ward = wards.find((c) => c.WardCode == address.ward)!
+      const ward = wards.find((c) => c.WardCode == address.ward)!;
       setWards(wards);
-      setWard(ward)
+      setWard(ward);
     }
     await setAddressEdit(address);
     await setOpen(true);
@@ -84,24 +81,10 @@ export default function CheckoutBillingAddress() {
   const handleBackStep = () => {
     dispatch(onBackStep());
   };
-
   const handleCreateBilling = (value: Address) => {
     dispatch(createBilling(value));
   };
   const [addressSelected, setAddressSelected] = useState<Address>();
-  useEffect(() => {
-    const getService = async () => {
-      if (addressSelected?.district) {
-        const deliveryServices = await ghnApi.getService({
-          shop_id: 4875027,
-          from_district: 3440,
-          to_district: addressSelected?.district!
-        })
-        dispatch(getDelverySucess(deliveryServices))
-      }
-    }
-    getService()
-  }, [addressSelected])
   useEffect(() => {
     if (!addressSelected) setAddressSelected(addresses.adresss.find((item) => item.isDefault)!);
   }, [addresses]);
@@ -151,6 +134,7 @@ export default function CheckoutBillingAddress() {
             size="large"
             type="submit"
             variant="contained"
+            disabled={!addressSelected}
             onClick={(e) => {
               handleCreateBilling(addressSelected!);
               handleNextStep();
@@ -161,7 +145,11 @@ export default function CheckoutBillingAddress() {
         </Grid>
       </Grid>
       {open ? (
-        <CheckoutNewAddressForm addressEdit={addressEdit} open={open} onClose={handleClose} provinces={provinces}
+        <CheckoutNewAddressForm
+          addressEdit={addressEdit}
+          open={open}
+          onClose={handleClose}
+          provinces={provinces}
           districts={districts}
           wards={wards}
           setProvinces={setProvinces}
@@ -172,7 +160,8 @@ export default function CheckoutBillingAddress() {
           ward={ward}
           setProvince={setProvince}
           setDistrict={setDistrict}
-          setWard={setWard} />
+          setWard={setWard}
+        />
       ) : (
         <></>
       )}
@@ -189,6 +178,15 @@ type AddressItemFormProps = {
   handleClickOpen: (address: Address) => void;
   deleteAddress: (id: number) => void;
 };
+
+const  OptionStyle = styled('div')(({ theme }) => ({
+  padding: theme.spacing(2),
+  position:'relative',
+  marginBottom:theme.spacing(3),
+  transition: theme.transitions.create('all'),
+  border: `solid 1px ${theme.palette.divider}`,
+  borderRadius: Number(theme.shape.borderRadius) * 1.5,
+}));
 function AddressItemForm({
   addressProp,
   handleClickOpen,
@@ -197,16 +195,13 @@ function AddressItemForm({
   setAddressSelected,
 }: AddressItemFormProps) {
   const { id, fullName, receiver, address, addressType, phone, isDefault } = addressProp;
-  // const handleCreateBilling = () => {
-  //   // onCreateBilling(address);
-  //   onNextStep();
-  // };
   return (
-    <Card sx={{ p: 3, mb: 3, position: 'relative' }}>
+    <OptionStyle>
       <FormControlLabel
         value={id}
         control={
           <Radio
+            checkedIcon={<Iconify icon={'eva:checkmark-circle-2-fill'} />}
             onChange={(e) => {
               setAddressSelected(addressProp);
             }}
@@ -262,6 +257,6 @@ function AddressItemForm({
           <SvgIconStyle src={'/icons/ic_edit.svg'} />
         </IconButton>
       </Box>
-    </Card>
+    </OptionStyle>
   );
 }

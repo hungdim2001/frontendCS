@@ -14,9 +14,10 @@ import {
   FormControlLabel,
 } from '@mui/material';
 // @types
-import { DeliveryOption } from '../../../../@types/product';
+import { DeliveryOption, DeliveryService } from '../../../../@types/product';
 // components
 import Iconify from '../../../../components/Iconify';
+import { format } from 'date-fns';
 
 // ----------------------------------------------------------------------
 
@@ -34,13 +35,15 @@ const OptionStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 type Props = {
-  deliveryOptions: DeliveryOption[];
+  deliveryServices: DeliveryService[];
   onApplyShipping: (shipping: number) => void;
 };
 
-export default function CheckoutDelivery({ deliveryOptions, onApplyShipping }: Props) {
+export default function CheckoutDelivery({
+  onApplyShipping,
+  deliveryServices,
+}: Props) {
   const { control } = useFormContext();
-
   return (
     <Card>
       <CardHeader title="Delivery options" />
@@ -58,12 +61,12 @@ export default function CheckoutDelivery({ deliveryOptions, onApplyShipping }: P
               }}
             >
               <Stack spacing={2} alignItems="center" direction={{ xs: 'column', md: 'row' }}>
-                {deliveryOptions.map((delivery) => {
-                  const selected = field.value === delivery.value;
+                {deliveryServices.map((delivery) => {
+                  const selected = field.value === delivery.service_id;
 
                   return (
                     <OptionStyle
-                      key={delivery.value}
+                      key={delivery.service_id}
                       sx={{
                         ...(selected && {
                           boxShadow: (theme) => theme.customShadows.z20,
@@ -71,15 +74,18 @@ export default function CheckoutDelivery({ deliveryOptions, onApplyShipping }: P
                       }}
                     >
                       <FormControlLabel
-                        value={delivery.value}
+                        value={delivery.service_id}
                         control={
                           <Radio checkedIcon={<Iconify icon={'eva:checkmark-circle-2-fill'} />} />
                         }
                         label={
                           <Box sx={{ ml: 1 }}>
-                            <Typography variant="subtitle2">{delivery.title}</Typography>
+                            <Typography variant="subtitle2">{delivery.short_name}</Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                              {delivery.description}
+                              {format(
+                                new Date(delivery.estimate_delivery_time * 1000),
+                                'EEE MMM dd yyyy'
+                              )}
                             </Typography>
                           </Box>
                         }

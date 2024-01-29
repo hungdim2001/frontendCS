@@ -7,6 +7,7 @@ import { CartItem, Product, ProductState } from '../../@types/product';
 //
 import { dispatch } from '../store';
 import { productApi } from 'src/service/app-apis/product';
+import { defaultCaculateFeeRequest, defaultItem, ghnApi } from 'src/service/app-apis/ghn';
 
 // ----------------------------------------------------------------------
 
@@ -24,6 +25,7 @@ const initialState: ProductState = {
     rating: '',
   },
   checkout: {
+    deliveryServices: [],
     activeStep: 0,
     cart: [],
     subtotal: 0,
@@ -175,7 +177,9 @@ const slice = createSlice({
     createBilling(state, action) {
       state.checkout.billing = action.payload;
     },
-
+    getDeliverySuccess(state, action) {
+      state.checkout.deliveryServices = action.payload;
+    },
     applyDiscount(state, action) {
       const discount = action.payload;
       state.checkout.discount = discount;
@@ -205,6 +209,7 @@ export const {
   createBilling,
   applyShipping,
   applyDiscount,
+  getDeliverySuccess,
   increaseQuantity,
   decreaseQuantity,
   sortByProducts,
@@ -244,6 +249,42 @@ export function getProduct(id: number) {
     try {
       const response = await productApi.getProducts(id);
       dispatch(slice.actions.getProductSuccess(response[0]));
+    } catch (error) {
+      console.error(error);
+      dispatch(slice.actions.hasError(error));
+    }
+  };
+}
+export function getDelevirySerives(district: number, ward: number) {
+  return async (dispatch: any) => {
+    dispatch(slice.actions.startLoading());
+    try {
+      const deliveryServices = await ghnApi.getService({
+        shop_id: 4875027,
+        from_district: 3440,
+        to_district: district,
+      });
+      const newDeliveryService = await Promise.all(
+        deliveryServices.map(async (item) => {
+          const estimateTimeResponse = await ghnApi.getEstimateTime({
+            from_district_id: 3440,
+            from_ward_code: '13004', // convert to string directly
+            to_district_id: district,
+            to_ward_code: ward + '', // convert to string
+            service_id: item.service_id,
+          });
+          const response = await ghnApi.caculateFee({
+            ...defaultCaculateFeeRequest,
+            service_id: item.service_id,
+            to_district_id: district,
+            to_ward_code: ward + '',
+            items: [{ ...defaultItem }],
+          });
+          console.log(response);
+          return { ...item, estimate_delivery_time: estimateTimeResponse.leadtime };
+        })
+      );
+      dispatch(getDeliverySuccess(newDeliveryService));
     } catch (error) {
       console.error(error);
       dispatch(slice.actions.hasError(error));
