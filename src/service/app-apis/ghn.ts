@@ -82,8 +82,23 @@ export const defaultCaculateFeeRequest: CaculateFeeRequest = {
   coupon: '',
   items: [],
 };
+export type CaculateFeeResponse ={
+  total:number;
+ serivce_fee:number;
+ insurance_fee: number;
+ pick_station_fee:number;
+ coupon_value:number;
+ r2s_fee:number;
+ document_return:number;
+ double_check:number;
+ cod_fee:number;
+ pick_remote_areas_fee:number;
+ deliver_remote_areas_fee:number;
+
+}
+
 const caculateFee = (caculateFeeRequest:CaculateFeeRequest) =>
-  ghnIns.post('v2/shipping-order/fee',caculateFeeRequest);
+  ghnIns.post<CaculateFeeResponse>('v2/shipping-order/fee',caculateFeeRequest);
 const getEstimateTime = (estimateRequest: EstimateDeliveryTimeRequest) =>
   ghnIns.post<EstimateResponse>('v2/shipping-order/leadtime', estimateRequest);
 const getService = (serviceRequest: ServiceRequest) =>

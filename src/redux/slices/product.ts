@@ -280,8 +280,7 @@ export function getDelevirySerives(district: number, ward: number) {
             to_ward_code: ward + '',
             items: [{ ...defaultItem }],
           });
-          console.log(response);
-          return { ...item, estimate_delivery_time: estimateTimeResponse.leadtime };
+          return { ...item, estimate_delivery_time: estimateTimeResponse.leadtime, total: response.total };
         })
       );
       dispatch(getDeliverySuccess(newDeliveryService));

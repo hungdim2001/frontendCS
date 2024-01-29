@@ -152,8 +152,6 @@ export default function ProductDetailsSummary({
 
   const handleAddCart = async () => {
     try {
-      console.log((currentCart.find(item => item.variant.id === values.variant.id)?.quantity ?? 0) +
-        values.variant.quantity)
       if (
         (currentCart.find(item => item.variant.id === values.variant.id)?.quantity ?? 0) +
         values.quantity <

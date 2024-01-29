@@ -24,22 +24,10 @@ import CheckoutSummary from './CheckoutSummary';
 import CheckoutDelivery from './CheckoutDelivery';
 import CheckoutBillingInfo from './CheckoutBillingInfo';
 import CheckoutPaymentMethods from './CheckoutPaymentMethods';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 // ----------------------------------------------------------------------
 
-const DELIVERY_OPTIONS: DeliveryOption[] = [
-  {
-    value: 0,
-    title: 'Standard delivery (Free)',
-    description: 'Delivered on Monday, August 12',
-  },
-  {
-    value: 2,
-    title: 'Fast delivery ($2,00)',
-    description: 'Delivered on Monday, August 5',
-  },
-];
 
 const PAYMENT_OPTIONS: PaymentOption[] = [
   {
@@ -102,20 +90,7 @@ export default function CheckoutPayment() {
     payment: Yup.string().required('Payment is required!'),
   });
 
-  const defaultValues = {
-    delivery: shipping,
-    payment: '',
-  };
 
-  const methods = useForm<FormValuesProps>({
-    resolver: yupResolver(PaymentSchema),
-    defaultValues,
-  });
-
-  const {
-    handleSubmit,
-    formState: { isSubmitting },
-  } = methods;
 
   const onSubmit = async () => {
     try {
@@ -129,48 +104,69 @@ export default function CheckoutPayment() {
   useEffect(() => {
     if (billing?.district) dispatch(getDelevirySerives(billing?.district, billing.ward));
   }, [billing]);
-  console.log(shipping)
-  return (
-    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
-          <CheckoutDelivery
-            deliveryServices={deliveryServices}
-            onApplyShipping={handleApplyShipping}
-          />
-          <CheckoutPaymentMethods cardOptions={CARDS_OPTIONS} paymentOptions={PAYMENT_OPTIONS} />
-          <Button
-            size="small"
-            color="inherit"
-            onClick={handleBackStep}
-            startIcon={<Iconify icon={'eva:arrow-ios-back-fill'} />}
-          >
-            Back
-          </Button>
-        </Grid>
+  const defaultValues = useMemo(
+    () => ({
+      delivery: deliveryServices[0].total,
+      payment: '',
+    }),
+    [deliveryServices]
+  );
 
-        <Grid item xs={12} md={4}>
-          <CheckoutBillingInfo onBackStep={handleBackStep} />
 
-          <CheckoutSummary
-            enableEdit
-            total={total}
-            subtotal={subtotal}
-            discount={discount}
-            shipping={shipping}
-            onEdit={() => handleGotoStep(0)}
-          />
-          <LoadingButton
-            fullWidth
-            size="large"
-            type="submit"
-            variant="contained"
-            loading={isSubmitting}
-          >
-            Complete Order
-          </LoadingButton>
-        </Grid>
+  const methods = useForm<FormValuesProps>({
+    resolver: yupResolver(PaymentSchema),
+    defaultValues,
+  });
+  const {
+    setValue,
+    reset,
+    watch,
+    setError,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = methods;
+  if (!deliveryServices)
+    return <></>
+  return (<FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+    <Grid container spacing={3}>
+      <Grid item xs={12} md={8}>
+        <CheckoutDelivery
+          deliveryServices={deliveryServices}
+          onApplyShipping={handleApplyShipping}
+        />
+        <CheckoutPaymentMethods cardOptions={CARDS_OPTIONS} paymentOptions={PAYMENT_OPTIONS} />
+        <Button
+          size="small"
+          color="inherit"
+          onClick={handleBackStep}
+          startIcon={<Iconify icon={'eva:arrow-ios-back-fill'} />}
+        >
+          Back
+        </Button>
       </Grid>
-    </FormProvider>
+
+      <Grid item xs={12} md={4}>
+        <CheckoutBillingInfo onBackStep={handleBackStep} />
+
+        <CheckoutSummary
+          enableEdit
+          total={total}
+          subtotal={subtotal}
+          discount={discount}
+          shipping={shipping}
+          onEdit={() => handleGotoStep(0)}
+        />
+        <LoadingButton
+          fullWidth
+          size="large"
+          type="submit"
+          variant="contained"
+          loading={isSubmitting}
+        >
+          Complete Order
+        </LoadingButton>
+      </Grid>
+    </Grid>
+  </FormProvider>
   );
 }

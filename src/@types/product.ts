@@ -122,6 +122,7 @@ export type Address = BaseDTO & {
 export type DeliveryService = {
   service_id: number;
   short_name: number;
+  total:number;
   service_type_id: number;
   estimate_delivery_time: number;
 };

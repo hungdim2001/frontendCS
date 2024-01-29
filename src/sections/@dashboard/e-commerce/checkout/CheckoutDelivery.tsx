@@ -62,8 +62,7 @@ export default function CheckoutDelivery({
             >
               <Stack spacing={2} alignItems="center" direction={{ xs: 'column', md: 'row' }}>
                 {deliveryServices.map((delivery) => {
-                  const selected = field.value === delivery.service_id;
-
+                  const selected = field.value === delivery.total;
                   return (
                     <OptionStyle
                       key={delivery.service_id}
@@ -74,7 +73,7 @@ export default function CheckoutDelivery({
                       }}
                     >
                       <FormControlLabel
-                        value={delivery.service_id}
+                        value={delivery.total}
                         control={
                           <Radio checkedIcon={<Iconify icon={'eva:checkmark-circle-2-fill'} />} />
                         }
