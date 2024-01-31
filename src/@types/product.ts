@@ -1,7 +1,7 @@
 import { CustomFile } from 'src/components/upload';
 import { BaseDTO } from './common';
 
-export type PaymentType = 'paypal' | 'credit_card' | 'cash';
+export type PaymentType = 'paypal' | 'credit_card' | 'cash'| 'vnpay';
 
 export type ProductStatus = 'sale' | 'new' | '';
 
@@ -169,7 +169,7 @@ export type PaymentOption = {
   value: PaymentType;
   title: string;
   description: string;
-  icons: string[];
+  icons: string;
 };
 
 export type CardOption = {

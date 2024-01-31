@@ -95,9 +95,7 @@ export default function CheckoutPaymentMethods({ paymentOptions, cardOptions }: 
 
                         {isDesktop && (
                           <Stack direction="row" spacing={1} flexShrink={0}>
-                            {icons.map((icon) => (
-                              <Image key={icon} alt="logo card" src={icon} />
-                            ))}
+                              <Image sx={{width:'100px',height:'100px`'}} key={icons} alt="logo card" src={icons} />
                           </Stack>
                         )}
 

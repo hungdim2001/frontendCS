@@ -273,6 +273,7 @@ export function getDelevirySerives(district: number, ward: number) {
             to_ward_code: ward + '', // convert to string
             service_id: item.service_id,
           });
+          console.log('here')
           const response = await ghnApi.caculateFee({
             ...defaultCaculateFeeRequest,
             service_id: item.service_id,
