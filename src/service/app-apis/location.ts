@@ -1,4 +1,3 @@
-import { type } from 'os';
 import { BaseApi } from './base-api';
 
 const locationApiIns = new BaseApi('/api/area');
