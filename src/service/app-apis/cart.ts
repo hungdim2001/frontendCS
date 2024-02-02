@@ -3,7 +3,7 @@ import { CartItem, ProductChar } from '../../@types/product';
 
 const cartIns = new BaseApi('/api/cart');
 
-const addToCart = (cartItems: CartItem[]) => cartIns.post<CartItem>('', cartItems);
+const addToCart = (cartItem: CartItem) => cartIns.post<CartItem>('', cartItem);
 const cartApi = {
   addToCart,
 };

@@ -91,9 +91,10 @@ export type Product = BaseDTO & {
   // gender: ProductGender;
 };
 
-export type CartItem = {
+export type CartItem = BaseDTO &{
   cartId:number;
   name: string;
+  variantId: Variant;
   variant: Variant;
   quantity: number;
   subtotal: number;

@@ -17,7 +17,7 @@ import {
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 // redux
 import { useDispatch, useSelector } from '../../redux/store';
-import { getProduct, addCart, onGotoStep } from '../../redux/slices/product';
+import { getProduct, addCart, onGotoStep, addToCart } from '../../redux/slices/product';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // @types
@@ -90,7 +90,7 @@ export default function EcommerceProductDetails() {
     dispatch(getProduct(+id));
   }, [dispatch, id]);
   const handleAddCart = (product: CartItem) => {
-    dispatch(addCart(product));
+    dispatch(addToCart(product));
   };
   const [variant, setVariant] = useState<Variant>({} as Variant);
 

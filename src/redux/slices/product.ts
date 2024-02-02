@@ -8,6 +8,7 @@ import { CartItem, Product, ProductState } from '../../@types/product';
 import { dispatch } from '../store';
 import { productApi } from 'src/service/app-apis/product';
 import { defaultCaculateFeeRequest, defaultItem, ghnApi } from 'src/service/app-apis/ghn';
+import { cartApi } from 'src/service/app-apis/cart';
 
 // ----------------------------------------------------------------------
 
@@ -96,23 +97,25 @@ const slice = createSlice({
     },
 
     addCart(state, action) {
-      const product = action.payload;
-      const isEmptyCart = state.checkout.cart.length === 0;
-      if (isEmptyCart) {
-        state.checkout.cart = [...state.checkout.cart, product];
-      } else {
-        state.checkout.cart = state.checkout.cart.map((_product) => {
-          const isExisted = _product.variant.id === product.variant.id;
-          if (isExisted) {
-            return {
-              ..._product,
-              quantity: _product.quantity + product.quantity,
-            };
-          }
-          return _product;
-        });
-      }
-      state.checkout.cart = uniqBy([...state.checkout.cart, product], 'variant.id');
+      state.isLoading = false;
+      state.checkout.cart = action.payload;
+      // const product = action.payload;
+      // const isEmptyCart = state.checkout.cart.length === 0;
+      // if (isEmptyCart) {
+      //   state.checkout.cart = [...state.checkout.cart, product];
+      // } else {
+      //   state.checkout.cart = state.checkout.cart.map((_product) => {
+      //     const isExisted = _product.variant.id === product.variant.id;
+      //     if (isExisted) {
+      //       return {
+      //         ..._product,
+      //         quantity: _product.quantity + product.quantity,
+      //       };
+      //     }
+      //     return _product;
+      //   });
+      // }
+      // state.checkout.cart = uniqBy([...state.checkout.cart, product], 'variant.id');
     },
 
     deleteCart(state, action) {
@@ -217,6 +220,28 @@ export const {
 } = slice.actions;
 
 // ----------------------------------------------------------------------
+export function addToCart(cartItem: CartItem) {
+  return async () => {
+    console.log(cartItem)
+    const response = await cartApi.addToCart(cartItem);
+    // dispatch(slice.actions.addCart(response));
+  };
+  // const product = slice.action.payload;
+  // const isEmptyCart = dispatch(getCart())=== 0;
+  // if (isEmptyCart) {
+  //   state.checkout.cart = [...state.checkout.cart, product];
+  // } else {
+  //   state.checkout.cart = state.checkout.cart.map((_product) => {
+  //     const isExisted = _product.variant.id === product.variant.id;
+  //     if (isExisted) {
+  //       return {
+  //         ..._product,
+  //         quantity: _product.quantity + product.quantity,
+  //       };
+  //     }
+  // }
+  // state.checkout.cart = uniqBy([...state.checkout.cart, product], 'variant.id');
+}
 export function deleteProducts(ids: number[]) {
   return async () => {
     try {
@@ -273,7 +298,7 @@ export function getDelevirySerives(district: number, ward: number) {
             to_ward_code: ward + '', // convert to string
             service_id: item.service_id,
           });
-          console.log('here')
+          console.log('here');
           const response = await ghnApi.caculateFee({
             ...defaultCaculateFeeRequest,
             service_id: item.service_id,
@@ -281,7 +306,11 @@ export function getDelevirySerives(district: number, ward: number) {
             to_ward_code: ward + '',
             items: [{ ...defaultItem }],
           });
-          return { ...item, estimate_delivery_time: estimateTimeResponse.leadtime, total: response.total };
+          return {
+            ...item,
+            estimate_delivery_time: estimateTimeResponse.leadtime,
+            total: response.total,
+          };
         })
       );
       dispatch(getDeliverySuccess(newDeliveryService));
