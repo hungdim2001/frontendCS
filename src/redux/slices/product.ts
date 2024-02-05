@@ -98,14 +98,23 @@ const slice = createSlice({
 
     addCart(state, action) {
       state.isLoading = false;
-      state.checkout.cart = action.payload;
+      const newCartItem = action.payload.map((cartItem: CartItem) => {
+        const variant = state.products
+          .flatMap((product) => product.variants)
+          .find((variant) => 
+            variant.id === cartItem.variantId
+          );
+        cartItem.variant = variant!;
+        return cartItem;
+      });
+      state.checkout.cart = newCartItem;
       // const product = action.payload;
       // const isEmptyCart = state.checkout.cart.length === 0;
       // if (isEmptyCart) {
       //   state.checkout.cart = [...state.checkout.cart, product];
       // } else {
       //   state.checkout.cart = state.checkout.cart.map((_product) => {
-      //     const isExisted = _product.variant.id === product.variant.id;
+          // const isExisted = _product.variant.id === product.variant.id;
       //     if (isExisted) {
       //       return {
       //         ..._product,
@@ -222,9 +231,8 @@ export const {
 // ----------------------------------------------------------------------
 export function addToCart(cartItem: CartItem) {
   return async () => {
-    console.log(cartItem)
-    const response = await cartApi.addToCart(cartItem);
-    // dispatch(slice.actions.addCart(response));
+    const response = await cartApi.addToCart({ ...cartItem, variantId: cartItem.variant.id! });
+    dispatch(slice.actions.addCart(response));
   };
   // const product = slice.action.payload;
   // const isEmptyCart = dispatch(getCart())=== 0;

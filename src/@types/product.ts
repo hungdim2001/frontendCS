@@ -94,7 +94,7 @@ export type Product = BaseDTO & {
 export type CartItem = BaseDTO &{
   cartId:number;
   name: string;
-  variantId: Variant;
+  variantId: number;
   variant: Variant;
   quantity: number;
   subtotal: number;
