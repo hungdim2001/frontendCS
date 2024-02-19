@@ -10,6 +10,7 @@ import {
   applyDiscount,
   increaseQuantity,
   decreaseQuantity,
+  addToCart,
 } from '../../../../redux/slices/product';
 // routes
 import { PATH_DASHBOARD } from '../../../../routes/paths';
@@ -20,6 +21,7 @@ import EmptyContent from '../../../../components/EmptyContent';
 //
 import CheckoutSummary from './CheckoutSummary';
 import CheckoutProductList from './CheckoutProductList';
+import { CartItem } from 'src/@types/product';
 
 // ----------------------------------------------------------------------
 
@@ -34,8 +36,8 @@ export default function CheckoutCart() {
 
   const isEmptyCart = cart.length === 0;
 
-  const handleDeleteCart = (productId: number|null) => {
-    dispatch(deleteCart(productId));
+  const handleDeleteCart = (cartItem: CartItem) => {
+    dispatch(deleteCart(cartItem));
   };
 
   const handleNextStep = () => {
@@ -43,11 +45,11 @@ export default function CheckoutCart() {
   };
 
   const handleIncreaseQuantity = (productId: number|null) => {
-    dispatch(increaseQuantity(productId));
+    dispatch(increaseQuantity({variantId:productId!, quantity: 1} as CartItem));
   };
 
   const handleDecreaseQuantity = (productId: number|null) => {
-    dispatch(decreaseQuantity(productId));
+    dispatch(increaseQuantity({variantId:productId!, quantity: -1} as CartItem));
   };
 
   const handleApplyDiscount = (value: number) => {

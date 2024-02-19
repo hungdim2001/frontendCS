@@ -78,24 +78,16 @@ export default function ProductDetailsSummary({
   const {
     id,
     name,
-    // sizes,
     price,
     thumbnail,
     status,
     quantity,
     productSpecChars,
     variants,
-    // colors,
-    // available,
-    // priceSale,
-    // totalRating,
-    // totalReview,
-    // inventoryType,
   } = product;
   const alreadyProduct = cart.map((item) => item.variant.id).includes(id);
   const isMaxQuantity =
-    cart.filter((item) => item.variant.id === id).map((item) => item.quantity)[0] >= quantity;
-
+    cart.filter((item) => item.variantId === id).map((item) => item.quantity)[0] >= quantity;
   const defaultValues = {
     name,
     variant:

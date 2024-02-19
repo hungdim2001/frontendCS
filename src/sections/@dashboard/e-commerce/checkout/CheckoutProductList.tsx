@@ -44,7 +44,7 @@ const IncrementerStyle = styled('div')(({ theme }) => ({
 
 type Props = {
   products: CartItem[];
-  onDelete: (id: number | null) => void;
+  onDelete: (cartItem: CartItem) => void;
   onDecreaseQuantity: (id: number | null) => void;
   onIncreaseQuantity: (id: number | null) => void;
 };
@@ -123,7 +123,7 @@ export default function CheckoutProductList({
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <IconButton
                       sx={{ color: '#C91433', mt: '12px', padding: 0 }}
-                      onClick={() => onDelete(variant.id)}
+                      onClick={() => onDelete({variantId: variant.id!, quantity: -quantity} as CartItem)}
                     >
                       <SvgIconStyle src={'/icons/ic_trash.svg'} />
                     </IconButton>

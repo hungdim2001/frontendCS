@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, current } from '@reduxjs/toolkit';
 import sum from 'lodash/sum';
 import uniqBy from 'lodash/uniqBy';
 // utils
@@ -76,18 +76,15 @@ const slice = createSlice({
       state.filters.priceRange = action.payload.priceRange;
       state.filters.rating = action.payload.rating;
     },
-
     // CHECKOUT
     getCart(state, action) {
       const cart = action.payload;
-
       const subtotal = sum(
         cart.map((cartItem: CartItem) => cartItem.variant.price * cartItem.quantity)
       );
       const discount = cart.length === 0 ? 0 : state.checkout.discount;
       const shipping = cart.length === 0 ? 0 : state.checkout.shipping;
       const billing = cart.length === 0 ? null : state.checkout.billing;
-
       state.checkout.cart = cart;
       state.checkout.discount = discount;
       state.checkout.shipping = shipping;
@@ -99,11 +96,9 @@ const slice = createSlice({
     addCart(state, action) {
       state.isLoading = false;
       const newCartItem = action.payload.map((cartItem: CartItem) => {
-        const variant = state.products
-          .flatMap((product) => product.variants)
-          .find((variant) => 
-            variant.id === cartItem.variantId
-          );
+        const variant = state.product?.variants.find(
+          (variant) => variant.id === cartItem.variantId
+        );
         cartItem.variant = variant!;
         return cartItem;
       });
@@ -114,7 +109,7 @@ const slice = createSlice({
       //   state.checkout.cart = [...state.checkout.cart, product];
       // } else {
       //   state.checkout.cart = state.checkout.cart.map((_product) => {
-          // const isExisted = _product.variant.id === product.variant.id;
+      // const isExisted = _product.variant.id === product.variant.id;
       //     if (isExisted) {
       //       return {
       //         ..._product,
@@ -129,7 +124,6 @@ const slice = createSlice({
 
     deleteCart(state, action) {
       const updateCart = state.checkout.cart.filter((item) => item.variant.id !== action.payload);
-
       state.checkout.cart = updateCart;
     },
 
@@ -217,12 +211,12 @@ export const {
   onGotoStep,
   onBackStep,
   onNextStep,
-  deleteCart,
+  // deleteCart,
   createBilling,
   applyShipping,
   applyDiscount,
   getDeliverySuccess,
-  increaseQuantity,
+  // increaseQuantity,
   decreaseQuantity,
   sortByProducts,
   filterProducts,
@@ -234,21 +228,19 @@ export function addToCart(cartItem: CartItem) {
     const response = await cartApi.addToCart({ ...cartItem, variantId: cartItem.variant.id! });
     dispatch(slice.actions.addCart(response));
   };
-  // const product = slice.action.payload;
-  // const isEmptyCart = dispatch(getCart())=== 0;
-  // if (isEmptyCart) {
-  //   state.checkout.cart = [...state.checkout.cart, product];
-  // } else {
-  //   state.checkout.cart = state.checkout.cart.map((_product) => {
-  //     const isExisted = _product.variant.id === product.variant.id;
-  //     if (isExisted) {
-  //       return {
-  //         ..._product,
-  //         quantity: _product.quantity + product.quantity,
-  //       };
-  //     }
-  // }
-  // state.checkout.cart = uniqBy([...state.checkout.cart, product], 'variant.id');
+}
+export function deleteCart(cartItem: CartItem) {
+  return async () => {
+    const response = await cartApi.addToCart(cartItem);
+    dispatch(slice.actions.addCart(response));
+  };
+}
+
+export function increaseQuantity(cartItem: CartItem) {
+  return async () => {
+    const response = await cartApi.addToCart(cartItem);
+    dispatch(slice.actions.addCart(response));
+  };
 }
 export function deleteProducts(ids: number[]) {
   return async () => {
@@ -268,6 +260,17 @@ export function getProducts() {
     try {
       const response = await productApi.getProducts(null);
       dispatch(slice.actions.getProductsSuccess(response));
+    } catch (error) {
+      dispatch(slice.actions.hasError(error));
+    }
+  };
+}
+export function initCart() {
+  return async () => {
+    dispatch(slice.actions.startLoading());
+    try {
+      const response = await cartApi.getCart();
+      dispatch(slice.actions.addCart(response));
     } catch (error) {
       dispatch(slice.actions.hasError(error));
     }

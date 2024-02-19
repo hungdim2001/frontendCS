@@ -17,7 +17,7 @@ import {
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 // redux
 import { useDispatch, useSelector } from '../../redux/store';
-import { getProduct, addCart, onGotoStep, addToCart } from '../../redux/slices/product';
+import { getProduct, addCart, onGotoStep, addToCart, initCart } from '../../redux/slices/product';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // @types
@@ -85,9 +85,19 @@ export default function EcommerceProductDetails() {
   const { id = '' } = useParams();
 
   const { product, error, checkout } = useSelector((state) => state.product);
-  const [currentIndex, setCurrentIndex] = useState<number>(product?.variants.length === 1 ? product?.images.indexOf(product?.variants.at(0)?.image.toString()!) : product?.images.indexOf(product?.variants.find(item => !item.chars.includes(-1))?.image.toString()!)!);
+  const [currentIndex, setCurrentIndex] = useState<number>(
+    product?.variants.length === 1
+      ? product?.images.indexOf(product?.variants.at(0)?.image.toString()!)
+      : product?.images.indexOf(
+          product?.variants.find((item) => !item.chars.includes(-1))?.image.toString()!
+        )!
+  );
   useEffect(() => {
-    dispatch(getProduct(+id));
+    const fetchData = async () => {
+      await dispatch(getProduct(+id));
+      await dispatch(initCart());
+    };
+    fetchData ()
   }, [dispatch, id]);
   const handleAddCart = (product: CartItem) => {
     dispatch(addToCart(product));
@@ -188,7 +198,6 @@ export default function EcommerceProductDetails() {
                       {product.productSpecChars.map((char: any, index) => {
                         // console.log(char.name + char.productSpecCharValueDTOS.some((value: ProductCharValue) => value.variant))
 
-
                         return (
                           <ListItem
                             key={char.id}
@@ -205,18 +214,26 @@ export default function EcommerceProductDetails() {
                               </Grid>
                               <Grid item xs={8} sm={8} md={8}>
                                 <Typography variant="body1" sx={{ color: '#2D2D2D' }}>
-                                  {
-                                    char.productSpecCharValueDTOS.some((value: ProductCharValue) => value.variant) ?
-                                      char.productSpecCharValueDTOS.find((value: ProductCharValue) => variant?.chars?.includes(value.id!)) && char.productSpecCharValueDTOS.find((value: ProductCharValue) => variant?.chars?.includes(value.id!)).value
-                                      : char.productSpecCharValueDTOS!.map((value: any) => value.value).join(', ')
-                                  }
+                                  {char.productSpecCharValueDTOS.some(
+                                    (value: ProductCharValue) => value.variant
+                                  )
+                                    ? char.productSpecCharValueDTOS.find(
+                                        (value: ProductCharValue) =>
+                                          variant?.chars?.includes(value.id!)
+                                      ) &&
+                                      char.productSpecCharValueDTOS.find(
+                                        (value: ProductCharValue) =>
+                                          variant?.chars?.includes(value.id!)
+                                      ).value
+                                    : char
+                                        .productSpecCharValueDTOS!.map((value: any) => value.value)
+                                        .join(', ')}
                                   {/* char.productSpecCharValueDTOS!.map((value: any) => value.value).join(', ')} */}
                                 </Typography>
-
                               </Grid>
                             </Grid>
                           </ListItem>
-                        )
+                        );
                       })}
                     </List>
                   </Box>
