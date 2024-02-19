@@ -96,9 +96,11 @@ const slice = createSlice({
     addCart(state, action) {
       state.isLoading = false;
       const newCartItem = action.payload.map((cartItem: CartItem) => {
-        const variant = state.product?.variants.find(
-          (variant) => variant.id === cartItem.variantId
-        );
+        const variant = state.products
+          .flatMap((product) => product.variants)
+          .find((variant) =>
+            variant.id === cartItem.variantId
+          );
         cartItem.variant = variant!;
         return cartItem;
       });
