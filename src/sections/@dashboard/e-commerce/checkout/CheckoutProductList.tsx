@@ -56,91 +56,90 @@ export default function CheckoutProductList({
   onDecreaseQuantity,
 }: Props) {
   return (
-    <>
+    < Stack spacing={3}>
       {products.map((product, index) => {
         const { variant, name, quantity } = product;
         return (
-          <Card key={index} sx={{ padding: 2, boxShadow: '0 4px 4px 0  rgba(0, 0, 0, .25)' }}>
-            <Grid container>
-              <Grid item lg={3} md={3}>
+          <Grid
+            key={index}
+            sx={{padding: 2, borderRadius:1, boxShadow: '-2px 2px 15px -1px rgba(113, 113, 113, 0.12)' }}
+            container
+          >
+            <Grid item lg={3} md={3}>
+              <Image alt="product image" src={variant.image.toString()} />
+            </Grid>
+            <Grid
+              item
+              lg={9}
+              md={9}
+              container
+              direction="column"
+              justifyContent="space-between"
+              alignItems="flex-start"
+            >
+              <Typography noWrap variant="h6">
+                {name}
+              </Typography>
+              <Grid>
                 {' '}
-                <Image
-                  alt="product image"
-                  src={variant.image.toString()}
-                  // sx={{ width: 64, height: 64, borderRadius: 1.5, mr: 2 }}
-                />
-              </Grid>
-              <Grid
-                item
-                lg={9}
-                md={9}
-                container
-                direction="column"
-                justifyContent="space-between"
-                alignItems="flex-start"
-              >
-                <Typography noWrap variant="h6">
-                  {name}
-                </Typography>
-                <Grid>
-                  {' '}
-                  {Object.entries(variant.charValues).map(([key, value], index) => (
+                {Object.entries(variant.charValues).map(([key, value], index) => (
+                  <Typography
+                    key={index}
+                    sx={{
+                      fontSize: 14,
+                      fontWeight: 500,
+                      color: '#717170',
+                    }}
+                  >
                     <Typography
-                      key={index}
+                      component="span"
+                      variant="subtitle1"
                       sx={{
+                        color: 'text.primary',
                         fontSize: 14,
-                        fontWeight: 500,
-                        color: '#717170',
+                        fontWeight: 400,
                       }}
                     >
-                      <Typography
-                        component="span"
-                        variant="subtitle1"
-                        sx={{
-                          color: 'text.primary',
-                          fontSize: 14,
-                          fontWeight: 400,
-                        }}
-                      >
-                        {key}:&nbsp;
-                      </Typography>
-                      {value}
+                      {key}:&nbsp;
                     </Typography>
-                  ))}
-                </Grid>
-                <Grid container direction="row" justifyContent="space-between">
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    {variant.price && (
-                      <Typography
-                        component="span"
-                        sx={{ color: 'text.disabled', textDecoration: 'line-through' }}
-                      >
-                        {fCurrency(variant.price)}₫
-                      </Typography>
-                    )}
-                    <Typography variant="body1">{fCurrency(variant.price)}₫</Typography>
-                  </Stack>
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <IconButton
-                      sx={{ color: '#C91433', mt: '12px', padding: 0 }}
-                      onClick={() => onDelete({variantId: variant.id!, quantity: -quantity} as CartItem)}
+                    {value}
+                  </Typography>
+                ))}
+              </Grid>
+              <Grid container direction="row" justifyContent="space-between">
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  {variant.price && (
+                    <Typography
+                      component="span"
+                      sx={{ color: 'text.disabled', textDecoration: 'line-through' }}
                     >
-                      <SvgIconStyle src={'/icons/ic_trash.svg'} />
-                    </IconButton>
-                    <Incrementer
-                      quantity={quantity}
-                      available={variant.quantity}
-                      onDecrease={() => onDecreaseQuantity(variant.id)}
-                      onIncrease={() => onIncreaseQuantity(variant.id)}
-                    />
-                  </Stack>
-                </Grid>
+                      {fCurrency(variant.price)}₫
+                    </Typography>
+                  )}
+                  <Typography variant="body1">{fCurrency(variant.price)}₫</Typography>
+                </Stack>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <IconButton
+                    sx={{ color: '#C91433', mt: '12px', padding: 0 }}
+                    onClick={() =>
+                      onDelete({ variantId: variant.id!, quantity: -quantity } as CartItem)
+                    }
+                  >
+                    <SvgIconStyle src={'/icons/ic_trash.svg'} />
+                  </IconButton>
+                  <Incrementer
+                    quantity={quantity}
+                    available={variant.quantity}
+                    onDecrease={() => onDecreaseQuantity(variant.id)}
+                    onIncrease={() => onIncreaseQuantity(variant.id)}
+                  />
+                </Stack>
               </Grid>
             </Grid>
-          </Card>
+          </Grid>
         );
       })}
-    </>
+    </Stack>
   );
 }
 

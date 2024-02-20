@@ -74,7 +74,7 @@ export default function CheckoutSummary({
               Shipping
             </Typography>
             <Typography variant="subtitle2">
-              {shipping && shipping != 0 ? `${fCurrency(-shipping)}₫` : displayShipping}
+              {shipping && shipping != 0 ? `${fCurrency(shipping)}₫` : displayShipping}
             </Typography>
           </Stack>
 
@@ -86,9 +86,6 @@ export default function CheckoutSummary({
               <Typography variant="subtitle1" sx={{ color: 'error.main' }}>
                 {fCurrency(total)}₫
               </Typography>
-              {/* <Typography variant="caption" sx={{ fontStyle: 'italic' }}>
-                (VAT included if applicable)
-              </Typography> */}
             </Box>
           </Stack>
 

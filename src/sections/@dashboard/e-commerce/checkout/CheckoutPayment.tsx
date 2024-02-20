@@ -25,13 +25,14 @@ import CheckoutDelivery from './CheckoutDelivery';
 import CheckoutBillingInfo from './CheckoutBillingInfo';
 import CheckoutPaymentMethods from './CheckoutPaymentMethods';
 import { useEffect, useMemo, useState } from 'react';
+import { data } from 'cheerio/lib/api/attributes';
 
 // ----------------------------------------------------------------------
 
 const PAYMENT_OPTIONS: PaymentOption[] = [
   {
     value: 'vnpay',
-    title: 'Pay with VNPay', 
+    title: 'Pay with VNPay',
     description: 'You will be redirected to PayPal website to complete your purchase securely.',
     icons: '/icons/ic_vnpay.svg',
   },
@@ -87,9 +88,10 @@ export default function CheckoutPayment() {
 
   const PaymentSchema = Yup.object().shape({
     payment: Yup.string().required('Payment is required!'),
+    delivery: Yup.number().moreThan(0, 'Delivery is required!').required('Delivery is required!'),
   });
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: FormValuesProps) => {
     try {
       handleNextStep();
     } catch (error) {
@@ -118,9 +120,8 @@ export default function CheckoutPayment() {
         payment: '',
       };
     }
-    // You can provide default values or handle the case where deliveryServices are not available yet
     return {
-      delivery: 0,
+      delivery: -1,
       payment: '',
     };
   }, [loading, deliveryServices]);
