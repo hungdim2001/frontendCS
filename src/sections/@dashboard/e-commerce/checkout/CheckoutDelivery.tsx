@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardContent,
   FormControlLabel,
+  FormHelperText,
 } from '@mui/material';
 // @types
 import { DeliveryOption, DeliveryService } from '../../../../@types/product';
@@ -39,10 +40,7 @@ type Props = {
   onApplyShipping: (shipping: number) => void;
 };
 
-export default function CheckoutDelivery({
-  onApplyShipping,
-  deliveryServices,
-}: Props) {
+export default function CheckoutDelivery({ onApplyShipping, deliveryServices }: Props) {
   const { control } = useFormContext();
   return (
     <Card>
@@ -51,50 +49,57 @@ export default function CheckoutDelivery({
         <Controller
           name="delivery"
           control={control}
-          render={({ field }) => (
-            <RadioGroup
-              {...field}
-              onChange={(event) => {
-                const { value } = event.target;
-                field.onChange(Number(value));
-                onApplyShipping(Number(value));
-              }}
-            >
-              <Stack spacing={2} alignItems="center" direction={{ xs: 'column', md: 'row' }}>
-                {deliveryServices.map((delivery) => {
-                  const selected = field.value === delivery.total;
-                  return (
-                    <OptionStyle
-                      key={delivery.service_id}
-                      sx={{
-                        ...(selected && {
-                          boxShadow: (theme) => theme.customShadows.z20,
-                        }),
-                      }}
-                    >
-                      <FormControlLabel
-                        value={delivery.total}
-                        control={
-                          <Radio checkedIcon={<Iconify icon={'eva:checkmark-circle-2-fill'} />} />
-                        }
-                        label={
-                          <Box sx={{ ml: 1 }}>
-                            <Typography variant="subtitle2">{delivery.short_name}</Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                              {format(
-                                new Date(delivery.estimate_delivery_time * 1000),
-                                'EEE MMM dd yyyy'
-                              )}
-                            </Typography>
-                          </Box>
-                        }
-                        sx={{ py: 3, flexGrow: 1, mr: 0 }}
-                      />
-                    </OptionStyle>
-                  );
-                })}
-              </Stack>
-            </RadioGroup>
+          render={({ field, fieldState: { error } }) => (
+            <>
+              <RadioGroup
+                {...field}
+                onChange={(event) => {
+                  const { value } = event.target;
+                  field.onChange(Number(value));
+                  onApplyShipping(Number(value));
+                }}
+              >
+                <Stack spacing={2} alignItems="center" direction={{ xs: 'column', md: 'row' }}>
+                  {deliveryServices.map((delivery) => {
+                    const selected = field.value === delivery.total;
+                    return (
+                      <OptionStyle
+                        key={delivery.service_id}
+                        sx={{
+                          ...(selected && {
+                            boxShadow: (theme) => theme.customShadows.z20,
+                          }),
+                        }}
+                      >
+                        <FormControlLabel
+                          value={delivery.total}
+                          control={
+                            <Radio checkedIcon={<Iconify icon={'eva:checkmark-circle-2-fill'} />} />
+                          }
+                          label={
+                            <Box sx={{ ml: 1 }}>
+                              <Typography variant="subtitle2">{delivery.short_name}</Typography>
+                              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                {format(
+                                  new Date(delivery.estimate_delivery_time * 1000),
+                                  'EEE MMM dd yyyy'
+                                )}
+                              </Typography>
+                            </Box>
+                          }
+                          sx={{ py: 3, flexGrow: 1, mr: 0 }}
+                        />
+                      </OptionStyle>
+                    );
+                  })}
+                </Stack>
+              </RadioGroup>
+              {!!error && (
+                <FormHelperText error sx={{ pt: 1, px: 2 }}>
+                  {error.message}
+                </FormHelperText>
+              )}
+            </>
           )}
         />
       </CardContent>

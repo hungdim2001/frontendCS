@@ -44,12 +44,12 @@ export default function CheckoutCart() {
     dispatch(onNextStep());
   };
 
-  const handleIncreaseQuantity = (productId: number|null) => {
-    dispatch(increaseQuantity({variantId:productId!, quantity: 1} as CartItem));
+  const handleIncreaseQuantity = (productId: number | null) => {
+    dispatch(increaseQuantity({ variantId: productId!, quantity: 1 } as CartItem));
   };
 
-  const handleDecreaseQuantity = (productId: number|null) => {
-    dispatch(increaseQuantity({variantId:productId!, quantity: -1} as CartItem));
+  const handleDecreaseQuantity = (productId: number | null) => {
+    dispatch(increaseQuantity({ variantId: productId!, quantity: -1 } as CartItem));
   };
 
   const handleApplyDiscount = (value: number) => {
@@ -60,18 +60,6 @@ export default function CheckoutCart() {
     <Grid container spacing={3}>
       <Grid item xs={12} md={8}>
         <Card sx={{ mb: 3 }}>
-          {/* <CardHeader
-            title={
-              <Typography variant="h6">
-                Cart
-                <Typography component="span" sx={{ color: 'text.secondary' }}>
-                  &nbsp;({totalItems} item)
-                </Typography>
-              </Typography>
-            }
-            sx={{ mb: 3 }}
-          /> */}
-
           {!isEmptyCart ? (
             <Scrollbar>
               <CheckoutProductList
@@ -116,7 +104,7 @@ export default function CheckoutCart() {
           disabled={cart.length === 0}
           onClick={handleNextStep}
         >
-         Procced  to checkout 
+          Procced to checkout
         </Button>
       </Grid>
     </Grid>
