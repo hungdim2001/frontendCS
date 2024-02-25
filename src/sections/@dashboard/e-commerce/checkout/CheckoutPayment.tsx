@@ -6,7 +6,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Grid, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // @types
-import { CardOption, PaymentOption, DeliveryOption } from '../../../../@types/product';
+import { CardOption, PaymentOption, DeliveryOption, OrderRequest } from '../../../../@types/product';
 // redux
 import { useDispatch, useSelector } from '../../../../redux/store';
 import {
@@ -25,7 +25,7 @@ import CheckoutDelivery from './CheckoutDelivery';
 import CheckoutBillingInfo from './CheckoutBillingInfo';
 import CheckoutPaymentMethods from './CheckoutPaymentMethods';
 import { useEffect, useMemo, useState } from 'react';
-import { data } from 'cheerio/lib/api/attributes';
+import { orderApi } from 'src/service/app-apis/order';
 
 // ----------------------------------------------------------------------
 
@@ -36,15 +36,6 @@ const PAYMENT_OPTIONS: PaymentOption[] = [
     description: 'You will be redirected to PayPal website to complete your purchase securely.',
     icons: '/icons/ic_vnpay.svg',
   },
-  // {
-  //   value: 'credit_card',
-  //   title: 'Credit / Debit Card',
-  //   description: 'We support Mastercard, Visa, Discover and Stripe.',
-  //   icons: [
-  //     'https://minimal-assets-api.vercel.app/assets/icons/ic_mastercard.svg',
-  //     'https://minimal-assets-api.vercel.app/assets/icons/ic_visa.svg',
-  //   ],
-  // },
   {
     value: 'cash',
     title: 'Cash on Delivery',
@@ -67,7 +58,6 @@ type FormValuesProps = {
 export default function CheckoutPayment() {
   const dispatch = useDispatch();
   const { checkout } = useSelector((state) => state.product);
-
   const { total, discount, subtotal, shipping } = checkout;
 
   const handleNextStep = () => {
@@ -88,13 +78,24 @@ export default function CheckoutPayment() {
 
   const PaymentSchema = Yup.object().shape({
     payment: Yup.string().required('Payment is required!'),
-    delivery: Yup.number().moreThan(0, 'Delivery is required!').required('Delivery is required!'),
+    delivery: Yup.number().moreThan(0, 'Delivery service is required!').required('Delivery service is required!'),
   });
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
-      console.log('payment')
-      // handleNextStep();
+      if (data.payment === 'vnpay') {
+        const deliveryService = deliveryServices.find((deliveryService => {
+          return deliveryService.total === data.delivery
+        }));
+        const orderRequest: OrderRequest = {
+          shippingMethod: deliveryService?.short_name!,
+          shippingFee: deliveryService?.total!,
+          estimateDate: deliveryService?.estimate_delivery_time!,
+          addressId: checkout.billing?.id!
+        };
+        const paymentLink = await orderApi.createVnPay(orderRequest);
+      console.log(paymentLink)
+      }
     } catch (error) {
       console.error(error);
     }
