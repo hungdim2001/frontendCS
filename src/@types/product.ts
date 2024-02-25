@@ -1,7 +1,7 @@
 import { CustomFile } from 'src/components/upload';
 import { BaseDTO } from './common';
 
-export type PaymentType = 'paypal' | 'credit_card' | 'cash'| 'vnpay';
+export type PaymentType = 'paypal' | 'credit_card' | 'cash' | 'vnpay';
 
 export type ProductStatus = 'sale' | 'new' | '';
 
@@ -90,9 +90,15 @@ export type Product = BaseDTO & {
   // category: ProductCategory;
   // gender: ProductGender;
 };
+export type OrderRequest = {
+  shippingMethod: string;
+  shippingFee: number;
+  estimateDate: number;
+  addressId: number;
 
-export type CartItem = BaseDTO &{
-  cartId:number;
+}
+export type CartItem = BaseDTO & {
+  cartId: number;
   name: string;
   variantId: number;
   variant: Variant;
@@ -124,7 +130,7 @@ export type Address = BaseDTO & {
 export type DeliveryService = {
   service_id: number;
   short_name: number;
-  total:number;
+  total: number;
   service_type_id: number;
   estimate_delivery_time: number;
 };

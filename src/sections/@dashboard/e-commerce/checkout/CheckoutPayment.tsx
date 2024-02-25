@@ -91,7 +91,8 @@ export default function CheckoutPayment() {
 
   const onSubmit = async () => {
     try {
-      handleNextStep();
+      console.log('payment')
+      // handleNextStep();
     } catch (error) {
       console.error(error);
     }
@@ -118,7 +119,6 @@ export default function CheckoutPayment() {
         payment: '',
       };
     }
-    // You can provide default values or handle the case where deliveryServices are not available yet
     return {
       delivery: 0,
       payment: '',
