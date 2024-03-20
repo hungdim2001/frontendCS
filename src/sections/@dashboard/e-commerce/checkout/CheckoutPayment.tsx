@@ -6,7 +6,12 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Grid, Button } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // @types
-import { CardOption, PaymentOption, DeliveryOption, OrderRequest } from '../../../../@types/product';
+import {
+  CardOption,
+  PaymentOption,
+  DeliveryOption,
+  OrderRequest,
+} from '../../../../@types/product';
 // redux
 import { useDispatch, useSelector } from '../../../../redux/store';
 import {
@@ -78,23 +83,25 @@ export default function CheckoutPayment() {
 
   const PaymentSchema = Yup.object().shape({
     payment: Yup.string().required('Payment is required!'),
-    delivery: Yup.number().moreThan(0, 'Delivery service is required!').required('Delivery service is required!'),
+    delivery: Yup.number()
+      .moreThan(0, 'Delivery service is required!')
+      .required('Delivery service is required!'),
   });
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
       if (data.payment === 'vnpay') {
-        const deliveryService = deliveryServices.find((deliveryService => {
-          return deliveryService.total === data.delivery
-        }));
+        const deliveryService = deliveryServices.find((deliveryService) => {
+          return deliveryService.total === data.delivery;
+        });
         const orderRequest: OrderRequest = {
           shippingMethod: deliveryService?.short_name!,
           shippingFee: deliveryService?.total!,
           estimateDate: deliveryService?.estimate_delivery_time!,
-          addressId: checkout.billing?.id!
+          addressId: checkout.billing?.id!,
         };
         const paymentLink = await orderApi.createVnPay(orderRequest);
-      console.log(paymentLink)
+        window.location.href = paymentLink;
       }
     } catch (error) {
       console.error(error);

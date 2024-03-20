@@ -303,7 +303,7 @@ export function getDelevirySerives(district: number, ward: number) {
         to_district: district,
       });
       const newDeliveryService = await Promise.all(
-        deliveryServices.map(async (item) => {
+        deliveryServices.filter(x=> x.service_type_id!=5).map(async (item) => {
           const estimateTimeResponse = await ghnApi.getEstimateTime({
             from_district_id: 3440,
             from_ward_code: '13004', // convert to string directly
