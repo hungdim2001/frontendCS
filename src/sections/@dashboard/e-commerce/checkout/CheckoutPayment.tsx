@@ -101,8 +101,10 @@ export default function CheckoutPayment() {
           addressId: checkout.billing?.id!,
         };
         const paymentLink = await orderApi.createVnPay(orderRequest);
-        window.location.href = paymentLink;
+        // console.dir(paymentLink)
+        // window.location.href = paymentLink;
       }
+     handleNextStep() ;
     } catch (error) {
       console.error(error);
     }

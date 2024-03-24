@@ -17,6 +17,7 @@ import LoadingScreen from '../components/LoadingScreen';
 import VerifyGuard from 'src/guards/VerifyGuard';
 import FindEmail from '../pages/auth/FindEmail';
 import ResetPassWord from 'src/pages/auth/ResetPassword';
+import { CheckoutOrderComplete } from 'src/sections/@dashboard/e-commerce/checkout';
 
 // ----------------------------------------------------------------------
 
@@ -37,6 +38,12 @@ const Loadable = (Component: ElementType) => (props: any) => {
 
 export default function Router() {
   return useRoutes([
+    {
+      path: 'order/success/:token',
+      element: (
+        <CheckoutOrderComplete open={true} />
+      )
+    },
     {
       path: 'auth',
       children: [

@@ -47,6 +47,7 @@ export default function FindEmailForm({ onSent, onGetEmail }: Props) {
         email: data.email
       })
       if (isMountedRef.current) {
+        console.log('here')
         onSent();
         onGetEmail(data.email);
       }

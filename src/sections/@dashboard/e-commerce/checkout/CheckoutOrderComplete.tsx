@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
 import { Box, Link, Button, Divider, Typography, Stack, DialogProps } from '@mui/material';
@@ -12,6 +12,8 @@ import Iconify from '../../../../components/Iconify';
 import { DialogAnimate } from '../../../../components/animate';
 // assets
 import { OrderCompleteIllustration } from '../../../../assets';
+import { useEffect } from 'react';
+import { authApi } from 'src/service/app-apis/auth';
 
 // ----------------------------------------------------------------------
 
@@ -29,15 +31,26 @@ const DialogStyle = styled(DialogAnimate)(({ theme }) => ({
 
 export default function CheckoutOrderComplete({ open }: DialogProps) {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
+  const dispatch = useDispatch()
+  const { token } = useParams();
   const handleResetStep = () => {
     dispatch(resetCart());
     navigate(PATH_DASHBOARD.eCommerce.shop);
   };
+  useEffect(() => {
+    (async () => {
 
+      try {
+        authApi.setSession({ accessToken: token! });
+        // await authApi.whoAmI();
+      } catch (error) {
+        // setError('afterSubmit', { type: 'custom', message: 'Link đã hết hạn hoặc không tồn tại' });
+        // setDisableSubmit(true);
+      }
+    })();
+
+  }, [])
   return (
-    <DialogStyle fullScreen open={open}>
       <Box sx={{ p: 4, maxWidth: 480, margin: 'auto' }}>
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant="h4" paragraph>
@@ -81,6 +94,5 @@ export default function CheckoutOrderComplete({ open }: DialogProps) {
           </Button>
         </Stack>
       </Box>
-    </DialogStyle>
   );
 }
