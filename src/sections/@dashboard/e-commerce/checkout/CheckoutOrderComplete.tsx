@@ -29,7 +29,7 @@ const DialogStyle = styled(DialogAnimate)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function CheckoutOrderComplete({ open }: DialogProps) {
+export default function CheckoutOrderComplete() {
   const navigate = useNavigate();
   const dispatch = useDispatch()
   const { token } = useParams();

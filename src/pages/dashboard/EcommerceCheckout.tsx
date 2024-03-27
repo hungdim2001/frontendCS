@@ -180,7 +180,8 @@ export default function EcommerceCheckout() {
             {activeStep === 2 && billing && <CheckoutPayment />}
           </>
         ) : (
-          <CheckoutOrderComplete open={isComplete} />
+          // <CheckoutOrderComplete open={isComplete} />
+           <CheckoutOrderComplete />
         )}
       </Container>
     </Page>

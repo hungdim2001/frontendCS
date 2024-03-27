@@ -41,7 +41,7 @@ export default function Router() {
     {
       path: 'order/success/:token',
       element: (
-        <CheckoutOrderComplete open={true} />
+        <CheckoutOrderComplete/>
       )
     },
     {
