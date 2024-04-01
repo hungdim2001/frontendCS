@@ -14,6 +14,7 @@ import { DialogAnimate } from '../../../../components/animate';
 import { OrderCompleteIllustration } from '../../../../assets';
 import { useEffect } from 'react';
 import { authApi } from 'src/service/app-apis/auth';
+import { orderApi } from 'src/service/app-apis/order';
 
 // ----------------------------------------------------------------------
 
@@ -42,14 +43,15 @@ export default function CheckoutOrderComplete() {
 
       try {
         authApi.setSession({ accessToken: token! });
-        // await authApi.whoAmI();
+        await orderApi.checkOrder();
+        console.log('here')
       } catch (error) {
         // setError('afterSubmit', { type: 'custom', message: 'Link đã hết hạn hoặc không tồn tại' });
         // setDisableSubmit(true);
       }
     })();
 
-  }, [])
+  })
   return (
       <Box sx={{ p: 4, maxWidth: 480, margin: 'auto' }}>
         <Box sx={{ textAlign: 'center' }}>
