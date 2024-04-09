@@ -90,21 +90,27 @@ export default function CheckoutPayment() {
 
   const onSubmit = async (data: FormValuesProps) => {
     try {
+      const deliveryService = deliveryServices.find((deliveryService) => {
+        return deliveryService.total === data.delivery;
+      });
+      const orderRequest: OrderRequest = {
+        shippingMethod: deliveryService?.short_name!,
+        shippingFee: deliveryService?.total!,
+        estimateDate: deliveryService?.estimate_delivery_time!,
+        addressId: checkout.billing?.id!,
+      };
       if (data.payment === 'vnpay') {
-        const deliveryService = deliveryServices.find((deliveryService) => {
-          return deliveryService.total === data.delivery;
-        });
-        const orderRequest: OrderRequest = {
-          shippingMethod: deliveryService?.short_name!,
-          shippingFee: deliveryService?.total!,
-          estimateDate: deliveryService?.estimate_delivery_time!,
-          addressId: checkout.billing?.id!,
-        };
-        const paymentLink = await orderApi.createVnPay(orderRequest);
-        console.dir(paymentLink)
+        const paymentLink = await orderApi.createVnPay(orderRequest, true);
+       console.log('vnpay')
         window.location.href = paymentLink;
       }
-    //  handleNextStep() ;
+      else{
+       const paymentLink = await orderApi.createVnPay(orderRequest, false);
+       console.log('normal')
+        window.location.href = paymentLink;
+      }
+      
+      //  handleNextStep() ;
     } catch (error) {
       console.error(error);
     }
