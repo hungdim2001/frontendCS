@@ -32,7 +32,9 @@ export default function ShopProductCard({ product }: Props) {
 
   return (
 
-    <Card onClick={() => navigate(linkTo)} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+    <Card onClick={() => {
+     console.log('here') 
+      navigate(linkTo)}} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       <Box sx={{ position: 'relative' }}>
         {price && (
           <Label
