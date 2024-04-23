@@ -14,8 +14,35 @@ const locationStateInit = {
   precinct: undefined,
   streetBlock: undefined,
 };
+const emptyLocation: CurrentLocation = {
+  place_id: 0,
+  licence: '',
+  osm_type: '',
+  osm_id: 0,
+  lat: '',
+  lon: '',
+  class: '',
+  type: '',
+  place_rank: 0,
+  importance: 0,
+  addresstype: '',
+  name: '',
+  display_name: '',
+  ip: '',
+  address: {
+    road: '',
+    quarter: '',
+    suburb: '',
+    city: '',
+    ISO3166_2_lvl4: '',
+    postcode: '',
+    country: '',
+    country_code: '',
+  },
+};
 const initialState: LocationContextProps = {
   locationState: locationStateInit,
+  currentLocation: emptyLocation,
   onSubmit: () => {},
   handleLocationSelect: () => {},
   initFromOld: (province: string, district: string, precinct: string, streetBlock: string) => {},
@@ -42,11 +69,74 @@ export interface locationObject {
   district: areaResponse | undefined;
   precinct: areaResponse | undefined;
 }
+export interface CurrentLocation {
+  place_id: number;
+  licence: string;
+  osm_type: string;
+  ip: string;
+  osm_id: number;
+  lat: string;
+  lon: string;
+  class: string;
+  type: string;
+  place_rank: number;
+  importance: number;
+  addresstype: string;
+  name: string;
+  display_name: string;
+  address: {
+    road: string;
+    quarter: string;
+    suburb: string;
+    city: string;
+    ISO3166_2_lvl4: string;
+    postcode: string;
+    country: string;
+    country_code: string;
+  };
+}
 
 function LocationProvider({ children }: LocationProviderProps) {
   const [locationState, setLocationState] = useState<locationObject>(locationStateInit);
+  const [currentLocation, setCurrentLocation] = useState<CurrentLocation>(emptyLocation);
   const { province, district, precinct, streetBlock } = locationState;
-
+  const NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org/reverse?format=json&';
+  const GEOLOCATION_URL = 'https://geolocation-db.com/json/';
+  useEffect(() => {
+    (() => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            fetch(
+              `${NOMINATIM_BASE_URL}lat=${position.coords.latitude}&lon=${position.coords.longitude}`
+            )
+              .then((response) => response.json())
+              .then((result) => {
+              console.log(result)
+                setCurrentLocation(result);
+              })
+              .then(() => {
+                fetch(GEOLOCATION_URL)
+                  .then((response) => response.json())
+                  .then((result) => {
+                    setCurrentLocation((prevLocation) => ({
+                      ...prevLocation,
+                      ip: result.IPv4,
+                    }));
+                  })
+                  .catch((err) => console.log('err: ', err));
+              })
+              .catch((err) => console.log('err: ', err));
+          },
+          (error) => {
+            console.error('Error getting geolocation:', error);
+          }
+        );
+      } else {
+        console.error('Geolocation is not supported by this browser.');
+      }
+    })();
+  }, []);
   useEffect(() => {
     (async () => {
       try {
@@ -135,6 +225,7 @@ function LocationProvider({ children }: LocationProviderProps) {
     <LocationContext.Provider
       value={{
         locationState,
+        currentLocation,
         onSubmit,
         handleLocationSelect,
         initFromOld,

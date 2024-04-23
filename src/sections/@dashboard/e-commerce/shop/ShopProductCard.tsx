@@ -16,6 +16,10 @@ import Image from '../../../../components/Image';
 import { ColorPreview } from '../../../../components/color-utils';
 import Iconify from 'src/components/Iconify';
 import { useState } from 'react';
+import useLocationContext from 'src/hooks/useLocation';
+import { ActionAudit, logApi } from 'src/service/app-apis/log';
+import { Action } from 'history';
+import useAuth from 'src/hooks/useAuth';
 
 // ----------------------------------------------------------------------
 
@@ -24,22 +28,48 @@ type Props = {
 };
 
 export default function ShopProductCard({ product }: Props) {
-  const { name, thumbnail, price, productSpecChars,id } = product;
+  const { name, thumbnail, price, productSpecChars, id } = product;
 
   const linkTo = `${PATH_DASHBOARD.eCommerce.root}/product/${id}`;
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
-
+  const { currentLocation } = useLocationContext();
+  const { user } = useAuth();
   return (
-
-    <Card onClick={() => {
-     console.log('here') 
-      navigate(linkTo)}} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+    <Card
+      onClick={async () => {
+        console.log(currentLocation)
+        const log:  ActionAudit = await {
+          userId: user?.id,
+          browser: '',
+          ipClient: currentLocation.ip,
+          actionTime: new Date(),
+          action: 'CLICK',
+          productId: id,
+          deviceType: '',
+          keyWord: '',
+          lat: currentLocation.lat,
+          lon: currentLocation.lon,
+          road: currentLocation.address.road,
+          quarter: currentLocation.address.quarter,
+          suburb: currentLocation.address.suburb,
+          city: currentLocation.address.city,
+          ISO3166_2_lvl4: currentLocation.address.ISO3166_2_lvl4,
+          postcode: currentLocation.address.postcode,
+          country: currentLocation.address.country,
+          country_code: currentLocation.address.country_code,
+        } as ActionAudit;
+        await logApi.createLog(log);
+        navigate(linkTo);
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <Box sx={{ position: 'relative' }}>
         {price && (
           <Label
             variant="filled"
-            color='error'
+            color="error"
             sx={{
               top: 16,
               right: 16,
@@ -53,10 +83,9 @@ export default function ShopProductCard({ product }: Props) {
         )}
         {hovered && (
           <Button
-          onClick={(e)=>{
-            e.stopPropagation();
-            console.log("hetre")
-          }}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
             sx={{
               backgroundColor: '#ffab00',
               color: '#000000',
@@ -90,8 +119,8 @@ export default function ShopProductCard({ product }: Props) {
 
       <Stack spacing={2} sx={{ p: 3 }}>
         <Typography variant="subtitle2" noWrap>
-            {name}
-          </Typography>
+          {name}
+        </Typography>
         <Stack direction="column" alignItems="start" justifyContent="start">
           <Stack direction="row" alignItems="center" spacing={0.5}>
             {price && (

@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------------
 
-import { locationObject } from "src/contexts/LocationContext";
+import { CurrentLocation, locationObject } from "src/contexts/LocationContext";
 import { areaResponse } from "src/service/app-apis/location";
 
 export type ThemeMode = 'light' | 'dark';
@@ -29,6 +29,7 @@ export type SettingsValueProps = {
 
 export type LocationContextProps = {
   onSubmit:(event: Event) => void;
+  currentLocation:CurrentLocation;
   handleLocationSelect: (option: areaResponse|undefined, selectedField: string) =>void;
   locationState:locationObject 
   initFromOld:(province:string, district:string, precinct:string, streetBlock:string)=>void;
