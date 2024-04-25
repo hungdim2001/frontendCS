@@ -17,7 +17,14 @@ import {
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 // redux
 import { useDispatch, useSelector } from '../../redux/store';
-import { getProduct, addCart, onGotoStep, addToCart, initCart, getProducts } from '../../redux/slices/product';
+import {
+  getProduct,
+  addCart,
+  onGotoStep,
+  addToCart,
+  initCart,
+  getProducts,
+} from '../../redux/slices/product';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 // @types
@@ -83,23 +90,26 @@ export default function EcommerceProductDetails() {
   const [value, setValue] = useState('1');
 
   const { id = '' } = useParams();
-
-  const { variantId = '' } = useParams();
+  const { variantParam = '' } = useParams();
+  const [variantId, setVariantId] = useState(variantParam);
+  useEffect(() => {
+    setVariantId(variantParam);
+  }, [variantParam]);
   const { product, error, checkout } = useSelector((state) => state.product);
   const [currentIndex, setCurrentIndex] = useState<number>(
-    product?.variants.length === 1
+    product?.variants?.length === 1
       ? product?.images.indexOf(product?.variants.at(0)?.image.toString()!)
       : product?.images.indexOf(
-          product?.variants.find((item) => item.id?.toString() ===variantId)?.image.toString()!
+          product?.variants.find((item) => item.id?.toString() === variantId)?.image.toString()!
         )!
   );
   useEffect(() => {
     const fetchData = async () => {
-      await dispatch(getProducts())
+      await dispatch(getProducts());
       await dispatch(getProduct(+id));
       await dispatch(initCart());
     };
-    fetchData ()
+    fetchData();
   }, [dispatch, id]);
   const handleAddCart = (product: CartItem) => {
     dispatch(addToCart(product));
@@ -109,7 +119,9 @@ export default function EcommerceProductDetails() {
   const handleGotoStep = (step: number) => {
     dispatch(onGotoStep(step));
   };
-  if (!product) {
+  const { isLoading } = useSelector((state) => state.product);
+  if ( isLoading) {
+    console.log(product);
     return <LoadingScreen />;
   }
 

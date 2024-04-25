@@ -16,7 +16,7 @@ export default function VariantPicker({ charValues, value, ...other }: Props) {
     <RadioGroup  row {...other}>
       {charValues.map((charValue) => (
         <Radio
-          checked={value.chars.includes(charValue.id)}
+          checked={value?.chars.includes(charValue.id)}
           key={charValue.id}
           value={charValue.id}
           icon={<IconColor charValue={charValue} variant={value} />}

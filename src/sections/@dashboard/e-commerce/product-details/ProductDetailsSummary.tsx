@@ -33,12 +33,13 @@ import { ColorSinglePicker } from '../../../../components/color-utils';
 import { FormProvider, RHFSelect } from '../../../../components/hook-form';
 import { ICONS } from 'src/layouts/dashboard/navbar/NavConfig';
 import VariantPicker from 'src/components/variant/VariantPicker';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import productChar from 'src/redux/slices/product-char';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
 import { useDispatch, useSelector } from 'src/redux/store';
 import { getCart } from 'src/redux/slices/product';
 import Maps from 'src/components/GoogleMap';
+import LoadingScreen from 'src/components/LoadingScreen';
 
 // ----------------------------------------------------------------------
 
@@ -90,8 +91,9 @@ export default function ProductDetailsSummary({
   const alreadyProduct = cart.map((item) => item.variant.id).includes(id);
   const isMaxQuantity =
     cart.filter((item) => item.variantId === id).map((item) => item.quantity)[0] >= quantity;
-  const defaultValues = {
-    name,
+  const defaultValues = useMemo(
+    () => ({
+     name,
     variant:
       variants.length === 1 ? variants[0] : variants.find((item) => {
         return item.id?.toString()===variantId.toString()}),
@@ -102,8 +104,11 @@ export default function ProductDetailsSummary({
           : 1
         : (variants.find((item) => !item.chars.includes(-1))?.quantity ?? 0) < 1
           ? 0
-          : 1,
-  };
+          : 1,  
+    }),
+    [variantId, variants]
+  );
+
 
   const methods = useForm<FormValuesProps>({
     defaultValues,
@@ -124,7 +129,7 @@ export default function ProductDetailsSummary({
   const values = watch();
   useEffect(() => {
     const image = variants
-      .find((variant) => variant.chars.every((char) => getValues('variant').chars.includes(char)))
+      .find((variant) => variant.chars.every((char) => getValues('variant')?.chars.includes(char)))
       ?.image.toString()!;
     const currentIndex = product.images.indexOf(image);
     setCurrentIndex(currentIndex);
@@ -163,7 +168,6 @@ export default function ProductDetailsSummary({
       console.error(error);
     }
   };
-
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Grid container>
@@ -262,7 +266,7 @@ export default function ProductDetailsSummary({
               alignItems="center"
               sx={{ mb: 2 }}
             >
-              <Typography variant="h6"> {fCurrency(getValues('variant').price!)}₫</Typography>
+              <Typography variant="h6"> {fCurrency(getValues('variant')?.price)}₫</Typography>
               <Stack direction="row" flex={1} justifyContent="flex-start" sx={{ mr: 1 }}></Stack>
               <Stack direction="row" justifyContent="flex-end">
                 <Typography
@@ -322,8 +326,8 @@ export default function ProductDetailsSummary({
               <div>
                 <Incrementer
                   name="quantity"
-                  quantity={values.quantity}
-                  available={getValues('variant').quantity}
+                  quantity={values?.quantity}
+                  available={getValues('variant')?.quantity}
                   onIncrementQuantity={() => setValue('quantity', values.quantity + 1)}
                   onDecrementQuantity={() => setValue('quantity', values.quantity - 1)}
                 />
@@ -332,7 +336,7 @@ export default function ProductDetailsSummary({
                   component="div"
                   sx={{ mt: 1, textAlign: 'right', color: 'text.secondary' }}
                 >
-                  Available:{getValues('variant').quantity}
+                  Available:{getValues('variant')?.quantity}
                 </Typography>
               </div>
             </Stack>

@@ -284,6 +284,7 @@ export function initCart() {
 export function getProduct(id: number) {
   return async () => {
     dispatch(slice.actions.startLoading());
+  console.log(id)
     try {
       const response = await productApi.getProducts(id);
       dispatch(slice.actions.getProductSuccess(response[0]));
