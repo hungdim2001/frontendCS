@@ -115,7 +115,7 @@ function LocationProvider({ children }: LocationProviderProps) {
               console.log(result)
                 setCurrentLocation(result);
               })
-              .then(() => {
+              .then(() =>  {
                 fetch(GEOLOCATION_URL)
                   .then((response) => response.json())
                   .then((result) => {

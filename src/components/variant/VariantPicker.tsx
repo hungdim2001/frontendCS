@@ -1,5 +1,6 @@
 // @mui
 import { Box, Radio, RadioGroup, RadioGroupProps, BoxProps } from '@mui/material';
+import { val } from 'cheerio/lib/api/attributes';
 import { values } from 'lodash';
 import { useEffect } from 'react';
 import { ProductCharValue, Variant } from 'src/@types/product';

@@ -58,6 +58,7 @@ type Props = {
   cart: CartItem[];
   onAddCart: (cartItem: CartItem) => void;
   onGotoStep: (step: number) => void;
+  variantId:String;
   setCurrentIndex: (currentInde: React.SetStateAction<number>) => void;
   setVariant: (currentInde: React.SetStateAction<Variant>) => void;
 };
@@ -67,6 +68,7 @@ export default function ProductDetailsSummary({
   product,
   onAddCart,
   onGotoStep,
+  variantId,
   setCurrentIndex,
   setVariant,
   ...other
@@ -91,7 +93,8 @@ export default function ProductDetailsSummary({
   const defaultValues = {
     name,
     variant:
-      variants.length === 1 ? variants[0] : variants.find((item) => !item.chars.includes(-1)),
+      variants.length === 1 ? variants[0] : variants.find((item) => {
+        return item.id?.toString()===variantId.toString()}),
     quantity:
       variants.length === 1
         ? (variants[0]?.quantity ?? 0) < 1
@@ -125,6 +128,7 @@ export default function ProductDetailsSummary({
       ?.image.toString()!;
     const currentIndex = product.images.indexOf(image);
     setCurrentIndex(currentIndex);
+    console.log(getValues('variant'))
     setVariant(getValues('variant'));
   }, [getValues('variant')]);
   const onSubmit = async (data: FormValuesProps) => {
@@ -247,32 +251,11 @@ export default function ProductDetailsSummary({
               '& li::before': { content: '"\\2022"', color: '#717171', marginRight: '8px' },
             }}
           >
-            {/* {productSpecChars.filter(item=> item.productSpecCharValueDTOS?.some(value=> value.priority!=-1)).map((char) => (
-              <ListItem key={char.id}>
-                <Grid container justifyContent="flex-start" alignItems="center">
-                  <Grid item xs={5} sm={5} md={5}>
-                    <Typography sx={{ color: '#717171' }} variant="body2">
-                      {char.name}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={7} sm={7} md={7}>
-                    <Typography variant="body2" sx={{ color: '#0C0C0C' }}>
-                      {char.productSpecCharValueDTOS?.filter(value=> value.priority!=-1).map((value) => value.value).join(', ')}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </ListItem>
-            ))} */}
+            
           </List>
         </Grid>
         <Grid item xs={12} md={6} lg={5}>
           <Card sx={{ p: 3 }}>
-            {/* <Stack direction="column" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-              <Rating value={5} precision={0.1} readOnly />
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                ({fShortenNumber(5)} reviews)
-              </Typography>
-            </Stack> */}
             <Stack
               direction="row"
               justifyContent="space-between"

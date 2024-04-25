@@ -1,11 +1,13 @@
 // @mui
 import { Box } from '@mui/material';
 // @type
-import { Product } from '../../../../@types/product';
+import { CartItem, Product } from '../../../../@types/product';
 // components
 import { SkeletonProductItem } from '../../../../components/skeleton';
 //
 import ShopProductCard from './ShopProductCard';
+import { useDispatch } from 'src/redux/store';
+import { addToCart } from 'src/redux/slices/product';
 
 // ----------------------------------------------------------------------
 
@@ -15,6 +17,10 @@ type Props = {
 };
 
 export default function ShopProductList({ products, loading }: Props) {
+  const dispatch = useDispatch();
+ const handleAddCart = (product: CartItem) => {
+    dispatch(addToCart(product));
+  };
   return (
     <Box
       sx={{
@@ -30,7 +36,7 @@ export default function ShopProductList({ products, loading }: Props) {
     >
       {(loading ? [...Array(12)] : products).map((product, index) =>
         product ? (
-          <ShopProductCard key={product.id} product={product} />
+          <ShopProductCard onAddCart={handleAddCart} key={product.id} product={product} />
         ) : (
           <SkeletonProductItem key={index} />
         )

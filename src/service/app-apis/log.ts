@@ -8,7 +8,7 @@ export type ActionAudit = {
   ipClient: string;
   actionTime: Date;
   action: string;
-  productId: number;
+  variantId:number;
   deviceType: string;
   keyWord: string;
   lat: string;

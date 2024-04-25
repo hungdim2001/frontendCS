@@ -84,12 +84,13 @@ export default function EcommerceProductDetails() {
 
   const { id = '' } = useParams();
 
+  const { variantId = '' } = useParams();
   const { product, error, checkout } = useSelector((state) => state.product);
   const [currentIndex, setCurrentIndex] = useState<number>(
     product?.variants.length === 1
       ? product?.images.indexOf(product?.variants.at(0)?.image.toString()!)
       : product?.images.indexOf(
-          product?.variants.find((item) => !item.chars.includes(-1))?.image.toString()!
+          product?.variants.find((item) => item.id?.toString() ===variantId)?.image.toString()!
         )!
   );
   useEffect(() => {
@@ -143,6 +144,7 @@ export default function EcommerceProductDetails() {
                 <ProductDetailsSummary
                   product={product}
                   setCurrentIndex={setCurrentIndex}
+                  variantId={variantId}
                   setVariant={setVariant}
                   cart={checkout.cart}
                   onAddCart={handleAddCart}
