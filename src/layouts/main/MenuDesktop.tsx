@@ -29,8 +29,8 @@ interface RouterLinkProps extends LinkProps {
 }
 
 const LinkStyle = styled(Link)<RouterLinkProps>(({ theme }) => ({
-  ...theme.typography.subtitle2,
-  color: theme.palette.text.primary,
+  ...theme.typography.subtitle1,
+  color: theme.palette.common.black,
   marginRight: theme.spacing(5),
   transition: theme.transitions.create('opacity', {
     duration: theme.transitions.duration.shorter,
@@ -42,10 +42,10 @@ const LinkStyle = styled(Link)<RouterLinkProps>(({ theme }) => ({
 }));
 
 const ListItemStyle = styled(ListItem)<RouterLinkProps>(({ theme }) => ({
-  ...theme.typography.body2,
+  ...theme.typography.subtitle1,
   padding: 0,
   marginTop: theme.spacing(3),
-  color: theme.palette.text.secondary,
+  color: theme.palette.common.black,
   transition: theme.transitions.create('color'),
   '&:hover': {
     color: theme.palette.text.primary,
@@ -144,7 +144,7 @@ function MenuDesktopItem({
             display: 'flex',
             cursor: 'pointer',
             alignItems: 'center',
-            ...(isHome && { color: 'common.white' }),
+            ...(isHome && { color: '#0C0C0C' }),
             ...(isOffset && { color: 'text.primary' }),
             ...(isOpen && { opacity: 0.48 }),
           }}
@@ -190,7 +190,7 @@ function MenuDesktopItem({
                         display: 'flex',
                         lineHeight: 'unset',
                         alignItems: 'center',
-                        color: 'text.primary',
+                        color: '#0C0C0C',
                         typography: 'overline',
                       }}
                     >
@@ -207,6 +207,7 @@ function MenuDesktopItem({
                           '&.active': {
                             color: 'text.primary',
                             typography: 'subtitle2',
+                            border:'1px solid red'
                           },
                         }}
                       >
@@ -256,7 +257,7 @@ function MenuDesktopItem({
         target="_blank"
         rel="noopener"
         sx={{
-          ...(isHome && { color: 'common.white' }),
+          ...(isHome && { color: 'common.black' }),
           ...(isOffset && { color: 'text.primary' }),
         }}
       >
@@ -271,7 +272,7 @@ function MenuDesktopItem({
       component={RouterLink}
       end={path === '/'}
       sx={{
-        ...(isHome && { color: 'common.white' }),
+        ...(isHome && { color: 'common.black' }),
         ...(isOffset && { color: 'text.primary' }),
         '&.active': {
           color: 'primary.main',

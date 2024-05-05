@@ -72,11 +72,11 @@ export default function HomeHero() {
   return (
     <MotionContainer>
       <RootStyle>
-        <HeroOverlayStyle
+        {/* <HeroOverlayStyle
           alt="overlay"
           src="/img/overlay_4.jpg"
           variants={varFade().in}
-        />
+        /> */}
 
         <HeroImgStyle
           alt="hero"

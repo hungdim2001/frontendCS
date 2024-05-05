@@ -33,7 +33,7 @@ export default function HomePage() {
   return (
     <Page title="The starting point for your next project">
       <RootStyle>
-        <HomeHero />
+        {/* <HomeHero /> */}
         <ContentStyle>
           <HomeMinimal />
 

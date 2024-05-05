@@ -1,7 +1,7 @@
 import { useLocation } from 'react-router-dom';
 // @mui
 import { styled, useTheme } from '@mui/material/styles';
-import { Box, Button, AppBar, Toolbar, Container } from '@mui/material';
+import { Box, Button, AppBar, Toolbar, Container, IconButton, Stack } from '@mui/material';
 // hooks
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useResponsive from '../../hooks/useResponsive';
@@ -16,6 +16,7 @@ import Label from '../../components/Label';
 import MenuDesktop from './MenuDesktop';
 import MenuMobile from './MenuMobile';
 import navConfig from './MenuConfig';
+import SvgIconStyle from 'src/components/SvgIconStyle';
 
 // ----------------------------------------------------------------------
 
@@ -72,28 +73,46 @@ export default function MainHeader() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            borderBottom: '1px solid',
+            // backgroundImage:
+            // 'linear-gradient(147.38deg, rgba(12, 104, 244, 0.3) 60.98%, rgba(12, 104, 244, 0.7) 81.93%, rgba(12, 104, 244, 0.3) 99.45%)',
+            borderImageSource:
+              'linear-gradient(147.38deg, rgba(12, 104, 244, 0.3) 60.98%, rgba(12, 104, 244, 0.7) 81.93%, rgba(12, 104, 244, 0.3) 99.45%)',
           }}
         >
           <Logo />
-
+          {/* 
           <Label color="info" sx={{ ml: 1 }}>
             v3.0.0
-          </Label>
-          <Box sx={{ flexGrow: 1 }} />
+          </Label> */}
 
           {isDesktop && <MenuDesktop isOffset={isOffset} isHome={isHome} navConfig={navConfig} />}
 
-          <Button
+          {/* <Button
             variant="contained"
             target="_blank"
             rel="noopener"
             href="https://material-ui.com/store/items/minimal-dashboard/"
           >
             Purchase Now
-          </Button>
+          </Button> */}
 
           {!isDesktop && <MenuMobile isOffset={isOffset} isHome={isHome} navConfig={navConfig} />}
+          <Stack sx={{color:'#0c0c0c'}} direction="row" flexWrap="wrap" alignItems="center">
+
+          <IconButton sx={{color:'#0c0c0c'}}type="button" >
+            <SvgIconStyle src={'/icons/ic_profile.svg'} />
+          </IconButton>
+          <IconButton sx={{color:'#0c0c0c'}}type="button" >
+            <SvgIconStyle src={'/icons/ic_search-normal.svg'} />
+          </IconButton>
+          <IconButton sx={{color:'#0c0c0c'}}type="button" >
+            <SvgIconStyle src={'/icons/ic_bag.svg'} />
+          </IconButton>
+
+          </Stack>
         </Container>
+
       </ToolbarStyle>
 
       {isOffset && <ToolbarShadowStyle />}
