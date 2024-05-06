@@ -1,6 +1,6 @@
 import { useLocation, Outlet } from 'react-router-dom';
 // @mui
-import { Box, Link, Container, Typography, Stack } from '@mui/material';
+import { Box, Link, Container, Typography, Stack, styled } from '@mui/material';
 // components
 import Logo from '../../components/Logo';
 //
@@ -39,7 +39,7 @@ export default function MainLayout() {
             <Typography variant="caption" component="p">
               © All rights reserved
               <br /> made by &nbsp;
-              <Link href="https://minimals.cc/">minimals.cc</Link>
+              <Link href="https://facebook.com/hungdim2001/">hungdz</Link>
             </Typography>
           </Container>
         </Box>

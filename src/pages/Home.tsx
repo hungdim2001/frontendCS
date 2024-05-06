@@ -1,5 +1,5 @@
 // @mui
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 // components
 import Page from '../components/Page';
 // sections
@@ -14,6 +14,10 @@ import {
   HomeCleanInterfaces,
   HomeHugePackElements,
 } from '../sections/home';
+import { Box, Container } from '@mui/material';
+import { useDispatch, useSelector } from 'src/redux/store';
+import { useEffect } from 'react';
+import { getProductTypes } from 'src/redux/slices/product-type';
 
 // ----------------------------------------------------------------------
 
@@ -28,15 +32,31 @@ const ContentStyle = styled('div')(({ theme }) => ({
 }));
 
 // ----------------------------------------------------------------------
+const MenuStyle = styled('div')(({ theme }) => ({
+  marginTop: '77px',
+  color: theme.palette.common.white,
+  backgroundColor: theme.palette.primary.main,
+  padding: 8,
+}));
 
 export default function HomePage() {
+  const theme = useTheme();
+  const dispatch = useDispatch();
+  const { productTypes } = useSelector((state) => state.productTypes);
+  useEffect(() => {
+    dispatch(getProductTypes());
+  }, [dispatch]);
+
   return (
     <Page title="The starting point for your next project">
       <RootStyle>
-        {/* <HomeHero /> */}
         <ContentStyle>
+          <MenuStyle
+          
+          >
+            <Container>This is a full-width box.</Container>
+          </MenuStyle>
           <HomeMinimal />
-
           <HomeHugePackElements />
 
           <HomeDarkMode />

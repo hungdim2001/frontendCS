@@ -15,6 +15,7 @@ import {
   ListSubheader,
   CardActionArea,
 } from '@mui/material';
+import Image from '../../components/Image';
 // components
 import Iconify from '../../components/Iconify';
 //
@@ -177,13 +178,12 @@ function MenuDesktopItem({
           }}
         >
           <Grid container spacing={3}>
-            {children.map((list) => {
+            {children.map((list, index) => {
               const { subheader, items } = list;
-
               return (
-                <Grid key={subheader} item xs={12} md={subheader === 'Dashboard' ? 6 : 2}>
-                  <List disablePadding>
-                    <ListSubheader
+                <Grid key={index} item xs={12} md={subheader === 'Dashboard' ? 6 : 2}>
+                  <List>
+                    {/* <ListSubheader
                       disableSticky
                       disableGutters
                       sx={{
@@ -195,7 +195,7 @@ function MenuDesktopItem({
                       }}
                     >
                       <IconBullet type="subheader" /> {subheader}
-                    </ListSubheader>
+                    </ListSubheader> */}
 
                     {items.map((item) => (
                       <ListItemStyle
@@ -204,14 +204,14 @@ function MenuDesktopItem({
                         component={RouterLink}
                         underline="none"
                         sx={{
-                          '&.active': {
-                            color: 'text.primary',
-                            typography: 'subtitle2',
-                            border:'1px solid red'
-                          },
+                          // '&.active': {
+                          //   color: 'text.primary',
+                          //   typography: 'subtitle2',
+                          //   border: '1px solid red',
+                          // },
                         }}
                       >
-                        {item.title === 'Dashboard' ? (
+                        {/* {item.title === 'Dashboard' ? (
                           <CardActionArea
                             sx={{
                               py: 5,
@@ -237,7 +237,8 @@ function MenuDesktopItem({
                             <IconBullet />
                             {item.title}
                           </>
-                        )}
+                        )} */}
+                        {item.title}
                       </ListItemStyle>
                     ))}
                   </List>
