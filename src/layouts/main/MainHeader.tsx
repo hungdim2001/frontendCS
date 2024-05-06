@@ -17,6 +17,10 @@ import MenuDesktop from './MenuDesktop';
 import MenuMobile from './MenuMobile';
 import navConfig from './MenuConfig';
 import SvgIconStyle from 'src/components/SvgIconStyle';
+import { useDispatch, useSelector } from 'src/redux/store';
+import { useEffect, useState } from 'react';
+import { getProductTypes } from 'src/redux/slices/product-type';
+import { PATH_PAGE } from 'src/routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -54,9 +58,54 @@ export default function MainHeader() {
   const { pathname } = useLocation();
 
   const isDesktop = useResponsive('up', 'md');
-
+  const [menuConfig, setMenuConfig] = useState<any>();
   const isHome = pathname === '/';
+  const dispatch = useDispatch();
+  const { productTypes } = useSelector((state) => state.productTypes);
+  useEffect(() => {
+    dispatch(getProductTypes());
+  }, [dispatch]);
 
+  useEffect(() => {
+    setMenuConfig([
+      {
+        title: 'Home',
+        path: '/',
+      },
+      {
+        title: 'Blogs',
+        path: '/blogs',
+      },
+      {
+        title: 'FAQ',
+        path: '/faq',
+      },
+      {
+        title: 'Contac Us',
+        path: '/contact-us',
+      },
+      {
+        title: 'Products',
+        path: '/',
+        children: [
+          {
+            subheader: 'Other',
+            items: [
+              { title: 'About us', path: PATH_PAGE.about },
+              { title: 'Contact us', path: PATH_PAGE.contact },
+              { title: 'FAQs', path: PATH_PAGE.faqs },
+              { title: 'Pricing', path: PATH_PAGE.pricing },
+              { title: 'Payment', path: PATH_PAGE.payment },
+              { title: 'Maintenance', path: PATH_PAGE.maintenance },
+              { title: 'Coming Soon', path: PATH_PAGE.comingSoon },
+            ],
+          },
+        ],
+      },
+    ]);
+  }, [productTypes]);
+
+  console.log(productTypes);
   return (
     <AppBar sx={{ boxShadow: 0, bgcolor: 'transparent' }}>
       <ToolbarStyle
@@ -98,21 +147,18 @@ export default function MainHeader() {
           </Button> */}
 
           {!isDesktop && <MenuMobile isOffset={isOffset} isHome={isHome} navConfig={navConfig} />}
-          <Stack sx={{color:'#0c0c0c'}} direction="row" flexWrap="wrap" alignItems="center">
-
-          <IconButton sx={{color:'#0c0c0c'}}type="button" >
-            <SvgIconStyle src={'/icons/ic_profile.svg'} />
-          </IconButton>
-          <IconButton sx={{color:'#0c0c0c'}}type="button" >
-            <SvgIconStyle src={'/icons/ic_search-normal.svg'} />
-          </IconButton>
-          <IconButton sx={{color:'#0c0c0c'}}type="button" >
-            <SvgIconStyle src={'/icons/ic_bag.svg'} />
-          </IconButton>
-
+          <Stack sx={{ color: '#0c0c0c' }} direction="row" flexWrap="wrap" alignItems="center">
+            <IconButton sx={{ color: '#0c0c0c' }} type="button">
+              <SvgIconStyle src={'/icons/ic_profile.svg'} />
+            </IconButton>
+            <IconButton sx={{ color: '#0c0c0c' }} type="button">
+              <SvgIconStyle src={'/icons/ic_search-normal.svg'} />
+            </IconButton>
+            <IconButton sx={{ color: '#0c0c0c' }} type="button">
+              <SvgIconStyle src={'/icons/ic_bag.svg'} />
+            </IconButton>
           </Stack>
         </Container>
-
       </ToolbarStyle>
 
       {isOffset && <ToolbarShadowStyle />}
