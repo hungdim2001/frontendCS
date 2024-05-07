@@ -18,6 +18,9 @@ import { Box, Container } from '@mui/material';
 import { useDispatch, useSelector } from 'src/redux/store';
 import { useEffect } from 'react';
 import { getProductTypes } from 'src/redux/slices/product-type';
+import ProductMenu from 'src/sections/home/ProductMenu';
+import Banner from 'src/sections/home/Banner';
+import NewProductSection from 'src/sections/home/NewProductSection';
 
 // ----------------------------------------------------------------------
 
@@ -51,14 +54,10 @@ export default function HomePage() {
     <Page title="The starting point for your next project">
       <RootStyle>
         <ContentStyle>
-          <MenuStyle
-          
-          >
-            <Container>This is a full-width box.</Container>
-          </MenuStyle>
-          <HomeMinimal />
+          <ProductMenu />
+          <Banner />
+          <NewProductSection/>
           <HomeHugePackElements />
-
           <HomeDarkMode />
 
           <HomeColorPresets />

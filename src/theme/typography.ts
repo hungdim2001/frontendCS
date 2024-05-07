@@ -10,6 +10,11 @@ const typography = {
   // fontWeightRegular: 400,
   // fontWeightMedium: 600,
   // fontWeightBold: 700,
+  display2: {
+    fontWeight: 600,
+    fontSize: pxToRem(56),
+    letterSpacing: 2,
+  },
   h1: {
     fontWeight: 500,
     lineHeight: 80 / 64,
@@ -38,7 +43,7 @@ const typography = {
   h5: {
     fontWeight: 500,
     lineHeight: 1.5,
-    color:'#000000',
+    color: '#000000',
     fontSize: pxToRem(20),
     ...responsiveFontSizes({ sm: 19, md: 20, lg: 20 }),
   },
@@ -84,7 +89,6 @@ const typography = {
     fontSize: pxToRem(14),
     textTransform: 'capitalize',
   },
- 
 } as const;
 
 export default typography;
