@@ -10,6 +10,7 @@ type Props = {
 };
 const ProductCard = ({ product }: Props) => {
   const { name, thumbnail, images, price, productSpecChars, id, variants } = product;
+  console.log(variants)
   const linkTo = `${PATH_DASHBOARD.eCommerce.root}/product/${id}/${
     variants.length > 1 ? variants[1].id : variants[0].id
   }`;

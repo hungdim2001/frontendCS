@@ -40,9 +40,7 @@ export default function Router() {
   return useRoutes([
     {
       path: 'order/success/:token',
-      element: (
-        <CheckoutOrderComplete/>
-      )
+      element: <CheckoutOrderComplete />,
     },
     {
       path: 'auth',
@@ -100,6 +98,7 @@ export default function Router() {
           {/* </VerifyGuard> */}
         </AuthGuard>
       ),
+
       children: [
         { element: <Navigate to={PATH_AFTER_LOGIN} replace />, index: true },
         { path: 'app', element: <GeneralApp /> },
@@ -123,10 +122,7 @@ export default function Router() {
         },
         {
           path: 'product-type',
-          children: [
-            { path: '', element: <ProductType /> },
-
-          ],
+          children: [{ path: '', element: <ProductType /> }],
         },
         {
           path: 'product-char',
@@ -202,11 +198,31 @@ export default function Router() {
       element: <MainLayout />,
       children: [
         { element: <HomePage />, index: true },
-        { path: 'about-us', element: <About /> },
-        { path: 'contact-us', element: <Contact /> },
-        { path: 'faqs', element: <Faqs /> },
+        {
+          path: 'user',
+          element: (
+            <AuthGuard>
+              <RoleBasedGuard accessibleRoles={['ADMIN', 'USER']}>
+                <UserPage />
+              </RoleBasedGuard>
+            </AuthGuard>
+          ),
+        },
+        // { path: 'contact-us', element: <Contact /> },
+        // { path: 'faqs', element: <Faqs /> },
       ],
     },
+    // {
+    //   path: 'user',
+    //   element: (
+    //     <AuthGuard>
+    //       <RoleBasedGuard accessibleRoles={['ADMIN', 'USER']}>
+    //         <MainLayout />
+    //       </RoleBasedGuard>
+    //     </AuthGuard>
+    //   ),
+    //   children: [{ element: <UserPage />, index: true }],
+    // },
     { path: '*', element: <Navigate to="/404" replace /> },
   ]);
 }
@@ -234,21 +250,16 @@ const EcommerceProductList = Loadable(
 const EcommerceProductCreate = Loadable(
   lazy(() => import('../pages/dashboard/EcommerceProductCreate'))
 );
-const ProductCharList = Loadable(
-  lazy(() => import('../pages/dashboard/ProductCharList'))
-);
-const ProductType = Loadable(
-  lazy(() => import('../pages/dashboard/ProductType'))
-);
-const ProductCharCreate = Loadable(
-  lazy(() => import('../pages/dashboard/ProductCharCreate'))
-);
+const ProductCharList = Loadable(lazy(() => import('../pages/dashboard/ProductCharList')));
+const ProductType = Loadable(lazy(() => import('../pages/dashboard/ProductType')));
+const ProductCharCreate = Loadable(lazy(() => import('../pages/dashboard/ProductCharCreate')));
 const EcommerceCheckout = Loadable(lazy(() => import('../pages/dashboard/EcommerceCheckout')));
 const EcommerceInvoice = Loadable(lazy(() => import('../pages/dashboard/EcommerceInvoice')));
 const BlogPosts = Loadable(lazy(() => import('../pages/dashboard/BlogPosts')));
 const BlogPost = Loadable(lazy(() => import('../pages/dashboard/BlogPost')));
 const BlogNewPost = Loadable(lazy(() => import('../pages/dashboard/BlogNewPost')));
 const UserProfile = Loadable(lazy(() => import('../pages/dashboard/UserProfile')));
+const UserPage = Loadable(lazy(() => import('../pages/dashboard/UserPage')));
 const UserCards = Loadable(lazy(() => import('../pages/dashboard/UserCards')));
 const UserList = Loadable(lazy(() => import('../pages/dashboard/UserList')));
 const UserAccount = Loadable(lazy(() => import('../pages/dashboard/UserAccount')));

@@ -36,23 +36,9 @@ const ContentStyle = styled('div')(({ theme }) => ({
 }));
 
 // ----------------------------------------------------------------------
-const MenuStyle = styled('div')(({ theme }) => ({
-  marginTop: '77px',
-  color: theme.palette.common.white,
-  backgroundColor: theme.palette.primary.main,
-  padding: 8,
-}));
-
 export default function HomePage() {
-  const theme = useTheme();
-  const dispatch = useDispatch();
-  const { productTypes } = useSelector((state) => state.productTypes);
-  useEffect(() => {
-    dispatch(getProductTypes());
-  }, [dispatch]);
-
   return (
-    <Page title="The starting point for your next project">
+    <Page title="">
       <RootStyle>
         <ContentStyle>
           <ProductMenu />
