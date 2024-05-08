@@ -1,20 +1,20 @@
 import { Box, Button, Container, Typography } from '@mui/material';
 import { useEffect } from 'react';
 import Iconify from 'src/components/Iconify';
-import { getProducts } from 'src/redux/slices/product';
+import product, { getProducts } from 'src/redux/slices/product';
 import { useDispatch, useSelector } from 'src/redux/store';
+import ProductCard from './ProductCard';
 
 export default function NewProductSection() {
   const { products, sortBy, filters } = useSelector((state) => state.product);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getProducts());
+    dispatch(getProducts(true));
   }, [dispatch]);
+  if (products.length == 0) return <></>;
   return (
     <Container
-      sx={{
-        padding: '0px 16px',
-      }}
+sx={{marginY:2}}
     >
       <Box
         sx={{
@@ -38,6 +38,23 @@ export default function NewProductSection() {
           View All
           <Iconify icon={'eva:chevron-right-fill'} width={24} height={24} />
         </Box>
+      </Box>
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 3,
+          marginTop:'20px',
+          gridTemplateColumns: {
+            xs: 'repeat(1, 1fr)',
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(3, 1fr)',
+            lg: 'repeat(4, 1fr)',
+          },
+        }}
+      >
+        {products.map((product, index) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
       </Box>
     </Container>
   );

@@ -67,7 +67,7 @@ export default function EcommerceProductCreate() {
   useEffect(() => {
     dispatch(getProductChars(null));
     dispatch(getProductTypes());
-    dispatch(getProducts());
+    dispatch(getProducts(false));
   }, [dispatch]);
   useEffect(() => {}, [isEdit, currentProduct]);
   if (isEdit && !currentProduct.id) {

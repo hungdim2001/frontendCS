@@ -22,7 +22,6 @@ export default function ProductMenu() {
   useEffect(() => {
     dispatch(getProductTypes());
   }, [dispatch]);
-  console.log(productTypes);
   if (!productTypes) return <LoadingScreen />;
   return (
     <RootStyle>

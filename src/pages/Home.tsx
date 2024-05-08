@@ -21,6 +21,7 @@ import { getProductTypes } from 'src/redux/slices/product-type';
 import ProductMenu from 'src/sections/home/ProductMenu';
 import Banner from 'src/sections/home/Banner';
 import NewProductSection from 'src/sections/home/NewProductSection';
+import TopBrand from 'src/sections/home/TopBrand';
 
 // ----------------------------------------------------------------------
 
@@ -56,19 +57,11 @@ export default function HomePage() {
         <ContentStyle>
           <ProductMenu />
           <Banner />
-          <NewProductSection/>
-          <HomeHugePackElements />
-          <HomeDarkMode />
-
-          <HomeColorPresets />
-
-          <HomeCleanInterfaces />
-
-          <HomePricingPlans />
-
-          <HomeLookingFor />
-
-          <HomeAdvertisement />
+          <NewProductSection />
+          <TopBrand />
+          <Container>
+            <img src="/img/Banner 2.png" alt="" />
+          </Container>
         </ContentStyle>
       </RootStyle>
     </Page>

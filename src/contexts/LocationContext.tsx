@@ -112,7 +112,6 @@ function LocationProvider({ children }: LocationProviderProps) {
             )
               .then((response) => response.json())
               .then((result) => {
-              console.log(result)
                 setCurrentLocation(result);
               })
               .then(() =>  {

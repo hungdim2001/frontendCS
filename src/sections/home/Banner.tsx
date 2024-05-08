@@ -2,7 +2,7 @@ import { Box, Button, Container, Theme, Typography, makeStyles } from '@mui/mate
 
 export default function ProductMenu() {
   return (
-    <Container sx={{  display: 'flex', justifyContent: 'space-between' }}>
+    <Container sx={{ marginY:2, display: 'flex', justifyContent: 'space-between' }}>
       <Box sx={{ padding: '20px 0px',display: 'flex', flexDirection: 'column', gap: '40px' }}>
         <Typography
           sx={{

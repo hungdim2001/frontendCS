@@ -302,7 +302,7 @@ export default function ProductDetailsSummary({
                       fill="#F45E0C"
                     />
                   </svg>
-                  &#160;-{fCurrency(price)}₫
+                  &#160;-15%
                 </Typography>
               </Stack>
             </Stack>
@@ -374,6 +374,7 @@ export default function ProductDetailsSummary({
             variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
             color={'error'}
             sx={{ textTransform: 'uppercase' }}
+  console.log(productTypes);
           >
             {sentenceCase('sale')}
           </Label>

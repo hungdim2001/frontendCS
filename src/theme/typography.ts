@@ -56,7 +56,7 @@ const typography = {
   subtitle1: {
     fontWeight: 300,
     lineHeight: 1.5,
-    fontSize: pxToRem(18),
+    fontSize: pxToRem(16),
   },
   subtitle2: {
     fontWeight: 600,

@@ -114,7 +114,6 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
           country_code: currentLocation.address.country_code,
         }) as ActionAudit;
         await logApi.createLog(log);
-        console.log(linkTo)
         navigate(linkTo);
       }}
       onMouseEnter={() => setHovered(true)}
