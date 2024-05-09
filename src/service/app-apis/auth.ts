@@ -49,7 +49,7 @@ type RefreshTokenResponseData = {
   refreshExpiresIn: number;
 };
 const register = (bodyData: RegisterRequestBody) =>
-  authApiIns.post<RegisterResponeData>('/register', bodyData);
+  authApiIns.post<UserAccount>('/register', bodyData);
 
 const login = (bodyData: LoginRequestBody) => {
   return authApiIns.post<LoginResponseData>('/login', bodyData);

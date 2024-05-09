@@ -1,4 +1,3 @@
-
 export type UserInvoice = {
   id: string;
   createdAt: Date | string | number;
@@ -37,16 +36,22 @@ export type UserAddressBook = {
   zipCode: string;
 };
 export type UserAccount = {
-  id: number|null;
+  id: number | null;
   fullName: string;
+  firstName: string;
+  lastName:string;
   role: string;
   avatarUrl: string;
   email: string;
   phone: string;
   userName: string;
   areaCode: string;
-  status:Boolean;
-}
+  province:string;
+  district:string;
+  precinct:string;
+  streetBlock:string;
+  status: Boolean;
+};
 export type Profile = {
   id: string;
   cover: string;

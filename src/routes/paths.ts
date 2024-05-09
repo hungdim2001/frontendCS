@@ -6,7 +6,7 @@ function path(root: string, sublink: string) {
 
 const ROOTS_AUTH = '/auth';
 const ROOTS_DASHBOARD = '/dashboard';
-
+const ROOTS = '';
 // ----------------------------------------------------------------------
 
 export const PATH_AUTH = {
@@ -17,7 +17,7 @@ export const PATH_AUTH = {
   registerUnprotected: path(ROOTS_AUTH, '/register-unprotected'),
   findEmail: path(ROOTS_AUTH, '/find-email'),
   verify: path(ROOTS_AUTH, '/verify'),
-  resetPassword: path(ROOTS_AUTH,'/reset-passwrod/:id/:token')
+  resetPassword: path(ROOTS_AUTH, '/reset-passwrod/:id/:token'),
 };
 
 export const PATH_PAGE = {
@@ -33,6 +33,18 @@ export const PATH_PAGE = {
   components: '/components',
 };
 
+export const PATH_ROOT = {
+  root:ROOTS,
+  user: {
+    root: path(ROOTS, '/user'),
+    profile: path(ROOTS_DASHBOARD, '/user/profile'),
+    cards: path(ROOTS_DASHBOARD, '/user/cards'),
+    list: path(ROOTS_DASHBOARD, '/user/list'),
+    newUser: path(ROOTS_DASHBOARD, '/user/new'),
+    editById: path(ROOTS_DASHBOARD, `/user/reece-chung/edit`),
+    account: path(ROOTS_DASHBOARD, '/user/account'),
+  },
+};
 export const PATH_DASHBOARD = {
   root: ROOTS_DASHBOARD,
   general: {
@@ -65,14 +77,12 @@ export const PATH_DASHBOARD = {
   product: {
     root: path(ROOTS_DASHBOARD, '/product/list'),
     productTypes: path(ROOTS_DASHBOARD, '/product-type'),
-
   },
   productChar: {
     root: path(ROOTS_DASHBOARD, '/product-char'),
     list: path(ROOTS_DASHBOARD, '/product-char/list'),
     create: path(ROOTS_DASHBOARD, '/product-char/create'),
     edit: path(ROOTS_DASHBOARD, '/product-char/edit'),
-
   },
   eCommerce: {
     root: path(ROOTS_DASHBOARD, '/e-commerce'),

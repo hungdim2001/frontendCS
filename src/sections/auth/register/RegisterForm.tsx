@@ -101,7 +101,7 @@ export default function RegisterForm() {
   const onSubmit = async (data: FormValuesProps) => {
     try {
       const role ="user"
-      await register(null,data.email, data.phone, data.precinct, role,data.password, data.firstName, data.lastName);
+      await register(null,data.email, data.phone, data.streetBlock, role,data.password, data.firstName, data.lastName);
     } catch (error) {
       console.error("register");
       console.error(error);

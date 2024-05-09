@@ -8,6 +8,8 @@ import {
   BreadcrumbsProps,
   Breadcrumbs as MUIBreadcrumbs,
 } from '@mui/material';
+import Iconify from './Iconify';
+import SvgIconStyle from './SvgIconStyle';
 
 // ----------------------------------------------------------------------
 
@@ -38,7 +40,7 @@ export default function Breadcrumbs({ links, activeLast = false, ...other }: Pro
             maxWidth: 260,
             overflow: 'hidden',
             whiteSpace: 'nowrap',
-            color: 'text.disabled',
+            color: '#0C68F4',
             textOverflow: 'ellipsis',
           }}
         >
@@ -50,13 +52,11 @@ export default function Breadcrumbs({ links, activeLast = false, ...other }: Pro
 
   return (
     <MUIBreadcrumbs
-      separator={
-        <Box
-          component="span"
-          sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: 'text.disabled' }}
-        />
+      separator={ 
+          <SvgIconStyle src={'/icons/arrow-down.svg'} />
       }
       {...other}
+      sx={{ '& li': { margin: 0 } }}
     >
       {activeLast ? listDefault : listActiveLast}
     </MUIBreadcrumbs>
@@ -76,12 +76,12 @@ function LinkItem({ link }: LinkItemProps) {
       key={name}
       variant="body2"
       component={RouterLink}
+      color='#717171'
       to={href || '#'}
       sx={{
         lineHeight: 2,
         display: 'flex',
         alignItems: 'center',
-        color: 'text.primary',
         '& > div': { display: 'inherit' },
       }}
     >

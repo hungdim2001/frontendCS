@@ -43,7 +43,7 @@ const typography = {
   h5: {
     fontWeight: 500,
     lineHeight: 1.5,
-    color: '#000000',
+    color: '#0C0C0C',
     fontSize: pxToRem(20),
     ...responsiveFontSizes({ sm: 19, md: 20, lg: 20 }),
   },
