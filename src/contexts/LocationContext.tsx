@@ -58,6 +58,12 @@ const initialLocation = async () => {
     provinces: provinces,
   };
 };
+const initiaOld = async () => {
+  const provinces = await locationApi.area(null);
+  return {
+    provinces: provinces,
+  };
+};
 
 export interface locationObject {
   provinces: Array<areaResponse>;
@@ -114,7 +120,7 @@ function LocationProvider({ children }: LocationProviderProps) {
               .then((result) => {
                 setCurrentLocation(result);
               })
-              .then(() =>  {
+              .then(() => {
                 fetch(GEOLOCATION_URL)
                   .then((response) => response.json())
                   .then((result) => {
@@ -197,11 +203,15 @@ function LocationProvider({ children }: LocationProviderProps) {
     const provinces = await locationApi.area(null);
     const provinceSelected = await provinces.find((item) => item.areaCode === province);
     const districts = await locationApi.area(province);
-    const districtSelected = await districts.find((item) => item.areaCode === district);
-    const precincts = await locationApi.area(district);
-    const precintsSelected = await precincts.find((item) => item.areaCode === precinct);
-    const streetBlocks = await locationApi.area(precinct);
-    const streetBlockSelected = await streetBlocks.find((item) => item.areaCode === streetBlock);
+    const districtSelected = await districts.find((item) => item.areaCode === province + district);
+    const precincts = await locationApi.area(province+district);
+    const precintsSelected = await precincts.find(
+      (item) => item.areaCode === province + district + precinct
+    );
+    const streetBlocks = await locationApi.area(province+district+precinct);
+    const streetBlockSelected = await streetBlocks.find(
+      (item) => item.areaCode === province + district + precinct + streetBlock
+    );
     const newState = {
       province: provinceSelected,
       district: districtSelected,
@@ -220,6 +230,7 @@ function LocationProvider({ children }: LocationProviderProps) {
     window.location.reload();
   };
 
+  const initExistLocation = async (areCode: string) => {};
   return (
     <LocationContext.Provider
       value={{

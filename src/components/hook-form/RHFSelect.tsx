@@ -2,6 +2,7 @@
 import { useFormContext, Controller } from 'react-hook-form';
 // @mui
 import { TextField, TextFieldProps } from '@mui/material';
+import Label from '../Label';
 
 // ----------------------------------------------------------------------
 
@@ -18,17 +19,20 @@ export default function RHFSelect({ name, children, ...other }: IProps & TextFie
       name={name}
       control={control}
       render={({ field, fieldState: { error } }) => (
-        <TextField
-          {...field}
-          select
-          fullWidth
-          SelectProps={{ native: true }}
-          error={!!error}
-          helperText={error?.message}
-          {...other}
-        >
-          {children}
-        </TextField>
+        <>
+          <TextField
+            {...field}
+            select
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            SelectProps={{ native: true }}
+            error={!!error}
+            helperText={error?.message}
+            {...other}
+          >
+            {children}
+          </TextField>
+        </>
       )}
     />
   );

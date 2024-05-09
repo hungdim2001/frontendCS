@@ -24,11 +24,13 @@ import { FormProvider, RHFSelect, RHFTextField } from 'src/components/hook-form'
 import { countries } from 'src/_mock';
 import { LoadingButton } from '@mui/lab';
 import { AuthUser } from 'src/@types/auth';
-import { firstName } from 'src/_mock/name';
+import { firstName, lastName } from 'src/_mock/name';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import useLocationContext from 'src/hooks/useLocation';
 import { areaResponse } from 'src/service/app-apis/location';
+import { init } from 'i18next';
+import { userApi } from 'src/service/app-apis/user';
 const UserMenu = [
   { title: 'Person Data', icon: '/icons/user-edit.svg' },
   { title: 'Address', icon: '/icons/dollar-circle.svg' },
@@ -59,7 +61,6 @@ type FormValuesProps = {
 
 const UserPage = () => {
   const { user } = useAuth();
-  console.log(user);
   const NewUserSchema = Yup.object().shape({
     firstName: Yup.string().required('First Name is required'),
     lastName: Yup.string().required('Last Name is required'),
@@ -75,13 +76,16 @@ const UserPage = () => {
       firstName: user?.firstName || '',
       lastName: user?.lastName || '',
       province: user?.province || '',
-      district: user?.district || '',
-      precinct: user?.precinct || '',
-      streetBlock: user?.streetBlock || '',
+      district: (user?.province ?? '') + (user?.district ?? '') || '',
+      precinct: (user?.province ?? '') + (user?.district ?? '') + (user?.precinct ?? ''),
+      streetBlock:
+        (user?.province ?? '') +
+        (user?.district ?? '') +
+        (user?.precinct ?? '') +
+        (user?.streetBlock ?? ''),
     }),
     [user]
   );
-  console.log(defaultValues);
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(NewUserSchema),
     defaultValues,
@@ -96,31 +100,33 @@ const UserPage = () => {
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
-  const {
-    locationState,
-    handleLocationSelect,
-  } = useLocationContext();
+  const { locationState, initFromOld, handleLocationSelect } = useLocationContext();
   const { provinces, districts, precincts, streetBlocks } = locationState;
   const onSubmit = async (data: FormValuesProps) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      reset();
+      const updateUser = {
+        ...user,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        areaCode: data.streetBlock,
+      };
+      await userApi.update(updateUser);
     } catch (error) {
       console.error(error);
     }
   };
+
   useEffect(() => {
-    if (user) {
-      reset(defaultValues);
+    if (user?.province && user.district && user.precinct && user.streetBlock) {
+      initFromOld(user.province, user.district, user.precinct, user.streetBlock);
+      // reset(defaultValues);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
   type Field = 'province' | 'district' | 'precinct' | 'streetBlock';
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, field: Field) => {
     const selectedValue = e.target.value;
     let option: areaResponse | undefined;
     setValue(field, selectedValue, { shouldValidate: true });
-    console.log('here')
     if (field === 'province') {
       option = provinces.find((c) => c.areaCode === selectedValue);
       resetField('district');
@@ -261,7 +267,6 @@ const UserPage = () => {
                       label="District"
                       placeholder="District"
                     >
-                      {' '}
                       <option value="" />
                       {districts.map((option) => (
                         <option key={option.areaCode} value={option.areaCode!}>
