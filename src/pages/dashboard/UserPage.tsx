@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Grid,
   Paper,
@@ -14,7 +14,12 @@ import {
   Stack,
   styled,
   Box,
+  TextField,
+  InputAdornment,
+  MenuItem,
 } from '@mui/material';
+
+import Image from '../../components/Image';
 import * as Yup from 'yup';
 import HeaderBreadcrumbs from 'src/components/HeaderBreadcrumbs';
 import { PATH_DASHBOARD, PATH_ROOT } from 'src/routes/paths';
@@ -29,13 +34,42 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import useLocationContext from 'src/hooks/useLocation';
 import { areaResponse } from 'src/service/app-apis/location';
-import { init } from 'i18next';
 import { userApi } from 'src/service/app-apis/user';
+import Iconify from 'src/components/Iconify';
+import { Padding } from '@mui/icons-material';
 const UserMenu = [
-  { title: 'Person Data', icon: '/icons/user-edit.svg' },
-  { title: 'Address', icon: '/icons/dollar-circle.svg' },
+  { title: 'Personal Data', icon: '/icons/user-edit.svg' },
+  { title: 'Payment & Instalments', icon: '/icons/dollar-circle.svg' },
   { title: 'Order', icon: '/icons/ic_bag.svg' },
   { title: 'security', icon: '/icons/security-safe.svg' },
+];
+const orderStatus = [
+  {
+    name: 'Current',
+  },
+  {
+    name: 'Delivered',
+  },
+  {
+    name: 'Cancel',
+  },
+  {
+    name: 'Returned',
+  },
+];
+const paymentOptions = [
+  {
+    name: 'Visa',
+    icon: '/img/visa.png',
+  },
+  {
+    name: 'Master Card',
+    icon: '/img/master card.png',
+  },
+  {
+    name: 'American Express',
+    icon: '/img/american express.png',
+  },
 ];
 const RootStyle = styled('div')(({ theme }) => ({
   height: '100%',
@@ -60,7 +94,7 @@ type FormValuesProps = {
 };
 
 const UserPage = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const NewUserSchema = Yup.object().shape({
     firstName: Yup.string().required('First Name is required'),
     lastName: Yup.string().required('Last Name is required'),
@@ -148,7 +182,8 @@ const UserPage = () => {
       handleLocationSelect(option, field);
     }
   };
-
+  const [optionSelected, setOptionSelected] = useState(UserMenu[0]);
+  const [orderStatusSelected, setOrderStatusSelected] = useState(orderStatus[0]);
   if (!user) return <></>;
   return (
     <RootStyle>
@@ -161,7 +196,7 @@ const UserPage = () => {
                 name: 'User',
                 href: PATH_ROOT.user.root,
               },
-              { name: 'Personal Data' },
+              { name: optionSelected.title },
             ]}
             heading={''}
           />
@@ -179,7 +214,7 @@ const UserPage = () => {
               item
               xs={3}
             >
-              <ListItem sx={{ display: 'flex', alignItems: 'center' }}>
+              <ListItem sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                 <SvgIconStyle
                   sx={{ color: '#B4B4B4', width: '60px', height: '60px', mr: 2 }}
                   src={'/icons/profile-circle.svg'}
@@ -200,7 +235,18 @@ const UserPage = () => {
               <Stack direction="column" sx={{ padding: 0 }}>
                 {UserMenu.map((item) => (
                   <ListItem
-                    sx={{ padding: '24px', display: 'flex', alignItems: 'center' }}
+                    onClick={(e) => {
+                      setOptionSelected(item);
+                    }}
+                    sx={{
+                      borderLeft:
+                        item.title === optionSelected.title ? 'solid 2px #0C68F4' : undefined,
+                      color: item.title === optionSelected.title ? '#0C68F4' : undefined,
+                      cursor: 'pointer',
+                      padding: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
                     key={item.title}
                   >
                     <SvgIconStyle src={item.icon} sx={{ mr: 2 }} />
@@ -208,7 +254,12 @@ const UserPage = () => {
                   </ListItem>
                 ))}
               </Stack>
-              <ListItem sx={{ padding: '24px', display: 'flex', alignItems: 'center' }}>
+              <ListItem
+                onClick={() => {
+                  logout();
+                }}
+                sx={{ cursor: 'pointer', padding: '24px', display: 'flex', alignItems: 'center' }}
+              >
                 <SvgIconStyle src={'/icons/logout.svg'} sx={{ mr: 2 }} />
                 <ListItemText
                   primary="Log out"
@@ -217,99 +268,99 @@ const UserPage = () => {
               </ListItem>
             </Grid>
             <Grid item xs={9}>
-              <Typography variant="h5">Identification</Typography>
-              <Typography
-                sx={{
-                  color: '#717171',
-                  fontSize: '16px', // Kích thước font là 16px
-                  fontWeight: 300, // Độ đậm của font là 300
-                  lineHeight: '24px', // Độ cao của dòng là 24px
-                  textAlign: 'left', // Căn chỉnh văn bản sang trái
-                }}
-              >
-                Verify your identity
-              </Typography>
+              <Box sx={{ display: optionSelected.title === 'Personal Data' ? 'block' : 'none' }}>
+                <Typography variant="h5">Identification</Typography>
+                <Typography
+                  sx={{
+                    color: '#717171',
+                    fontSize: '16px', // Kích thước font là 16px
+                    fontWeight: 300, // Độ đậm của font là 300
+                    lineHeight: '24px', // Độ cao của dòng là 24px
+                    textAlign: 'left', // Căn chỉnh văn bản sang trái
+                  }}
+                >
+                  Verify your identity
+                </Typography>
+                <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+                  <Card sx={{ p: 3 }}>
+                    <Box
+                      sx={{
+                        display: 'grid',
+                        columnGap: 2,
+                        rowGap: 3,
+                        gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
+                      }}
+                    >
+                      <RHFTextField name="firstName" label="First Name" />
+                      <RHFTextField name="lastName" label="Last Name" />
+                      <RHFSelect
+                        disabled={provinces.length === 0}
+                        name="province"
+                        label="Province"
+                        placeholder="Province"
+                        onChange={(e) =>
+                          handleChange(e as React.ChangeEvent<HTMLInputElement>, 'province')
+                        }
+                      >
+                        <option value="" />
+                        {provinces.map((option) => (
+                          <option key={option.areaCode} value={option.areaCode!}>
+                            {option.name}
+                          </option>
+                        ))}
+                      </RHFSelect>
+                      <RHFSelect
+                        onChange={(e) =>
+                          handleChange(e as React.ChangeEvent<HTMLInputElement>, 'district')
+                        }
+                        disabled={districts.length === 0}
+                        name="district"
+                        label="District"
+                        placeholder="District"
+                      >
+                        <option value="" />
+                        {districts.map((option) => (
+                          <option key={option.areaCode} value={option.areaCode!}>
+                            {option.name}
+                          </option>
+                        ))}
+                      </RHFSelect>
+                      <RHFSelect
+                        onChange={(e) =>
+                          handleChange(e as React.ChangeEvent<HTMLInputElement>, 'precinct')
+                        }
+                        disabled={precincts.length === 0}
+                        name="precinct"
+                        label="Precinct"
+                        placeholder="Precinct"
+                      >
+                        {' '}
+                        <option value="" />
+                        {precincts.map((option) => (
+                          <option key={option.areaCode} value={option.areaCode!}>
+                            {option.name}
+                          </option>
+                        ))}
+                      </RHFSelect>
+                      <RHFSelect
+                        onChange={(e) =>
+                          handleChange(e as React.ChangeEvent<HTMLInputElement>, 'streetBlock')
+                        }
+                        disabled={streetBlocks.length === 0}
+                        name="streetBlock"
+                        label="Street Block"
+                        placeholder="Street Block"
+                      >
+                        {' '}
+                        <option value="" />
+                        {streetBlocks.map((option) => (
+                          <option key={option.areaCode} value={option.areaCode!}>
+                            {option.name}
+                          </option>
+                        ))}
+                      </RHFSelect>
 
-              <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-                <Card sx={{ p: 3 }}>
-                  <Box
-                    sx={{
-                      display: 'grid',
-                      columnGap: 2,
-                      rowGap: 3,
-                      gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' },
-                    }}
-                  >
-                    <RHFTextField name="firstName" label="First Name" />
-                    <RHFTextField name="lastName" label="Last Name" />
-                    <RHFSelect
-                      disabled={provinces.length === 0}
-                      name="province"
-                      label="Province"
-                      placeholder="Province"
-                      onChange={(e) =>
-                        handleChange(e as React.ChangeEvent<HTMLInputElement>, 'province')
-                      }
-                    >
-                      <option value="" />
-                      {provinces.map((option) => (
-                        <option key={option.areaCode} value={option.areaCode!}>
-                          {option.name}
-                        </option>
-                      ))}
-                    </RHFSelect>
-                    <RHFSelect
-                      onChange={(e) =>
-                        handleChange(e as React.ChangeEvent<HTMLInputElement>, 'district')
-                      }
-                      disabled={districts.length === 0}
-                      name="district"
-                      label="District"
-                      placeholder="District"
-                    >
-                      <option value="" />
-                      {districts.map((option) => (
-                        <option key={option.areaCode} value={option.areaCode!}>
-                          {option.name}
-                        </option>
-                      ))}
-                    </RHFSelect>
-                    <RHFSelect
-                      onChange={(e) =>
-                        handleChange(e as React.ChangeEvent<HTMLInputElement>, 'precinct')
-                      }
-                      disabled={precincts.length === 0}
-                      name="precinct"
-                      label="Precinct"
-                      placeholder="Precinct"
-                    >
-                      {' '}
-                      <option value="" />
-                      {precincts.map((option) => (
-                        <option key={option.areaCode} value={option.areaCode!}>
-                          {option.name}
-                        </option>
-                      ))}
-                    </RHFSelect>
-                    <RHFSelect
-                      onChange={(e) =>
-                        handleChange(e as React.ChangeEvent<HTMLInputElement>, 'streetBlock')
-                      }
-                      disabled={streetBlocks.length === 0}
-                      name="streetBlock"
-                      label="Street Block"
-                      placeholder="Street Block"
-                    >
-                      {' '}
-                      <option value="" />
-                      {streetBlocks.map((option) => (
-                        <option key={option.areaCode} value={option.areaCode!}>
-                          {option.name}
-                        </option>
-                      ))}
-                    </RHFSelect>
-
-                    {/* <RHFTextField name="name" label="Full Name" />
+                      {/* <RHFTextField name="name" label="Full Name" />
                   <RHFTextField name="email" label="Email Address" />
                   <RHFTextField name="phoneNumber" label="Phone Number" />
                   <RHFTextField name="state" label="State/Region" />
@@ -318,15 +369,166 @@ const UserPage = () => {
                   <RHFTextField name="zipCode" label="Zip/Code" />
                   <RHFTextField name="company" label="Company" />
                   <RHFTextField name="role" label="Role" /> */}
-                  </Box>
+                    </Box>
 
-                  <Stack alignItems="flex-end" sx={{ mt: 3 }}>
-                    <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-                      Save Changes
-                    </LoadingButton>
+                    <Stack alignItems="flex-end" sx={{ mt: 3 }}>
+                      <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+                        Save Changes
+                      </LoadingButton>
+                    </Stack>
+                  </Card>
+                </FormProvider>
+              </Box>
+
+              <Box
+                sx={{
+                  display: optionSelected.title === 'Payment & Instalments' ? 'block' : 'none',
+                }}
+              >
+                <Typography variant="h5">Cards</Typography>
+                <Typography
+                  sx={{
+                    color: '#717171',
+                    fontSize: '16px', // Kích thước font là 16px
+                    fontWeight: 300, // Độ đậm của font là 300
+                    lineHeight: '24px', // Độ cao của dòng là 24px
+                    textAlign: 'left', // Căn chỉnh văn bản sang trái
+                  }}
+                >
+                  Manage payment methods
+                </Typography>
+                <Box marginTop={4} sx={{ display: 'flex', alignItems: 'center' }}>
+                  <TextField
+                    variant="outlined"
+                    disabled
+                    placeholder="Credit or Debit cards"
+                    sx={{
+                      '& fieldset': { border: 'none' },
+                      border: 'none',
+                      backgroundColor: '#F9f9f9',
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <SvgIconStyle sx={{ color: '#0C68F4' }} src={'/icons/ic_edit.svg'} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <Stack direction="row">
+                    {paymentOptions.map((paymentOption) => (
+                      <Image
+                        key={paymentOption.name}
+                        src={paymentOption.icon}
+                        alt={paymentOption.name}
+                        sx={{ width: '55px', height: '40px' }}
+                      />
+                    ))}
                   </Stack>
-                </Card>
-              </FormProvider>
+                </Box>
+                <Box marginTop={4} sx={{ display: 'flex', alignItems: 'center' }}>
+                  <TextField
+                    variant="outlined"
+                    disabled
+                    placeholder="PayPal"
+                    sx={{
+                      '& fieldset': { border: 'none' },
+                      border: 'none',
+                      backgroundColor: '#F9f9f9',
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <SvgIconStyle sx={{ color: '#0C68F4' }} src={'/icons/ic_edit.svg'} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <Image
+                    src="/img/paypal.png"
+                    alt="Paypal"
+                    sx={{ width: '55px', height: '40px' }}
+                  />
+                </Box>
+                <Typography variant="h5">Instalments</Typography>
+                <Typography
+                  sx={{
+                    color: '#0C68F4',
+                    fontSize: '16px', // Kích thước font là 16px
+                    fontWeight: 300, // Độ đậm của font là 300
+                    textAlign: 'left', // Căn chỉnh văn bản sang trái
+                  }}
+                >
+                  Manage your instalment
+                  <Iconify
+                    width={24}
+                    height={24}
+                    sx={{ ml: 1, verticalAlign: 'middle' }}
+                    icon={'eva:arrow-forward-fill'}
+                  />
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: optionSelected.title === 'Order' ? 'block' : 'none',
+                }}
+              >
+                <Typography variant="h5">Order History</Typography>
+                <Typography
+                  sx={{
+                    color: '#717171',
+                    fontSize: '16px', // Kích thước font là 16px
+                    fontWeight: 300, // Độ đậm của font là 300
+                    lineHeight: '24px', // Độ cao của dòng là 24px
+                    textAlign: 'left', // Căn chỉnh văn bản sang trái
+                  }}
+                >
+                  Track, return or purchase items
+                </Typography>
+                <Stack
+                  direction="row"
+                  sx={{
+                    mt: 4,
+                    borderBottom: '2px solid #f9f9f9',
+                  }}
+                >
+                  {orderStatus.map((item) => (
+                    <MenuItem
+                      sx={{
+                        fontWeight: 300,
+                        fontSize: '20px',
+                        lineHeight: '28px',
+                        textAlign: 'center',
+                        padding: 0,
+                        mr: 4,
+                        borderBottom:
+                          orderStatusSelected.name === item.name ? '2px solid #0C68F4' : undefined,
+                        color: orderStatusSelected.name === item.name ? '#0C68F4' : '#717171',
+                      }}
+                      key={item.name}
+                    >
+                      {item.name}
+                      <Box
+                        sx={{
+                          backgroundColor:
+                            orderStatusSelected.name === item.name ? '#0C68F4' : '#f9f9f9',
+                          ml: 1,
+                          color: orderStatusSelected.name === item.name ? '#fff' : '#717171',
+                          width: '20px',
+                          justifyContent: 'center',
+                          height: '20px',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          fontSize: '16px',
+                        }}
+                      >
+                        0
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Stack>
+              </Box>
             </Grid>
           </Grid>
         </Container>

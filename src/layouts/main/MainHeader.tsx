@@ -106,7 +106,7 @@ export default function MainHeader() {
 
           {!isDesktop && <MenuMobile isOffset={isOffset} isHome={isHome} navConfig={navConfig} />}
           <Stack sx={{ color: '#0c0c0c' }} direction="row" flexWrap="wrap" alignItems="center">
-            <IconButton sx={{ color: '#0c0c0c' }} type="button">
+            <IconButton href='/user' sx={{ color: '#0c0c0c' }} type="button">
               <SvgIconStyle src={'/icons/ic_profile.svg'} />
             </IconButton>
             <IconButton sx={{ color: '#0c0c0c' }} type="button">
