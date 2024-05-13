@@ -99,7 +99,6 @@ const createAuthChannel = () => {
       window.removeEventListener('storage', handleAuthChannel);
     },
     triggerAuthRefreshing: () => {
-      console.log("refresh")
       window.localStorage.setItem(rfAuthEventKey, Date.now().toString());
     },
   };

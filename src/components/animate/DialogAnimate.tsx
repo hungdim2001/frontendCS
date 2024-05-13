@@ -24,19 +24,19 @@ export default function DialogAnimate({
       {open && (
         <Dialog
           fullWidth
-          maxWidth="xs"
+          maxWidth="md"
           open={open}
           onClose={onClose}
           PaperComponent={(props) => (
             <Box
               component={m.div}
-              {...(variants ||
-                varFade({
-                  distance: 120,
-                  durationIn: 0.32,
-                  durationOut: 0.24,
-                  easeIn: 'easeInOut',
-                }).inUp)}
+              // {...(variants ||
+              //   varFade({
+              //     distance: 120,
+              //     durationIn: 0.32,
+              //     durationOut: 0.24,
+              //     easeIn: 'easeInOut',
+              //   }).inUp)}
               sx={{
                 width: '100%',
                 height: '100%',

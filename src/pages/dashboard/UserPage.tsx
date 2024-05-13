@@ -41,7 +41,7 @@ const UserMenu = [
   { title: 'Personal Data', icon: '/icons/user-edit.svg' },
   { title: 'Payment & Instalments', icon: '/icons/dollar-circle.svg' },
   { title: 'Order', icon: '/icons/ic_bag.svg' },
-  { title: 'security', icon: '/icons/security-safe.svg' },
+  { title: 'Security & access', icon: '/icons/security-safe.svg' },
 ];
 const orderStatus = [
   {
@@ -450,7 +450,9 @@ const UserPage = () => {
                     sx={{ width: '55px', height: '40px' }}
                   />
                 </Box>
-                <Typography variant="h5">Instalments</Typography>
+                <Typography mt={2} variant="h5">
+                  Instalments
+                </Typography>
                 <Typography
                   sx={{
                     color: '#0C68F4',
@@ -494,6 +496,9 @@ const UserPage = () => {
                 >
                   {orderStatus.map((item) => (
                     <MenuItem
+                      onClick={(e) => {
+                        setOrderStatusSelected(item);
+                      }}
                       sx={{
                         fontWeight: 300,
                         fontSize: '20px',
@@ -528,6 +533,85 @@ const UserPage = () => {
                     </MenuItem>
                   ))}
                 </Stack>
+                <Image
+                  src="/img/no order history.png"
+                  alt="Empty"
+                  sx={{ margin: '0 auto', width: '315px', height: '235px' }}
+                />
+                <Typography
+                  sx={{
+                    textAlign: 'center',
+                    color: '#0C0C0C',
+                    fontSize: '20px', // Kích thước font là 16px
+                    fontWeight: 300, // Độ đậm của font là 300
+                    lineHeight: '24px', // Độ cao của dòng là 24px
+                  }}
+                >
+                  You have not placed any orders yet
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: optionSelected.title === 'Security & access' ? 'block' : 'none',
+                }}
+              >
+                <Typography variant="h5">Security settings</Typography>
+                <Typography
+                  sx={{
+                    color: '#717171',
+                    fontSize: '16px', // Kích thước font là 16px
+                    fontWeight: 300, // Độ đậm của font là 300
+                    lineHeight: '24px', // Độ cao của dòng là 24px
+                    textAlign: 'left', // Căn chỉnh văn bản sang trái
+                  }}
+                >
+                  Change password and phone number
+                </Typography>
+
+                <TextField
+                  variant="outlined"
+                  disabled
+                  placeholder="Password"
+                  sx={{
+                    '& fieldset': { border: 'none' },
+                    border: 'none',
+                    backgroundColor: '#F9f9f9',
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <SvgIconStyle sx={{ color: '#0C68F4' }} src={'/icons/ic_edit.svg'} />
+                      </InputAdornment>
+                    ),
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SvgIconStyle  src={'/icons/key.svg'} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  variant="outlined"
+                  disabled
+                  placeholder="Phone Number"
+                  sx={{
+                    '& fieldset': { border: 'none' },
+                    border: 'none',
+                    backgroundColor: '#F9f9f9',
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <SvgIconStyle sx={{ color: '#0C68F4' }} src={'/icons/ic_edit.svg'} />
+                      </InputAdornment>
+                    ),
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SvgIconStyle src={'/icons/call.svg'} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
               </Box>
             </Grid>
           </Grid>

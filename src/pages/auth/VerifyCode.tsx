@@ -12,6 +12,7 @@ import Iconify from '../../components/Iconify';
 // sections
 import { BackVerifyFromButton, VerifyCodeForm } from '../../sections/auth/verify-code';
 import ReSendCodeButton from 'src/sections/auth/verify-code/ReSendCodeButton';
+import useAuth from 'src/hooks/useAuth';
 
 // ----------------------------------------------------------------------
 
@@ -25,6 +26,7 @@ const RootStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function VerifyCode() {
+  const {user} = useAuth();
   return (
     <Page title="Verify" sx={{ height: 1 }}>
       <RootStyle>
@@ -38,7 +40,7 @@ export default function VerifyCode() {
               Please check your email!
             </Typography>
             <Typography sx={{ color: 'text.secondary' }}>
-              We have emailed a 6-digit confirmation code to acb@domain, please enter the code in
+              We have emailed a 6-digit confirmation code to {user?.email}, please enter the code in
               below box to verify your email.
             </Typography>
 

@@ -12,8 +12,6 @@ import useResponsive from '../../hooks/useResponsive';
 import Page from '../../components/Page';
 import Logo from '../../components/Logo';
 import Image from '../../components/Image';
-// sections
-import { LoginForm } from '../../sections/auth/login';
 
 // ----------------------------------------------------------------------
 
@@ -114,7 +112,7 @@ export default function Login() {
               </Tooltip>
             </Stack>
 
-            <LoginForm />
+            {/* <LoginForm /> */}
 
             {!smUp && (
               <Typography variant="body2" align="center" sx={{ mt: 3 }}>

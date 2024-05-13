@@ -45,22 +45,22 @@ export default function Router() {
     {
       path: 'auth',
       children: [
-        {
-          path: 'login',
-          element: (
-            <GuestGuard>
-              <Login />
-            </GuestGuard>
-          ),
-        },
-        {
-          path: 'register',
-          element: (
-            <GuestGuard>
-              <Register />
-            </GuestGuard>
-          ),
-        },
+        // {
+        //   path: 'login',
+        //   element: (
+        //     <GuestGuard>
+        //       <Login />
+        //     </GuestGuard>
+        //   ),
+        // },
+        // {
+        //   path: 'register',
+        //   element: (
+        //     <GuestGuard>
+        //       <Register />
+        //     </GuestGuard>
+        //   ),
+        // },
         { path: 'login-unprotected', element: <Login /> },
         { path: 'register-unprotected', element: <Register /> },
         {

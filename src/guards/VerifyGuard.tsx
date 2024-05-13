@@ -8,6 +8,7 @@ import Login from '../pages/auth/Login';
 import LoadingScreen from '../components/LoadingScreen';
 import VerifyCode from 'src/pages/auth/VerifyCode';
 import { PATH_AUTH, PATH_DASHBOARD } from 'src/routes/paths';
+import { Alert, AlertTitle, Container } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -27,8 +28,15 @@ export default function VerifyGuard({ children }: AuthGuardProps) {
 
 
   if (!isAuthenticated) {
-
-    return <Navigate to={PATH_AUTH.login} />;;
+  return (
+      <Container>
+        <Alert severity="error">
+          <AlertTitle>Not Login</AlertTitle>
+          You must login to access this page
+        </Alert>
+      </Container>
+    );
+    // return <Navigate to={PATH_AUTH.login} />;;
   }
 
   if (isAuthenticated&& user?.status) {

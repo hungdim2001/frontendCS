@@ -15,6 +15,7 @@ import useIsMountedRef from '../../../hooks/useIsMountedRef';
 // components
 import Iconify from '../../../components/Iconify';
 import { FormProvider, RHFTextField, RHFCheckbox } from '../../../components/hook-form';
+import SvgIconStyle from 'src/components/SvgIconStyle';
 
 // ----------------------------------------------------------------------
 
@@ -24,8 +25,10 @@ type FormValuesProps = {
   remember: boolean;
   afterSubmit?: string;
 };
-
-export default function LoginForm() {
+export interface Props {
+  onCloseModal: VoidFunction;
+}
+export default function LoginForm({ onCloseModal }: Props) {
   const { login } = useAuth();
 
   const isMountedRef = useIsMountedRef();
@@ -38,8 +41,8 @@ export default function LoginForm() {
   });
 
   const defaultValues = {
-    email: 'hungdim2001@gmail.com',
-    password: '1',
+    email: '',
+    password: '',
     remember: true,
   };
 
@@ -56,9 +59,9 @@ export default function LoginForm() {
   } = methods;
 
   const onSubmit = async (data: FormValuesProps) => {
-    
     try {
       await login(data.email, data.password);
+      onCloseModal();
     } catch (error) {
       console.error(error);
       reset();
@@ -73,7 +76,17 @@ export default function LoginForm() {
       <Stack spacing={3}>
         {!!errors.afterSubmit && <Alert severity="error">{errors.afterSubmit.message}</Alert>}
 
-        <RHFTextField name="email" label="Email address/ Phone Number/ UserName" />
+        <RHFTextField
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SvgIconStyle src={'/icons/sms.svg'} />
+              </InputAdornment>
+            ),
+          }}
+          name="email"
+          label="Email address"
+        />
 
         <RHFTextField
           name="password"
@@ -85,6 +98,11 @@ export default function LoginForm() {
                 <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                   <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
                 </IconButton>
+              </InputAdornment>
+            ),
+            startAdornment: (
+              <InputAdornment position="start">
+                <SvgIconStyle src={'/icons/key.svg'} />
               </InputAdornment>
             ),
           }}

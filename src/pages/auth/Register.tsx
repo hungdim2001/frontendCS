@@ -115,7 +115,7 @@ export default function Register() {
               </Tooltip>
             </Box>
 
-            <RegisterForm />
+            {/* <RegisterForm /> */}
 
             <Typography variant="body2" align="center" sx={{ color: 'text.secondary', mt: 3 }}>
               By registering, I agree to Minimal&nbsp;

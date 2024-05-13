@@ -10,7 +10,7 @@ export default function ReSendCodeButton() {
     const handleReSendCode = async () => {
         try {
             await authApi.reSendCode();
-            enqueueSnackbar('Một mã mới đã được gửi vào hòm thư của bạn');
+            enqueueSnackbar('A new code has been sent to your mailbox');
 
         } catch (error) {
             console.error(error);
@@ -18,11 +18,11 @@ export default function ReSendCodeButton() {
         }
     }
     return (
-        <AtagStyle>
+        // <AtagStyle>
             <Link variant="subtitle2" underline="none"  onClick={handleReSendCode}>
                 Resend code
             </Link>
-        </AtagStyle>
+        // </AtagStyle>
     );
 
 }

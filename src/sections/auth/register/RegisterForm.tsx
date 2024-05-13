@@ -32,7 +32,10 @@ type FormValuesProps = {
   afterSubmit?: string;
 };
 
-export default function RegisterForm() {
+export interface Props {
+  onCloseModal: VoidFunction;
+}
+export default function RegisterForm({onCloseModal}:Props) {
   const { register } = useAuth();
   const { locationState,
     
@@ -102,6 +105,7 @@ export default function RegisterForm() {
     try {
       const role ="user"
       await register(null,data.email, data.phone, data.streetBlock, role,data.password, data.firstName, data.lastName);
+      onCloseModal();
     } catch (error) {
       console.error("register");
       console.error(error);
