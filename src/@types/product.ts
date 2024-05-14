@@ -59,7 +59,9 @@ export type ProductTypeState = {
 export type AddressState = {
   adresss: Address[];
 };
-
+export type MenuState = {
+  optionSelected:  any
+};
 export type ProductCharValue = BaseDTO & {
   value: string;
   variant: boolean;

@@ -22,7 +22,6 @@ export default function RoleBasedGuard({ accessibleRoles, children }: RoleBasedG
   const { logout } = useAuth();
   const navigate = useNavigate();
   const currentRole = useCurrentRole();
-  console.log(currentRole)
   if (!accessibleRoles.includes(currentRole)) {
     enqueueSnackbar('no permission', { variant: 'error' });
     logout();

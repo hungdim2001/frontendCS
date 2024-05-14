@@ -37,12 +37,9 @@ import { areaResponse } from 'src/service/app-apis/location';
 import { userApi } from 'src/service/app-apis/user';
 import Iconify from 'src/components/Iconify';
 import { Padding } from '@mui/icons-material';
-const UserMenu = [
-  { title: 'Personal Data', icon: '/icons/user-edit.svg' },
-  { title: 'Payment & Instalments', icon: '/icons/dollar-circle.svg' },
-  { title: 'Order', icon: '/icons/ic_bag.svg' },
-  { title: 'Security & access', icon: '/icons/security-safe.svg' },
-];
+import { UserMenu, setOptionMenuSelected } from 'src/redux/slices/menu';
+import { useDispatch, useSelector } from 'src/redux/store';
+
 const orderStatus = [
   {
     name: 'Current',
@@ -94,6 +91,8 @@ type FormValuesProps = {
 };
 
 const UserPage = () => {
+  const {menu} = useSelector((state) => state);
+  const dispatch = useDispatch();
   const { user, logout } = useAuth();
   const NewUserSchema = Yup.object().shape({
     firstName: Yup.string().required('First Name is required'),
@@ -104,7 +103,6 @@ const UserPage = () => {
     streetBlock: Yup.string().required('Street block is required'),
     avatarUrl: Yup.mixed().test('required', 'Avatar is required', (value) => value !== ''),
   });
-
   const defaultValues = useMemo(
     () => ({
       firstName: user?.firstName || '',
@@ -124,11 +122,7 @@ const UserPage = () => {
     resolver: yupResolver(NewUserSchema),
     defaultValues,
   });
-
   const {
-    reset,
-    watch,
-    control,
     setValue,
     resetField,
     handleSubmit,
@@ -153,7 +147,6 @@ const UserPage = () => {
   useEffect(() => {
     if (user?.province && user.district && user.precinct && user.streetBlock) {
       initFromOld(user.province, user.district, user.precinct, user.streetBlock);
-      // reset(defaultValues);
     }
   }, [user]);
   type Field = 'province' | 'district' | 'precinct' | 'streetBlock';
@@ -182,7 +175,6 @@ const UserPage = () => {
       handleLocationSelect(option, field);
     }
   };
-  const [optionSelected, setOptionSelected] = useState(UserMenu[0]);
   const [orderStatusSelected, setOrderStatusSelected] = useState(orderStatus[0]);
   if (!user) return <></>;
   return (
@@ -196,7 +188,7 @@ const UserPage = () => {
                 name: 'User',
                 href: PATH_ROOT.user.root,
               },
-              { name: optionSelected.title },
+              { name:menu.optionSelected.title },
             ]}
             heading={''}
           />
@@ -236,12 +228,12 @@ const UserPage = () => {
                 {UserMenu.map((item) => (
                   <ListItem
                     onClick={(e) => {
-                      setOptionSelected(item);
+                      dispatch(setOptionMenuSelected(item))
                     }}
                     sx={{
                       borderLeft:
-                        item.title === optionSelected.title ? 'solid 2px #0C68F4' : undefined,
-                      color: item.title === optionSelected.title ? '#0C68F4' : undefined,
+                        item.title === menu.optionSelected.title ? 'solid 2px #0C68F4' : undefined,
+                      color: item.title === menu.optionSelected.title ? '#0C68F4' : undefined,
                       cursor: 'pointer',
                       padding: '12px',
                       display: 'flex',
@@ -268,7 +260,7 @@ const UserPage = () => {
               </ListItem>
             </Grid>
             <Grid item xs={9}>
-              <Box sx={{ display: optionSelected.title === 'Personal Data' ? 'block' : 'none' }}>
+              <Box sx={{ display: menu.optionSelected.title === 'Personal Data' ? 'block' : 'none' }}>
                 <Typography variant="h5">Identification</Typography>
                 <Typography
                   sx={{
@@ -382,7 +374,7 @@ const UserPage = () => {
 
               <Box
                 sx={{
-                  display: optionSelected.title === 'Payment & Instalments' ? 'block' : 'none',
+                  display: menu.optionSelected.title === 'Payment & Instalments' ? 'block' : 'none',
                 }}
               >
                 <Typography variant="h5">Cards</Typography>
@@ -472,7 +464,7 @@ const UserPage = () => {
               </Box>
               <Box
                 sx={{
-                  display: optionSelected.title === 'Order' ? 'block' : 'none',
+                  display: menu.optionSelected.title === 'Order' ? 'block' : 'none',
                 }}
               >
                 <Typography variant="h5">Order History</Typography>
@@ -552,7 +544,7 @@ const UserPage = () => {
               </Box>
               <Box
                 sx={{
-                  display: optionSelected.title === 'Security & access' ? 'block' : 'none',
+                  display: menu.optionSelected.title === 'Security & access' ? 'block' : 'none',
                 }}
               >
                 <Typography variant="h5">Security settings</Typography>

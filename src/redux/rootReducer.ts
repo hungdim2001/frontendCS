@@ -11,6 +11,7 @@ import productCharsReducer from './slices/product-char';
 import productTypeReducer from './slices/product-type';
 import addressReducer from './slices/address';
 import deliveryService from './slices/deliveryService';
+import menu from './slices/menu';
 
 // ----------------------------------------------------------------------
 
@@ -37,7 +38,8 @@ const rootReducer = combineReducers({
   productChars: productCharsReducer,
   productTypes: productTypeReducer,
   addresses:addressReducer,
-  deliveryServices:deliveryService
+  deliveryServices:deliveryService,
+  menu:menu,
 });
 
 export { rootPersistConfig, rootReducer };

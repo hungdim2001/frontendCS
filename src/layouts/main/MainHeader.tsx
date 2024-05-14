@@ -35,6 +35,8 @@ import MenuMobile from './MenuMobile';
 import { RegisterForm } from 'src/sections/auth/register';
 import { LoginForm } from 'src/sections/auth/login';
 import MenuPopover from 'src/components/MenuPopover';
+import UserPopover from '../dashboard/header/UserPopover';
+import SearchModal from '../dashboard/header/SearchModal';
 
 // ----------------------------------------------------------------------
 
@@ -70,19 +72,10 @@ const UserMenu = [
 ];
 export default function MainHeader() {
   const isOffset = useOffSetTop(HEADER.MAIN_DESKTOP_HEIGHT);
-
   const theme = useTheme();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { user } = useAuth();
   const isDesktop = useResponsive('up', 'md');
   const isHome = pathname === '/';
-  const [isOpenModal, setIsOpenModal] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
-  const [openUserPopover, setOpenUserPopover] = useState<HTMLElement | null>(null);
-  const handleCloseModal = () => {
-    setIsOpenModal(false);
-  };
   return (
     <AppBar sx={{ boxShadow: 0, bgcolor: 'transparent' }}>
       <ToolbarStyle
@@ -124,137 +117,19 @@ export default function MainHeader() {
           </Button> */}
 
           {!isDesktop && <MenuMobile isOffset={isOffset} isHome={isHome} navConfig={navConfig} />}
-          <Stack sx={{ color: '#0c0c0c' }} direction="row" flexWrap="wrap" alignItems="center">
-            <IconButton
-              onClick={(e) => {
-                if (user) setOpenUserPopover(e.currentTarget);
-                // navigate('/user');
-                else {
-                  setIsOpenModal(true);
-                }
-              }}
-              sx={{ color: '#0c0c0c' }}
-              type="button"
-            >
-              <SvgIconStyle src={'/icons/ic_profile.svg'} />
-              <MenuPopover
-                anchorEl={openUserPopover}
-                open={Boolean(openUserPopover)}
-                onClose={() => {
-                  setOpenUserPopover(null);
-                }}
-                sx={{
-                  p: 0,
-                  mt: 1.5,
-                  ml: 0.75,
-                  '& .MuiMenuItem-root': {
-                    typography: 'body2',
-                    borderRadius: 0.75,
-                  },
-                }}
-              >
-                <ListItem sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                  <SvgIconStyle
-                    sx={{ color: '#B4B4B4', width: '24px', height: '24px', mr: 2 }}
-                    src={'/icons/profile-circle.svg'}
-                  />
-                  <ListItemText
-                    primary={user?.fullName}
-                    primaryTypographyProps={{
-                      sx: {
-                        color: '#0C68F4',
-                        fontSize: '18px', // Thiết lập font-size
-                        fontWeight: 300, // Thiết lập font-weight
-                        textAlign: 'left', // Thiết lập text-align
-                      },
-                    }}
-                  />
-                  {/* <ListItemText
-                    primary={user?.email}
-                    primaryTypographyProps={{
-                      sx: {
-                        color: '#0C0C0C',
-                        fontSize: '20px', // Thiết lập font-size
-                        fontWeight: 500, // Thiết lập font-weight
-                        lineHeight: '24.2px', // Thiết lập line-height
-                        textAlign: 'left', // Thiết lập text-align
-                      },
-                    }}
-                  /> */}
-                </ListItem>
-
-                <Stack >
-                  {UserMenu.map((option) => (
-                    <MenuItem key={option.title} onClick={(e) => {}}>
-                      <SvgIconStyle sx={{ mr: 2 }} src={option.icon} />
-                      {option.title}
-                    </MenuItem>
-                  ))}
-                </Stack>
-
-                <MenuItem sx={{ color: '#C91433' }}>
-                  <SvgIconStyle src={'/icons/logout.svg'} sx={{ mr: 2 }} />
-                  Logout
-                </MenuItem>
-              </MenuPopover>
-            </IconButton>
-            <IconButton sx={{ color: '#0c0c0c' }} type="button">
-              <SvgIconStyle src={'/icons/ic_search-normal.svg'} />
-            </IconButton>
+          <Stack
+            sx={{ color: '#0c0c0c' }}
+            direction="row"
+            spacing={{ xs: 0.5, sm: 1.5 }}
+            alignItems="center"
+          >
+            <UserPopover />
+            <SearchModal />
             <IconButton sx={{ color: '#0c0c0c' }} type="button">
               <SvgIconStyle src={'/icons/ic_bag.svg'} />
             </IconButton>
           </Stack>
         </Container>
-        <DialogAnimate open={isOpenModal} onClose={handleCloseModal} sx={{ padding: '40px 80px' }}>
-          <Stack direction={'row'}>
-            <MenuItem
-              onClick={() => {
-                setIsLogin(true);
-              }}
-              sx={{
-                fontWeight: 300,
-                padding: '2px 20px',
-                width: '50%',
-                borderBottom: isLogin ? '2px solid #0C68F4' : '2px solid #CBCBCB',
-                color: isLogin ? '#0C68F4' : undefined,
-                textAlign: 'center',
-                display: 'flex',
-                justifyContent: 'center',
-              }}
-            >
-              Log in
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setIsLogin(false);
-              }}
-              sx={{
-                fontWeight: 300,
-                padding: '2px 20px',
-                width: '50%',
-                color: isLogin ? undefined : '#0C68F4',
-                borderBottom: isLogin ? '2px solid #CBCBCB' : '2px solid #0C68F4',
-                display: 'flex',
-                justifyContent: 'center',
-              }}
-            >
-              Create Account
-            </MenuItem>
-          </Stack>
-          <Box sx={{ display: isLogin ? 'block' : 'none' }}>
-            <Typography textAlign="center" variant="h4" my={4}>
-              Log in to Tech Heim
-            </Typography>
-            <LoginForm onCloseModal={handleCloseModal} />
-          </Box>
-          <Box sx={{ display: isLogin ? 'none' : 'block' }}>
-            <Typography textAlign="center" variant="h4" my={4}>
-              Create your account
-            </Typography>
-            <RegisterForm onCloseModal={handleCloseModal} />
-          </Box>
-        </DialogAnimate>
       </ToolbarStyle>
 
       {isOffset && <ToolbarShadowStyle />}

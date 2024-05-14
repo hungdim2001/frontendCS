@@ -16,6 +16,7 @@ import useIsMountedRef from '../../../hooks/useIsMountedRef';
 import Iconify from '../../../components/Iconify';
 import { FormProvider, RHFTextField, RHFCheckbox } from '../../../components/hook-form';
 import SvgIconStyle from 'src/components/SvgIconStyle';
+import { useSnackbar } from 'notistack';
 
 // ----------------------------------------------------------------------
 
@@ -31,6 +32,7 @@ export interface Props {
 export default function LoginForm({ onCloseModal }: Props) {
   const { login } = useAuth();
 
+  const { enqueueSnackbar } = useSnackbar();
   const isMountedRef = useIsMountedRef();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -61,6 +63,7 @@ export default function LoginForm({ onCloseModal }: Props) {
   const onSubmit = async (data: FormValuesProps) => {
     try {
       await login(data.email, data.password);
+      enqueueSnackbar('login successfully ', { variant: 'success' });
       onCloseModal();
     } catch (error) {
       console.error(error);
