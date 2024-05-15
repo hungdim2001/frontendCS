@@ -34,7 +34,7 @@ export const PATH_PAGE = {
 };
 
 export const PATH_ROOT = {
-  root:ROOTS,
+  root: ROOTS,
   user: {
     root: path(ROOTS, '/user'),
     profile: path(ROOTS_DASHBOARD, '/user/profile'),
@@ -43,6 +43,9 @@ export const PATH_ROOT = {
     newUser: path(ROOTS_DASHBOARD, '/user/new'),
     editById: path(ROOTS_DASHBOARD, `/user/reece-chung/edit`),
     account: path(ROOTS_DASHBOARD, '/user/account'),
+  },
+  products: {
+    root: path(ROOTS, '/produts'),
   },
 };
 export const PATH_DASHBOARD = {

@@ -21,6 +21,8 @@ import Iconify from '../../../../components/Iconify';
 import Scrollbar from '../../../../components/Scrollbar';
 import { ColorManyPicker } from '../../../../components/color-utils';
 import { RHFMultiCheckbox, RHFRadioGroup } from '../../../../components/hook-form';
+import MenuPopover from 'src/components/MenuPopover';
+import { useState } from 'react';
 
 // ----------------------------------------------------------------------
 
@@ -32,6 +34,16 @@ export const SORT_BY_OPTIONS = [
 ];
 
 export const FILTER_GENDER_OPTIONS = ['Men', 'Women', 'Kids'];
+
+export const FILTER_BRAND_OPTIONS = [
+  'Samsung',
+  'Apple',
+  'Oppo',
+  'Xiaomi',
+  'Vivo',
+  'Realme',
+  'Nokia',
+];
 
 export const FILTER_CATEGORY_OPTIONS = ['All', 'Shose', 'Apparel', 'Accessories'];
 
@@ -68,7 +80,12 @@ type Props = {
 
 export default function ShopFilterSidebar({ isOpen, onResetAll, onOpen, onClose }: Props) {
   const { control } = useFormContext();
+  const [openBrand, setOpenBrand] = useState<HTMLElement | null>(null);
 
+  const handleClickBrand = (currentTarget: HTMLElement) => {
+    if (openBrand === null) setOpenBrand(currentTarget);
+    else setOpenBrand(null);
+  };
   return (
     <>
       <Button
@@ -107,31 +124,20 @@ export default function ShopFilterSidebar({ isOpen, onResetAll, onOpen, onClose 
         <Scrollbar>
           <Stack spacing={3} sx={{ p: 3 }}>
             <Stack spacing={1}>
-              <Typography variant="subtitle1">Gender</Typography>
-              <RHFMultiCheckbox name="gender" options={FILTER_GENDER_OPTIONS} sx={{ width: 1 }} />
-            </Stack>
+              <Box
+                onClick={(event) => handleClickBrand(event.currentTarget)}
+                sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+              >
+                <Typography variant="subtitle1">Brand</Typography>
+                <Iconify icon={openBrand ? 'eva:chevron-up-fill' : 'eva:chevron-down-fill'} />
+              </Box>
 
-            <Stack spacing={1}>
-              <Typography variant="subtitle1">Category</Typography>
-              <RHFRadioGroup name="category" options={FILTER_CATEGORY_OPTIONS} row={false} />
-            </Stack>
-
-            <Stack spacing={1}>
-              <Typography variant="subtitle1">Colour</Typography>
-
-              <Controller
-                name="colors"
-                control={control}
-                render={({ field }) => (
-                  <ColorManyPicker
-                    colors={FILTER_COLOR_OPTIONS}
-                    onChangeColor={(color) => field.onChange(onSelected(field.value, color))}
-                    sx={{ maxWidth: 36 * 4 }}
-                  />
-                )}
+              <RHFMultiCheckbox
+                sx={{ display: Boolean(openBrand) ? 'block' : 'none', width: 1 }}
+                name="brand"
+                options={FILTER_BRAND_OPTIONS}
               />
             </Stack>
-
             <Stack spacing={1}>
               <Typography variant="subtitle1">Price</Typography>
               <RHFRadioGroup
@@ -143,7 +149,6 @@ export default function ShopFilterSidebar({ isOpen, onResetAll, onOpen, onClose 
 
             <Stack spacing={1}>
               <Typography variant="subtitle1">Rating</Typography>
-
               <Controller
                 name="rating"
                 control={control}

@@ -58,13 +58,13 @@ type Props = {
   onRemoveRating: VoidFunction;
   onRemoveCategory: VoidFunction;
   onRemoveColor: (value: string) => void;
-  onRemoveGender: (value: string) => void;
+  onRemoveBrand: (value: string) => void;
 };
 
 export default function ShopTagFiltered({
   filters,
   isShowReset,
-  onRemoveGender,
+  onRemoveBrand,
   onRemoveCategory,
   onRemoveColor,
   onRemovePrice,
@@ -73,20 +73,20 @@ export default function ShopTagFiltered({
 }: Props) {
   const theme = useTheme();
 
-  const { gender, category, colors, priceRange, rating } = filters;
+  const {  brand, rating } = filters;
 
   return (
     <RootStyle>
-      {gender.length > 0 && (
+      {brand.length > 0 && (
         <WrapperStyle>
-          <LabelStyle>Gender:</LabelStyle>
+          <LabelStyle>Brand:</LabelStyle>
           <Stack direction="row" flexWrap="wrap" sx={{ p: 0.75 }}>
-            {gender.map((_gender) => (
+            {brand.map((_brand) => (
               <Chip
-                key={_gender}
-                label={_gender}
+                key={_brand}
+                label={_brand}
                 size="small"
-                onDelete={() => onRemoveGender(_gender)}
+                onDelete={() => onRemoveBrand(_brand)}
                 sx={{ m: 0.5 }}
               />
             ))}
@@ -94,15 +94,15 @@ export default function ShopTagFiltered({
         </WrapperStyle>
       )}
 
-      {category !== 'All' && (
+      {/* {category !== 'All' && (
         <WrapperStyle>
           <LabelStyle>Category:</LabelStyle>
           <Stack direction="row" flexWrap="wrap" sx={{ p: 0.75 }}>
             <Chip size="small" label={category} onDelete={onRemoveCategory} sx={{ m: 0.5 }} />
           </Stack>
         </WrapperStyle>
-      )}
-
+      )} */}
+{/* 
       {colors.length > 0 && (
         <WrapperStyle>
           <LabelStyle>Colors:</LabelStyle>
@@ -128,8 +128,8 @@ export default function ShopTagFiltered({
             ))}
           </Stack>
         </WrapperStyle>
-      )}
-
+      )} */}
+{/* 
       {priceRange && (
         <WrapperStyle>
           <LabelStyle>Price:</LabelStyle>
@@ -142,7 +142,7 @@ export default function ShopTagFiltered({
             />
           </Stack>
         </WrapperStyle>
-      )}
+      )} */}
 
       {rating && (
         <WrapperStyle>

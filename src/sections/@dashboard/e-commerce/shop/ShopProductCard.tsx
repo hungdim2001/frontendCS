@@ -62,7 +62,7 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
     defaultValues,
   });
   const { watch, control, setValue, getValues, handleSubmit } = methods;
-  const linkTo = `${PATH_DASHBOARD.eCommerce.root}/product/${id}/${getValues('variant')?.id??''}`;
+  const linkTo = `${PATH_DASHBOARD.eCommerce.root}/product/${id}/${getValues('variant')?.id ?? ''}`;
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
   const { currentLocation } = useLocationContext();
@@ -119,75 +119,45 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <Box sx={{ position: 'relative' }}>
+      <Box
+        sx={{
+          position: 'relative',
+          borderBottom: '1px solid #B4B4B4',
+          borderImageSource:
+            'linear-gradient(90deg, rgba(68, 68, 68, 0.1) 0%, rgba(16, 16, 16, 0.7) 54.17%, rgba(68, 68, 68, 0.1) 99.47%)',
+          borderImageSlice: 1,
+          p: 2,
+        }}
+      >
+        {' '}
         {price && (
           <Label
             variant="filled"
-            color="error"
             sx={{
-              top: 16,
-              right: 16,
+              backgroundColor:'#FDDBC9',
+              color: '#F45E0C',
+              top: '16px',
+              padding:'4px',  
+              left: 0,
               zIndex: 9,
+              borderRadius:'0px 4px 4px 0px',
               position: 'absolute',
-              textTransform: 'uppercase',
             }}
           >
-            sale
+            -15%
           </Label>
         )}
-        {/* {hovered && (
-          <Button
-            onClick={(e) => {
-              handleAddCart();
-              e.stopPropagation();
-            }}
-            sx={{
-              backgroundColor: '#ffab00',
-              color: '#000000',
-              boxShadow: '#ffab003d 0px 8px 16px 0px',
-              cursor: 'pointer',
-              bottom: 16,
-              right: 16,
-              zIndex: 9,
-              position: 'absolute',
-              borderRadius: '50%',
-              width: 48,
-              height: 48,
-              transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minWidth: 32,
-              visibility: 'visible', // Show the button on hover
-              opacity: 1, // Show the button on hover
-              '&:hover': {
-                backgroundColor: '#b76e00',
-              },
-            }}
-          >
-            <Iconify icon={'bxs:cart-add'} width={24} height={24} />
-          </Button>
-        )} */}
-
         <Image alt={name} src={getValues('variant')?.image.toString() ?? thumbnail} ratio="1/1" />
       </Box>
-
-      <Stack spacing={2} sx={{ p: 3 }}>
-        <Typography variant="subtitle2" noWrap>
+      <Stack spacing={2} sx={{ p: 2 }}>
+        <Typography
+          sx={{ textOverflow: 'ellipsis', overflow: 'hidden', maxHeight: '48px' }}
+          variant="subtitle2"
+          component="div"
+        >
           {name}
         </Typography>
         <Stack direction="column" alignItems="start" justifyContent="start">
-          <Stack direction="row" alignItems="center" spacing={0.5}>
-            {price && (
-              <Typography
-                component="span"
-                sx={{ color: 'text.disabled', textDecoration: 'line-through' }}
-              >
-                {fCurrency(price)}₫
-              </Typography>
-            )}
-            <Typography variant="subtitle1">{fCurrency(price)}₫</Typography>
-          </Stack>
           {productSpecChars
             .filter((char) => char.productSpecCharValueDTOS?.some((value) => value.variant))
             .map((char, index) => {
@@ -226,6 +196,44 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
                 </Stack>
               );
             })}
+          {price && (
+            <Typography
+              component="span"
+              sx={{ color: 'text.disabled', textDecoration: 'line-through' }}
+            >
+              {fCurrency(price)}₫
+            </Typography>
+          )}
+          <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+            <Typography component="div" variant="subtitle1">
+              {fCurrency(price)}₫
+            </Typography>
+            <Typography
+              component="div"
+              sx={{
+                display: 'flex',
+                gap: 0.5,
+                fontSize: '16px',
+                fontWeight: 500,
+                lineHeight: '24px',
+              }}
+              color={'#063A88'}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7.85873 1.51246C8.21795 0.406889 9.78205 0.406888 10.1413 1.51246L11.4248 5.46262C11.5854 5.95704 12.0461 6.2918 12.566 6.2918H16.7195C17.8819 6.2918 18.3653 7.77933 17.4248 8.46262L14.0646 10.9039C13.644 11.2095 13.468 11.7512 13.6287 12.2456L14.9122 16.1957C15.2714 17.3013 14.006 18.2207 13.0655 17.5374L9.70534 15.0961C9.28476 14.7905 8.71524 14.7905 8.29466 15.0961L4.93446 17.5374C3.994 18.2207 2.72862 17.3013 3.08784 16.1957L4.37133 12.2456C4.53198 11.7512 4.35599 11.2095 3.9354 10.9039L0.575201 8.46262C-0.365256 7.77934 0.118075 6.2918 1.28054 6.2918H5.43398C5.95385 6.2918 6.4146 5.95704 6.57525 5.46262L7.85873 1.51246Z"
+                  fill="#063A88"
+                />
+              </svg>
+              4.9
+            </Typography>
+          </Box>
           {/* <Stack direction="row" alignItems="center" spacing={0.5}>
             {productSpecChars?.[0]?.productSpecCharValueDTOS?.[0]?.value && (
               <Label variant="filled">
@@ -239,7 +247,6 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
               </Label>
             )}
           </Stack>  */}
-          <Rating readOnly={true} name="rating" defaultValue={4.5} precision={0.5} max={5} />
         </Stack>
       </Stack>
     </Card>

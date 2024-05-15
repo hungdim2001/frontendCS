@@ -10,6 +10,7 @@ type Props = {
 };
 const ProductCard = ({ product }: Props) => {
   const { name, thumbnail, images, price, productSpecChars, id, variants } = product;
+  console.log(product)
   const linkTo = `${PATH_DASHBOARD.eCommerce.root}/product/${id}/${
     variants.length > 1 ? variants[1].id : variants[0].id
   }`;
@@ -17,7 +18,6 @@ const ProductCard = ({ product }: Props) => {
   return (
     <Card
       onClick={() => {
-        console.log(linkTo);
         navigate(linkTo);
       }}
       sx={{ cursor: 'pointer', padding: '16px 0px', boxShadow: '-2px 2px 15px -1px #7171711F' }}

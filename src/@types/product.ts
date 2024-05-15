@@ -143,10 +143,7 @@ export type ProductState = {
   product: Product | null;
   sortBy: string | null;
   filters: {
-    gender: string[];
-    category: string;
-    colors: string[];
-    priceRange: string;
+    brand:string[]
     rating: string;
   };
   checkout: {
@@ -162,10 +159,7 @@ export type ProductState = {
 };
 
 export type ProductFilter = {
-  gender: string[];
-  category: string;
-  colors: string[];
-  priceRange: string;
+  brand: string[];
   rating: string;
 };
 

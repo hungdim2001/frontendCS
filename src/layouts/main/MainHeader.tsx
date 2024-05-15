@@ -93,29 +93,12 @@ export default function MainHeader() {
             alignItems: 'center',
             justifyContent: 'space-between',
             borderBottom: '1px solid',
-            // backgroundImage:
-            // 'linear-gradient(147.38deg, rgba(12, 104, 244, 0.3) 60.98%, rgba(12, 104, 244, 0.7) 81.93%, rgba(12, 104, 244, 0.3) 99.45%)',
             borderImageSource:
               'linear-gradient(147.38deg, rgba(12, 104, 244, 0.3) 60.98%, rgba(12, 104, 244, 0.7) 81.93%, rgba(12, 104, 244, 0.3) 99.45%)',
           }}
         >
           <Logo />
-          {/* 
-          <Label color="info" sx={{ ml: 1 }}>
-            v3.0.0
-          </Label> */}
-
           {isDesktop && <MenuDesktop isOffset={isOffset} isHome={isHome} navConfig={navConfig} />}
-
-          {/* <Button
-            variant="contained"
-            target="_blank"
-            rel="noopener"
-            href="https://material-ui.com/store/items/minimal-dashboard/"
-          >
-            Purchase Now
-          </Button> */}
-
           {!isDesktop && <MenuMobile isOffset={isOffset} isHome={isHome} navConfig={navConfig} />}
           <Stack
             sx={{ color: '#0c0c0c' }}

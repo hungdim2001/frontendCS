@@ -110,8 +110,8 @@ export default function Router() {
         {
           path: 'e-commerce',
           children: [
-            { element: <Navigate to="/dashboard/e-commerce/shop" replace />, index: true },
-            { path: 'shop', element: <EcommerceShop /> },
+            // { element: <Navigate to="/dashboard/e-commerce/shop" replace />, index: true },
+            // { path: 'shop', element: <EcommerceShop /> },
             { path: 'product/:id/:variantParam', element: <EcommerceProductDetails /> },
             { path: 'list', element: <EcommerceProductList /> },
             { path: 'product/new', element: <EcommerceProductCreate /> },
@@ -206,6 +206,12 @@ export default function Router() {
                 <UserPage />
               </RoleBasedGuard>
             </AuthGuard>
+          ),
+        },
+        {
+          path: 'products',
+          element: (
+                <EcommerceShop />
           ),
         },
         // { path: 'contact-us', element: <Contact /> },
