@@ -188,16 +188,19 @@ function applyFilter(products: Product[], sortBy: string | null, filters: Produc
   }
   // FILTER PRODUCTS
   if (filters.brand.length > 0) {
-    // products = products.filter((product) => filters.brand.includes());
-    console.log(filters.brand)
-    products.forEach((product) => {
-      console.log(
-        product.productSpecChars
-          .find((item) => item.name == 'Hãng')
-          ?.productSpecCharValueDTOS?.flatMap((item) => item.value).includes(filters.brand)
-      );
+    products = products.filter((product) => {
+      return product.productSpecChars.some((specChar) => {
+        return (
+          specChar.name === 'Hãng' &&
+          specChar.productSpecCharValueDTOS &&
+          specChar.productSpecCharValueDTOS.some((valueDTO) => {
+            return filters.brand.includes(valueDTO.value);
+          })
+        );
+      });
     });
   }
+  console.log(products);
   // if (filters.category !== 'All') {
   //   products = products.filter((product) => product.category === filters.category);
   // }
