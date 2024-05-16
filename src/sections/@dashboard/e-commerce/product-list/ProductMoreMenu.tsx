@@ -4,7 +4,7 @@ import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { MenuItem, IconButton } from '@mui/material';
 // routes
-import { PATH_DASHBOARD } from '../../../../routes/paths';
+import { PATH_DASHBOARD, PATH_ROOT } from '../../../../routes/paths';
 // components
 import Iconify from '../../../../components/Iconify';
 import MenuPopover from '../../../../components/MenuPopover';
@@ -59,7 +59,7 @@ export default function ProductMoreMenu({ onDelete, id }: Props) {
 
         <MenuItem
           component={RouterLink}
-          to={`${PATH_DASHBOARD.eCommerce.root}/product/${id}/edit`}
+          to={`${PATH_ROOT.root}/products/${id}/edit`}
         >
           <Iconify icon={'eva:edit-fill'} sx={{ ...ICON }} />
           Edit

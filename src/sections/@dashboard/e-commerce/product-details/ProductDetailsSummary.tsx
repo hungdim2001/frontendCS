@@ -259,7 +259,7 @@ export default function ProductDetailsSummary({
               {getValues('variant')?.discountPrice ? (
                 <Typography variant="h6">
                   {' '}
-                  {fCurrency(getValues('variant')?.discountPrice)}₫
+                  {fCurrency(getValues('variant')?.discountPrice!)}₫
                 </Typography>
               ) : (
                 <Typography variant="h6"> {fCurrency(getValues('variant')?.price)}₫</Typography>
@@ -302,7 +302,7 @@ export default function ProductDetailsSummary({
                     </svg>
                     &#160;
                     {caculatorPercent(
-                      getValues('variant').discountPrice,
+                      getValues('variant').discountPrice!,
                       getValues('variant').price
                     )}
                     %

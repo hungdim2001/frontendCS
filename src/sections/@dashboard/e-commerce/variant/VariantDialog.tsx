@@ -116,7 +116,7 @@ export default function VariantDialog({
         description: data.descriptionVariant,
         quantity: +data.quantityVariant,
         price: Number(data.priceVariant.toString().replace('.','')),
-        discountPrice:Number(data.discountPriceVariant.toString().replace('.','')),
+        discountPrice:data.discountPriceVariant?Number(data.discountPriceVariant.toString().replace('.','')):null,
         status: data.statusVariant === 'Active' ? true : false,
         updateDatetime: variant.id ? new Date() : null,
         updateUser: variant.id ? user?.id || null : null,

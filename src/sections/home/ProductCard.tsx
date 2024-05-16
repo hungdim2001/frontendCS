@@ -124,7 +124,7 @@ const ProductCard = ({ product }: Props) => {
           <Typography component="div" variant="subtitle1">
             {variants.length > 1
               ? fCurrency(variants[1].discountPrice ? variants[1].discountPrice : variants[1].price)
-              : fCurrency(variants[0].discountPrice)
+              : fCurrency(variants[0].discountPrice!)
               ? variants[0].discountPrice
               : variants[0].price}
             ₫

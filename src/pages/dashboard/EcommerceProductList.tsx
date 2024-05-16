@@ -2,7 +2,7 @@ import { sentenceCase } from 'change-case';
 import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
-import { useTheme } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import {
   Box,
   Card,
@@ -55,7 +55,10 @@ const TABLE_HEAD = [
 ];
 
 // ----------------------------------------------------------------------
-
+const RootStyle = styled('div')(({ theme }) => ({
+  height: '100%',
+  marginTop: '77px',
+}));
 export default function EcommerceProductList() {
   const { themeStretch } = useSettings();
 
@@ -131,13 +134,13 @@ export default function EcommerceProductList() {
     setFilterName(filterName);
   };
 
-  const handleDeleteProduct = (productId: number|null) => {
-    dispatch(deleteProducts([productId!]))
+  const handleDeleteProduct = (productId: number | null) => {
+    dispatch(deleteProducts([productId!]));
     setSelected([]);
   };
 
   const handleDeleteProducts = (selected: number[]) => {
-    dispatch(deleteProducts(selected))
+    dispatch(deleteProducts(selected));
 
     setSelected([]);
   };
@@ -149,136 +152,137 @@ export default function EcommerceProductList() {
   const isNotFound = !filteredProducts.length && Boolean(filterName);
 
   return (
-    <Page title="Ecommerce: Product List">
-      <Container maxWidth={themeStretch ? false : 'lg'}>
-        <HeaderBreadcrumbs
-          heading="Product List"
-          links={[
-            { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            {
-              name: 'E-Commerce',
-              href: PATH_DASHBOARD.eCommerce.root,
-            },
-            { name: 'Product List' },
-          ]}
-          action={
-            <Button
-              variant="contained"
-              startIcon={<Iconify icon="eva:plus-fill" />}
-              component={RouterLink}
-              to={PATH_DASHBOARD.eCommerce.newProduct}
-            >
-              New Product
-            </Button>
-          }
-        />
-
-        <Card>
-          <ProductListToolbar
-            numSelected={selected.length}
-            filterName={filterName}
-            onFilterName={handleFilterByName}
-            onDeleteProducts={() => handleDeleteProducts(selected)}
+    <RootStyle>
+      <Page title="Ecommerce: Product List">
+        <Container maxWidth={themeStretch ? false : 'lg'}>
+          <HeaderBreadcrumbs
+            heading="Product List"
+            links={[
+              { name: 'Dashboard', href: PATH_DASHBOARD.root },
+              {
+                name: 'E-Commerce',
+                href: PATH_DASHBOARD.eCommerce.root,
+              },
+              { name: 'Product List' },
+            ]}
+            action={
+              <Button
+                variant="contained"
+                startIcon={<Iconify icon="eva:plus-fill" />}
+                component={RouterLink}
+                to={PATH_DASHBOARD.eCommerce.newProduct}
+              >
+                New Product
+              </Button>
+            }
           />
 
-          <Scrollbar>
-            <TableContainer sx={{ minWidth: 800 }}>
-              <Table>
-                <ProductListHead
-                  order={order}
-                  orderBy={orderBy}
-                  headLabel={TABLE_HEAD}
-                  rowCount={productList.length}
-                  numSelected={selected.length}
-                  onRequestSort={handleRequestSort}
-                  onSelectAllClick={handleSelectAllClick}
-                />
+          <Card>
+            <ProductListToolbar
+              numSelected={selected.length}
+              filterName={filterName}
+              onFilterName={handleFilterByName}
+              onDeleteProducts={() => handleDeleteProducts(selected)}
+            />
 
-                <TableBody>
-                  {filteredProducts
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => {
-                      const { id, thumbnail,  name, quantity, status, price,  } = row;
+            <Scrollbar>
+              <TableContainer sx={{ minWidth: 800 }}>
+                <Table>
+                  <ProductListHead
+                    order={order}
+                    orderBy={orderBy}
+                    headLabel={TABLE_HEAD}
+                    rowCount={productList.length}
+                    numSelected={selected.length}
+                    onRequestSort={handleRequestSort}
+                    onSelectAllClick={handleSelectAllClick}
+                  />
 
-
-                      const isItemSelected = selected.indexOf(id!) !== -1;
-
-                      return (
-                        <TableRow
-                          hover
-                          key={id}
-                          tabIndex={-1}
-                          role="checkbox"
-                          selected={isItemSelected}
-                          aria-checked={isItemSelected}
-                        >
-                          <TableCell padding="checkbox">
-                            <Checkbox checked={isItemSelected} onClick={() => handleClick(id!)} />
-                          </TableCell>
-                          <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-                            <Image
-                              disabledEffect
-                              alt={name}
-                              src={thumbnail}
-                              sx={{ borderRadius: 1.5, width: 64, height: 64, mr: 2 }}
-                            />
-                            <Typography variant="subtitle2" noWrap>
-                              {name}
-                            </Typography>
-                          </TableCell>
-                          <TableCell style={{ minWidth: 160 }}>{quantity}</TableCell>
-                          <TableCell align="left">
-                        <Label
-                          variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
-                          color={(status === false && 'error') || 'success'}
-                        >
-                          {sentenceCase(status === true ? 'active' : 'inactive')}
-                        </Label>
-                      </TableCell>
-                          <TableCell align="right">{fCurrency(price)}₫</TableCell>
-                          <TableCell align="right">
-                            <ProductMoreMenu
-                              id={id?.toString()!}
-                              onDelete={() => handleDeleteProduct(id)}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
-                </TableBody>
-
-                {isNotFound && (
                   <TableBody>
-                    <TableRow>
-                      <TableCell align="center" colSpan={6}>
-                        <Box sx={{ py: 3 }}>
-                          <SearchNotFound searchQuery={filterName} />
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                )}
-              </Table>
-            </TableContainer>
-          </Scrollbar>
+                    {filteredProducts
+                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                      .map((row) => {
+                        const { id, thumbnail, name, quantity, status, price } = row;
 
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={productList.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={(event, value) => setPage(value)}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Card>
-      </Container>
-    </Page>
+                        const isItemSelected = selected.indexOf(id!) !== -1;
+
+                        return (
+                          <TableRow
+                            hover
+                            key={id}
+                            tabIndex={-1}
+                            role="checkbox"
+                            selected={isItemSelected}
+                            aria-checked={isItemSelected}
+                          >
+                            <TableCell padding="checkbox">
+                              <Checkbox checked={isItemSelected} onClick={() => handleClick(id!)} />
+                            </TableCell>
+                            <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
+                              <Image
+                                disabledEffect
+                                alt={name}
+                                src={thumbnail}
+                                sx={{ borderRadius: 1.5, width: 64, height: 64, mr: 2 }}
+                              />
+                              <Typography variant="subtitle2" noWrap>
+                                {name}
+                              </Typography>
+                            </TableCell>
+                            <TableCell style={{ minWidth: 160 }}>{quantity}</TableCell>
+                            <TableCell align="left">
+                              <Label
+                                variant={theme.palette.mode === 'light' ? 'ghost' : 'filled'}
+                                color={(status === false && 'error') || 'success'}
+                              >
+                                {sentenceCase(status === true ? 'active' : 'inactive')}
+                              </Label>
+                            </TableCell>
+                            <TableCell align="right">{fCurrency(price)}₫</TableCell>
+                            <TableCell align="right">
+                              <ProductMoreMenu
+                                id={id?.toString()!}
+                                onDelete={() => handleDeleteProduct(id)}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    {emptyRows > 0 && (
+                      <TableRow style={{ height: 53 * emptyRows }}>
+                        <TableCell colSpan={6} />
+                      </TableRow>
+                    )}
+                  </TableBody>
+
+                  {isNotFound && (
+                    <TableBody>
+                      <TableRow>
+                        <TableCell align="center" colSpan={6}>
+                          <Box sx={{ py: 3 }}>
+                            <SearchNotFound searchQuery={filterName} />
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  )}
+                </Table>
+              </TableContainer>
+            </Scrollbar>
+
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={productList.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={(event, value) => setPage(value)}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Card>
+        </Container>
+      </Page>
+    </RootStyle>
   );
 }
 

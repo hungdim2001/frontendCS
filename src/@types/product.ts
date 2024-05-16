@@ -36,7 +36,7 @@ export type Variant = BaseDTO & {
   chars: number[];
   quantity: number;
   price: number;
-  discountPrice:number;
+  discountPrice:number|null;
   image: string | CustomFile;
   charValues: CharValues;
 };
