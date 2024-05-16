@@ -19,7 +19,7 @@ const initialState: ProductState = {
   product: null,
   sortBy: null,
   filters: {
-    brand:[],
+    brand: [],
     rating: '',
   },
   checkout: {
@@ -95,9 +95,7 @@ const slice = createSlice({
       const newCartItem = action.payload.map((cartItem: CartItem) => {
         const variant = state.products
           .flatMap((product) => product.variants)
-          .find((variant) =>
-            variant.id === cartItem.variantId
-          );
+          .find((variant) => variant.id === cartItem.variantId);
         cartItem.variant = variant!;
         return cartItem;
       });
@@ -276,14 +274,29 @@ export function initCart() {
   };
 }
 
+export function setProduct(product: Product) {
+  dispatch(slice.actions.startLoading());
+  dispatch(slice.actions.getProductSuccess(product));
+}
 // ----------------------------------------------------------------------
 
 export function getProduct(id: number) {
   return async () => {
     dispatch(slice.actions.startLoading());
-  console.log(id)
     try {
       const response = await productApi.getProducts(id, false);
+      const product = response[0];
+      if (product?.description) {
+        fetch(product.description)
+          .then((response) => response.text())
+          .then((data) => {
+            console.log(data)
+            dispatch(slice.actions.getProductSuccess({ ...product, description: data }));
+          })
+          .catch((error) => {
+            console.error('Error fetching description:', error);
+          });
+      }
       dispatch(slice.actions.getProductSuccess(response[0]));
     } catch (error) {
       console.error(error);
@@ -301,27 +314,29 @@ export function getDelevirySerives(district: number, ward: number) {
         to_district: district,
       });
       const newDeliveryService = await Promise.all(
-        deliveryServices.filter(x=> x.service_type_id!=5).map(async (item) => {
-          const estimateTimeResponse = await ghnApi.getEstimateTime({
-            from_district_id: 3440,
-            from_ward_code: '13004', // convert to string directly
-            to_district_id: district,
-            to_ward_code: ward + '', // convert to string
-            service_id: item.service_id,
-          });
-          const response = await ghnApi.caculateFee({
-            ...defaultCaculateFeeRequest,
-            service_id: item.service_id,
-            to_district_id: district,
-            to_ward_code: ward + '',
-            items: [{ ...defaultItem }],
-          });
-          return {
-            ...item,
-            estimate_delivery_time: estimateTimeResponse.leadtime,
-            total: response.total,
-          };
-        })
+        deliveryServices
+          .filter((x) => x.service_type_id != 5)
+          .map(async (item) => {
+            const estimateTimeResponse = await ghnApi.getEstimateTime({
+              from_district_id: 3440,
+              from_ward_code: '13004', // convert to string directly
+              to_district_id: district,
+              to_ward_code: ward + '', // convert to string
+              service_id: item.service_id,
+            });
+            const response = await ghnApi.caculateFee({
+              ...defaultCaculateFeeRequest,
+              service_id: item.service_id,
+              to_district_id: district,
+              to_ward_code: ward + '',
+              items: [{ ...defaultItem }],
+            });
+            return {
+              ...item,
+              estimate_delivery_time: estimateTimeResponse.leadtime,
+              total: response.total,
+            };
+          })
       );
       dispatch(getDeliverySuccess(newDeliveryService));
     } catch (error) {

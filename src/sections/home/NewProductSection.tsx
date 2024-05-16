@@ -13,7 +13,6 @@ export default function NewProductSection() {
   useEffect(() => {
     dispatch(getProducts(true));
   }, [dispatch]);
-  console.log(products)
   if (products.length !==4 ) return <></>;
   return (
     <Container sx={{ marginY: 2 }}>

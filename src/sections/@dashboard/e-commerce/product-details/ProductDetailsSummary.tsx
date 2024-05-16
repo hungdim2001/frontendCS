@@ -22,7 +22,7 @@ import {
 // routes
 import { PATH_DASHBOARD } from '../../../../routes/paths';
 // utils
-import { fShortenNumber, fCurrency } from '../../../../utils/formatNumber';
+import { fShortenNumber, fCurrency, caculatorPercent } from '../../../../utils/formatNumber';
 // @types
 import { Product, CartItem, Variant } from '../../../../@types/product';
 // components
@@ -59,7 +59,7 @@ type Props = {
   cart: CartItem[];
   onAddCart: (cartItem: CartItem) => void;
   onGotoStep: (step: number) => void;
-  variantId:String;
+  variantId: String;
   setCurrentIndex: (currentInde: React.SetStateAction<number>) => void;
   setVariant: (currentInde: React.SetStateAction<Variant>) => void;
 };
@@ -78,37 +78,30 @@ export default function ProductDetailsSummary({
 
   const navigate = useNavigate();
 
-  const {
-    id,
-    name,
-    price,
-    thumbnail,
-    status,
-    quantity,
-    productSpecChars,
-    variants,
-  } = product;
+  const { id, name, price, thumbnail, status, quantity, productSpecChars, variants } = product;
   const alreadyProduct = cart.map((item) => item.variant.id).includes(id);
   const isMaxQuantity =
     cart.filter((item) => item.variantId === id).map((item) => item.quantity)[0] >= quantity;
   const defaultValues = useMemo(
     () => ({
-     name,
-    variant:
-      variants.length === 1 ? variants[0] : variants.find((item) => {
-        return item.id?.toString()===variantId.toString()}),
-    quantity:
-      variants.length === 1
-        ? (variants[0]?.quantity ?? 0) < 1
+      name,
+      variant:
+        variants.length === 1
+          ? variants[0]
+          : variants.find((item) => {
+              return item.id?.toString() === variantId.toString();
+            }),
+      quantity:
+        variants.length === 1
+          ? (variants[0]?.quantity ?? 0) < 1
+            ? 0
+            : 1
+          : (variants.find((item) => !item.chars.includes(-1))?.quantity ?? 0) < 1
           ? 0
-          : 1
-        : (variants.find((item) => !item.chars.includes(-1))?.quantity ?? 0) < 1
-          ? 0
-          : 1,  
+          : 1,
     }),
     [variantId, variants]
   );
-
 
   const methods = useForm<FormValuesProps>({
     defaultValues,
@@ -133,7 +126,7 @@ export default function ProductDetailsSummary({
       ?.image.toString()!;
     const currentIndex = product.images.indexOf(image);
     setCurrentIndex(currentIndex);
-    console.log(getValues('variant'))
+    console.log(getValues('variant'));
     setVariant(getValues('variant'));
   }, [getValues('variant')]);
   const onSubmit = async (data: FormValuesProps) => {
@@ -145,7 +138,7 @@ export default function ProductDetailsSummary({
         });
       }
       onGotoStep(0);
-      navigate(PATH_DASHBOARD.eCommerce.checkout);
+      // navigate(PATH_DASHBOARD.eCommerce.checkout);
     } catch (error) {
       console.error(error);
     }
@@ -154,16 +147,15 @@ export default function ProductDetailsSummary({
   const handleAddCart = async () => {
     try {
       if (
-        (currentCart.find(item => item.variant.id === values.variant.id)?.quantity ?? 0) +
-        values.quantity <
-        (variants.find(variant => variant.id === values.variant.id)?.quantity ?? 0)
+        (currentCart.find((item) => item.variant.id === values.variant.id)?.quantity ?? 0) +
+          values.quantity <
+        (variants.find((variant) => variant.id === values.variant.id)?.quantity ?? 0)
       ) {
         onAddCart({
           ...values,
           subtotal: values.variant.price * values.quantity,
         });
       }
-
     } catch (error) {
       console.error(error);
     }
@@ -217,7 +209,7 @@ export default function ProductDetailsSummary({
             .filter((char) => char.productSpecCharValueDTOS?.some((value) => value.variant))
             .map((char, index) => {
               return (
-                <Stack key={index} direction="row" alignItems="start" sx={{ mb: 2 }}>
+                <Stack key={index} direction="row" alignItems="start" sx={{ mb: 1 }}>
                   <Controller
                     name="variant"
                     control={control}
@@ -254,9 +246,7 @@ export default function ProductDetailsSummary({
               color: '#717171',
               '& li::before': { content: '"\\2022"', color: '#717171', marginRight: '8px' },
             }}
-          >
-            
-          </List>
+          ></List>
         </Grid>
         <Grid item xs={12} md={6} lg={5}>
           <Card sx={{ p: 3 }}>
@@ -266,57 +256,77 @@ export default function ProductDetailsSummary({
               alignItems="center"
               sx={{ mb: 2 }}
             >
-              <Typography variant="h6"> {fCurrency(getValues('variant')?.price)}₫</Typography>
+              {getValues('variant')?.discountPrice ? (
+                <Typography variant="h6">
+                  {' '}
+                  {fCurrency(getValues('variant')?.discountPrice)}₫
+                </Typography>
+              ) : (
+                <Typography variant="h6"> {fCurrency(getValues('variant')?.price)}₫</Typography>
+              )}
               <Stack direction="row" flex={1} justifyContent="flex-start" sx={{ mr: 1 }}></Stack>
               <Stack direction="row" justifyContent="flex-end">
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: '#F45E0C',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+                {getValues('variant')?.discountPrice ? (
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: '#F45E0C',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
                   >
-                    <path
-                      d="M12 22.75C11.37 22.75 10.78 22.51 10.34 22.06L8.82001 20.54C8.70001 20.42 8.38 20.29 8.22 20.29H6.06C4.76 20.29 3.70999 19.2399 3.70999 17.9399V15.78C3.70999 15.62 3.57999 15.3 3.45999 15.18L1.94 13.66C1.5 13.22 1.25 12.63 1.25 12C1.25 11.37 1.49 10.7799 1.94 10.3399L3.45999 8.81991C3.57999 8.69991 3.70999 8.37994 3.70999 8.21994V6.06002C3.70999 4.76002 4.76 3.70993 6.06 3.70993H8.22C8.38 3.70993 8.70001 3.57993 8.82001 3.45993L10.34 1.93991C11.22 1.05991 12.78 1.05991 13.66 1.93991L15.18 3.45993C15.3 3.57993 15.62 3.70993 15.78 3.70993H17.94C19.24 3.70993 20.29 4.76002 20.29 6.06002V8.21994C20.29 8.37994 20.42 8.69991 20.54 8.81991L22.06 10.3399C22.5 10.7799 22.75 11.37 22.75 12C22.75 12.63 22.51 13.22 22.06 13.66L20.54 15.18C20.42 15.3 20.29 15.62 20.29 15.78V17.9399C20.29 19.2399 19.24 20.29 17.94 20.29H15.78C15.62 20.29 15.3 20.42 15.18 20.54L13.66 22.06C13.22 22.51 12.63 22.75 12 22.75ZM4.51999 14.12C4.91999 14.52 5.20999 15.22 5.20999 15.78V17.9399C5.20999 18.4099 5.59 18.79 6.06 18.79H8.22C8.78 18.79 9.48001 19.0799 9.88 19.4799L11.4 21C11.72 21.32 12.28 21.32 12.6 21L14.12 19.4799C14.52 19.0799 15.22 18.79 15.78 18.79H17.94C18.41 18.79 18.79 18.4099 18.79 17.9399V15.78C18.79 15.22 19.08 14.52 19.48 14.12L21 12.5999C21.16 12.4399 21.25 12.23 21.25 12C21.25 11.77 21.16 11.56 21 11.4L19.48 9.87997C19.08 9.47997 18.79 8.77994 18.79 8.21994V6.06002C18.79 5.59002 18.41 5.20993 17.94 5.20993H15.78C15.22 5.20993 14.52 4.91999 14.12 4.51999L12.6 2.99997C12.28 2.67997 11.72 2.67997 11.4 2.99997L9.88 4.51999C9.48001 4.91999 8.78 5.20993 8.22 5.20993H6.06C5.59 5.20993 5.20999 5.59002 5.20999 6.06002V8.21994C5.20999 8.77994 4.91999 9.47997 4.51999 9.87997L3 11.4C2.84 11.56 2.75 11.77 2.75 12C2.75 12.23 2.84 12.4399 3 12.5999L4.51999 14.12Z"
-                      fill="#F45E0C"
-                    />
-                    <path
-                      d="M15.0002 16C14.4402 16 13.9902 15.55 13.9902 15C13.9902 14.45 14.4402 14 14.9902 14C15.5402 14 15.9902 14.45 15.9902 15C15.9902 15.55 15.5502 16 15.0002 16Z"
-                      fill="#F45E0C"
-                    />
-                    <path
-                      d="M9.01001 10C8.45001 10 8 9.55 8 9C8 8.45 8.45 8 9 8C9.55 8 10 8.45 10 9C10 9.55 9.56001 10 9.01001 10Z"
-                      fill="#F45E0C"
-                    />
-                    <path
-                      d="M8.99994 15.75C8.80994 15.75 8.61994 15.68 8.46994 15.53C8.17994 15.24 8.17994 14.7599 8.46994 14.4699L14.4699 8.46994C14.7599 8.17994 15.2399 8.17994 15.5299 8.46994C15.8199 8.75994 15.8199 9.24 15.5299 9.53L9.52994 15.53C9.37994 15.68 9.18994 15.75 8.99994 15.75Z"
-                      fill="#F45E0C"
-                    />
-                  </svg>
-                  &#160;-15%
-                </Typography>
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 22.75C11.37 22.75 10.78 22.51 10.34 22.06L8.82001 20.54C8.70001 20.42 8.38 20.29 8.22 20.29H6.06C4.76 20.29 3.70999 19.2399 3.70999 17.9399V15.78C3.70999 15.62 3.57999 15.3 3.45999 15.18L1.94 13.66C1.5 13.22 1.25 12.63 1.25 12C1.25 11.37 1.49 10.7799 1.94 10.3399L3.45999 8.81991C3.57999 8.69991 3.70999 8.37994 3.70999 8.21994V6.06002C3.70999 4.76002 4.76 3.70993 6.06 3.70993H8.22C8.38 3.70993 8.70001 3.57993 8.82001 3.45993L10.34 1.93991C11.22 1.05991 12.78 1.05991 13.66 1.93991L15.18 3.45993C15.3 3.57993 15.62 3.70993 15.78 3.70993H17.94C19.24 3.70993 20.29 4.76002 20.29 6.06002V8.21994C20.29 8.37994 20.42 8.69991 20.54 8.81991L22.06 10.3399C22.5 10.7799 22.75 11.37 22.75 12C22.75 12.63 22.51 13.22 22.06 13.66L20.54 15.18C20.42 15.3 20.29 15.62 20.29 15.78V17.9399C20.29 19.2399 19.24 20.29 17.94 20.29H15.78C15.62 20.29 15.3 20.42 15.18 20.54L13.66 22.06C13.22 22.51 12.63 22.75 12 22.75ZM4.51999 14.12C4.91999 14.52 5.20999 15.22 5.20999 15.78V17.9399C5.20999 18.4099 5.59 18.79 6.06 18.79H8.22C8.78 18.79 9.48001 19.0799 9.88 19.4799L11.4 21C11.72 21.32 12.28 21.32 12.6 21L14.12 19.4799C14.52 19.0799 15.22 18.79 15.78 18.79H17.94C18.41 18.79 18.79 18.4099 18.79 17.9399V15.78C18.79 15.22 19.08 14.52 19.48 14.12L21 12.5999C21.16 12.4399 21.25 12.23 21.25 12C21.25 11.77 21.16 11.56 21 11.4L19.48 9.87997C19.08 9.47997 18.79 8.77994 18.79 8.21994V6.06002C18.79 5.59002 18.41 5.20993 17.94 5.20993H15.78C15.22 5.20993 14.52 4.91999 14.12 4.51999L12.6 2.99997C12.28 2.67997 11.72 2.67997 11.4 2.99997L9.88 4.51999C9.48001 4.91999 8.78 5.20993 8.22 5.20993H6.06C5.59 5.20993 5.20999 5.59002 5.20999 6.06002V8.21994C5.20999 8.77994 4.91999 9.47997 4.51999 9.87997L3 11.4C2.84 11.56 2.75 11.77 2.75 12C2.75 12.23 2.84 12.4399 3 12.5999L4.51999 14.12Z"
+                        fill="#F45E0C"
+                      />
+                      <path
+                        d="M15.0002 16C14.4402 16 13.9902 15.55 13.9902 15C13.9902 14.45 14.4402 14 14.9902 14C15.5402 14 15.9902 14.45 15.9902 15C15.9902 15.55 15.5502 16 15.0002 16Z"
+                        fill="#F45E0C"
+                      />
+                      <path
+                        d="M9.01001 10C8.45001 10 8 9.55 8 9C8 8.45 8.45 8 9 8C9.55 8 10 8.45 10 9C10 9.55 9.56001 10 9.01001 10Z"
+                        fill="#F45E0C"
+                      />
+                      <path
+                        d="M8.99994 15.75C8.80994 15.75 8.61994 15.68 8.46994 15.53C8.17994 15.24 8.17994 14.7599 8.46994 14.4699L14.4699 8.46994C14.7599 8.17994 15.2399 8.17994 15.5299 8.46994C15.8199 8.75994 15.8199 9.24 15.5299 9.53L9.52994 15.53C9.37994 15.68 9.18994 15.75 8.99994 15.75Z"
+                        fill="#F45E0C"
+                      />
+                    </svg>
+                    &#160;
+                    {caculatorPercent(
+                      getValues('variant').discountPrice,
+                      getValues('variant').price
+                    )}
+                    %
+                  </Typography>
+                ) : (
+                  <></>
+                )}{' '}
               </Stack>
             </Stack>
-            <Typography
-              sx={{
-                mb: 2,
-                color: '#717171',
-                fontWeight: 300,
-                lineHeight: 22 / 14,
-                fontSize: 14,
-              }}
-            >
-              Last price {price && fCurrency(price)}₫
-            </Typography>
+            {getValues('variant') ? (
+              <Typography
+                sx={{
+                  mb: 2,
+                  color: '#717171',
+                  fontWeight: 300,
+                  lineHeight: 22 / 14,
+                  fontSize: 14,
+                }}
+              >
+                Last price {fCurrency(getValues('variant').price)}₫
+              </Typography>
+            ) : (
+              <></>
+            )}
 
             <Stack direction="row" justifyContent="space-between" sx={{ mb: 2 }}>
               <Typography variant="subtitle1" sx={{ mt: 0.5 }}>

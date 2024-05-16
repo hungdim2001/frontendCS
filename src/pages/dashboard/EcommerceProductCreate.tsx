@@ -43,14 +43,6 @@ export default function EcommerceProductCreate() {
     const foundProduct = products.find((product) => {
       return product.id === +id!;
     });
-    // foundProduct?.variants.forEach((variant) => {
-    //   if (typeof variant.chars === 'string') {
-    //     const charStr: string = variant.chars;
-    //     const newVariant = { ...variant, chars: charStr.split(',').map(Number) };
-    //     const updatedProduct = { ...foundProduct, variant: newVariant };
-    //     setCurrentProduct(updatedProduct as Product);
-    //   }
-    // });
     if (foundProduct && foundProduct.description) {
       fetch(foundProduct.description)
         .then((response) => response.text())
@@ -80,10 +72,6 @@ export default function EcommerceProductCreate() {
           heading={!isEdit ? 'Create a new product' : 'Edit product'}
           links={[
             { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            {
-              name: 'E-Commerce',
-              href: PATH_DASHBOARD.eCommerce.root,
-            },
             { name: !isEdit ? 'New product' : currentProduct.name },
           ]}
         />

@@ -90,29 +90,6 @@ export default function VariantList({
     dispatch(getProductChars(null));
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   if (productChars.length) {
-  //     for (const variant of variants.filter((item) => !item.chars.includes(-1))) {
-  //       const variantNames: string[] = [];
-  //       variant.chars
-  //         .map((item) => {
-  //           const matchingProductChar = productChars.find((char) =>
-  //             char.productSpecCharValueDTOS?.some((value) => value.id === item)
-  //           );
-  //           if (matchingProductChar) {
-  //             const matchingValue = matchingProductChar.productSpecCharValueDTOS?.find(
-  //               (value) => value.id === item
-  //             );
-  //             if (matchingValue) {
-  //               variantNames.push(`${matchingProductChar.name}: ${matchingValue.value}`);
-  //             }
-  //           }
-  //         })
-  //         .join(',');
-  //       variant.name = variantNames.join(',');
-  //     }
-  //   }
-  // }, [productChars, variants]);
 
   const handleSelectAllClick = (checked: boolean) => {
     if (checked) {
@@ -316,7 +293,6 @@ export default function VariantList({
                         })
                         .join(',')
                     : 'default';
-                  // const isItemSelected = selected.indexOf(name) !== -1;
                   const isItemSelected =
                     selected.findIndex((arr) => {
                       return (

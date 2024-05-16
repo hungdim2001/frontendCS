@@ -18,6 +18,7 @@ import VerifyGuard from 'src/guards/VerifyGuard';
 import FindEmail from '../pages/auth/FindEmail';
 import ResetPassWord from 'src/pages/auth/ResetPassword';
 import { CheckoutOrderComplete } from 'src/sections/@dashboard/e-commerce/checkout';
+import { children } from 'cheerio/lib/api/traversing';
 
 // ----------------------------------------------------------------------
 
@@ -108,12 +109,10 @@ export default function Router() {
         { path: 'booking', element: <GeneralBooking /> },
 
         {
-          path: 'e-commerce',
           children: [
             // { element: <Navigate to="/dashboard/e-commerce/shop" replace />, index: true },
             // { path: 'shop', element: <EcommerceShop /> },
-            { path: 'product/:id/:variantParam', element: <EcommerceProductDetails /> },
-            { path: 'list', element: <EcommerceProductList /> },
+            { path: 'produdct/list', element: <EcommerceProductList /> },
             { path: 'product/new', element: <EcommerceProductCreate /> },
             { path: 'product/:id/edit', element: <EcommerceProductCreate /> },
             { path: 'checkout', element: <EcommerceCheckout /> },
@@ -210,25 +209,18 @@ export default function Router() {
         },
         {
           path: 'products',
-          element: (
-                <EcommerceShop />
-          ),
+          children: [
+            {
+              element: <EcommerceShop />,
+              index: true,
+            },
+            { path: ':id/:variantParam', element: <EcommerceProductDetails /> },
+          ],
         },
         // { path: 'contact-us', element: <Contact /> },
         // { path: 'faqs', element: <Faqs /> },
       ],
     },
-    // {
-    //   path: 'user',
-    //   element: (
-    //     <AuthGuard>
-    //       <RoleBasedGuard accessibleRoles={['ADMIN', 'USER']}>
-    //         <MainLayout />
-    //       </RoleBasedGuard>
-    //     </AuthGuard>
-    //   ),
-    //   children: [{ element: <UserPage />, index: true }],
-    // },
     { path: '*', element: <Navigate to="/404" replace /> },
   ]);
 }

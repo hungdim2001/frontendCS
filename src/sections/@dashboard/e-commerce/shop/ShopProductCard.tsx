@@ -16,7 +16,7 @@ import {
   BoxProps,
 } from '@mui/material';
 // routes
-import { PATH_DASHBOARD } from '../../../../routes/paths';
+import { PATH_DASHBOARD, PATH_ROOT } from '../../../../routes/paths';
 // utils
 import { fCurrency } from '../../../../utils/formatNumber';
 // @types
@@ -62,7 +62,8 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
     defaultValues,
   });
   const { watch, control, setValue, getValues, handleSubmit } = methods;
-  const linkTo = `${PATH_DASHBOARD.eCommerce.root}/product/${id}/${getValues('variant')?.id ?? ''}`;
+  const linkTo = `${PATH_ROOT.products.root}/${id}/${getValues('variant')?.id ?? ''}`;
+  console.log(linkTo)
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
   const { currentLocation } = useLocationContext();
@@ -74,8 +75,6 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
   const values = watch();
   const handleAddCart = async () => {
     try {
-      console.log(currentCart.find((item) => item.variant.id === values.variant.id)?.quantity);
-      console.log(variants.find((variant) => variant.id === values.variant.id)?.quantity);
       if (
         (currentCart.find((item) => item.variant.id === values.variant.id)?.quantity ?? 0) +
           values.quantity <

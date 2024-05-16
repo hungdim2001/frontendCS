@@ -200,7 +200,6 @@ function applyFilter(products: Product[], sortBy: string | null, filters: Produc
       });
     });
   }
-  console.log(products);
   // if (filters.category !== 'All') {
   //   products = products.filter((product) => product.category === filters.category);
   // }

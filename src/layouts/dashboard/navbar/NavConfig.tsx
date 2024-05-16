@@ -1,5 +1,5 @@
 // routes
-import { PATH_DASHBOARD } from '../../../routes/paths';
+import { PATH_DASHBOARD, PATH_ROOT } from '../../../routes/paths';
 // components
 import Label from '../../../components/Label';
 import SvgIconStyle from '../../../components/SvgIconStyle';
@@ -11,7 +11,7 @@ const getIcon = (name: string) => (
 );
 
 export const ICONS = {
-  star:getIcon('ic_star'),
+  star: getIcon('ic_star'),
   blog: getIcon('ic_blog'),
   cart: getIcon('ic_cart'),
   chat: getIcon('ic_chat'),
@@ -63,9 +63,7 @@ const navConfig = [
         title: 'Product',
         path: PATH_DASHBOARD.product.root,
         icon: ICONS.ecommerce,
-        children: [
-          { title: 'Product type', path: PATH_DASHBOARD.product.productTypes },
-        ],
+        children: [{ title: 'Product type', path: PATH_DASHBOARD.product.productTypes }],
       },
       {
         title: 'Product characteristic',
@@ -83,13 +81,25 @@ const navConfig = [
         path: PATH_DASHBOARD.eCommerce.root,
         icon: ICONS.cart,
         children: [
-          { title: 'shop', path: PATH_DASHBOARD.eCommerce.shop },
-          { title: 'product', path: PATH_DASHBOARD.eCommerce.productById },
+          // { title: 'prduct', path: PATH_DASHBOARD.eCommerce.productById },
           { title: 'list', path: PATH_DASHBOARD.eCommerce.list },
           { title: 'create', path: PATH_DASHBOARD.eCommerce.newProduct },
-          { title: 'edit', path: PATH_DASHBOARD.eCommerce.editById },
-          { title: 'checkout', path: PATH_DASHBOARD.eCommerce.checkout },
-          { title: 'invoice', path: PATH_DASHBOARD.eCommerce.invoice },
+          // { title: 'edit', path: PATH_DASHBOARD.eCommerce.editById },
+          // { title: 'checkout', path: PATH_DASHBOARD.eCommerce.checkout },
+          // { title: 'invoice', path: PATH_DASHBOARD.eCommerce.invoice },
+        ],
+      },
+      {
+        title: 'product',
+        path: PATH_ROOT.root,
+        icon: ICONS.cart,
+        children: [
+          { title: 'shop', path: PATH_ROOT.products.root },
+          { title: 'list', path: PATH_DASHBOARD.eCommerce.list },
+          { title: 'create', path: PATH_DASHBOARD.eCommerce.newProduct },
+          // { title: 'edit', path: PATH_DASHBOARD.eCommerce.editById },
+          // { title: 'checkout', path: PATH_DASHBOARD.eCommerce.checkout },
+          // { title: 'invoice', path: PATH_DASHBOARD.eCommerce.invoice },
         ],
       },
 

@@ -24,11 +24,12 @@ import {
   addToCart,
   initCart,
   getProducts,
+  setProduct,
 } from '../../redux/slices/product';
 // routes
-import { PATH_DASHBOARD } from '../../routes/paths';
+import { PATH_DASHBOARD, PATH_ROOT } from '../../routes/paths';
 // @types
-import { CartItem, ProductCharValue, Variant } from '../../@types/product';
+import { CartItem, Product, ProductCharValue, Variant } from '../../@types/product';
 // hooks
 import useSettings from '../../hooks/useSettings';
 // components
@@ -81,7 +82,10 @@ const IconWrapperStyle = styled('div')(({ theme }) => ({
 }));
 
 // ----------------------------------------------------------------------
-
+const RootStyle = styled('div')(({ theme }) => ({
+  height: '100%',
+  marginTop: '77px',
+}));
 export default function EcommerceProductDetails() {
   const { themeStretch } = useSettings();
 
@@ -96,6 +100,7 @@ export default function EcommerceProductDetails() {
     setVariantId(variantParam);
   }, [variantParam]);
   const { product, error, checkout } = useSelector((state) => state.product);
+
   const [currentIndex, setCurrentIndex] = useState<number>(
     product?.variants?.length === 1
       ? product?.images.indexOf(product?.variants.at(0)?.image.toString()!)
@@ -120,151 +125,153 @@ export default function EcommerceProductDetails() {
     dispatch(onGotoStep(step));
   };
   const { isLoading } = useSelector((state) => state.product);
-  if ( isLoading) {
-    console.log(product);
+  if (isLoading) {
     return <LoadingScreen />;
   }
 
   return (
-    <Page title="Ecommerce: Product Details">
-      <Container>
-        <HeaderBreadcrumbs
-          heading="Product Details"
-          links={[
-            { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            {
-              name: 'E-Commerce',
-              href: PATH_DASHBOARD.eCommerce.root,
-            },
-            {
-              name: 'Shop',
-              href: PATH_DASHBOARD.eCommerce.shop,
-            },
-            { name: product?.name! ? product.name : '' },
-          ]}
-        />
+    <RootStyle>
+      <Page title="Ecommerce: Product Details">
+        <Container>
+          <HeaderBreadcrumbs
+            heading="Product Details"
+            links={[
+              { name: 'Home', href: '/' },
+              {
+                name: 'Products',
+                href: PATH_ROOT.products.root,
+              },
+              { name: product?.name! ? product.name : '' },
+            ]}
+          />
 
-        <CartWidget />
+          <CartWidget />
 
-        {product && (
-          <>
-            <Grid container>
-              <Grid item xs={12} md={4} lg={4}>
-                <ProductDetailsCarousel current={currentIndex} product={product} />
+          {product && (
+            <>
+              <Grid container>
+                <Grid item xs={12} md={4} lg={4}>
+                  <ProductDetailsCarousel current={currentIndex} product={product} />
+                </Grid>
+                <Grid item xs={12} md={8} lg={8}>
+                  <ProductDetailsSummary
+                    product={product}
+                    setCurrentIndex={setCurrentIndex}
+                    variantId={variantId}
+                    setVariant={setVariant}
+                    cart={checkout.cart}
+                    onAddCart={handleAddCart}
+                    onGotoStep={handleGotoStep}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12} md={8} lg={8}>
-                <ProductDetailsSummary
-                  product={product}
-                  setCurrentIndex={setCurrentIndex}
-                  variantId={variantId}
-                  setVariant={setVariant}
-                  cart={checkout.cart}
-                  onAddCart={handleAddCart}
-                  onGotoStep={handleGotoStep}
-                />
-              </Grid>
-            </Grid>
-            <Card>
-              <TabContext value={value}>
-                <Box sx={{ px: 3 }}>
-                  <TabList onChange={(e, value) => setValue(value)}>
-                    <Tab
-                      disableRipple
-                      value="1"
-                      label="Technical Details"
-                      sx={{
-                        '&.Mui-selected': {
-                          color: '#0C68F4',
-                        },
-                        color: 'black',
-                        fontSize: '18px',
-                        fontWeight: 300,
-                      }}
-                    />
-                    <Tab
-                      disableRipple
-                      value="2"
-                      label={`Review (10)`}
-                      sx={{
-                        '&.Mui-selected': {
-                          color: '#0C68F4',
-                        },
-                        color: 'black',
-                        fontSize: '18px',
-                        fontWeight: 300,
-                        '&.MuiTab-wrapper': { whiteSpace: 'nowrap' },
-                      }}
-                    />
-                  </TabList>
-                </Box>
-
-                <Divider />
-
-                <TabPanel value="1">
-                  <Box sx={{ p: 3 }}>
-                    <Typography variant="h5" sx={{ mt: 0.5 }}>
-                      Technical Details{' '}
-                    </Typography>
-                    <List
-                      sx={{
-                        color: '#717171',
-                      }}
-                    >
-                      {product.productSpecChars.map((char: any, index) => {
-                        // console.log(char.name + char.productSpecCharValueDTOS.some((value: ProductCharValue) => value.variant))
-
-                        return (
-                          <ListItem
-                            key={char.id}
-                            sx={{
-                              p: 2,
-                              backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'transparent',
-                            }}
-                          >
-                            <Grid container justifyContent="flex-start" alignItems="center">
-                              <Grid item xs={4} sm={4} md={4}>
-                                <Typography sx={{ color: '#717171' }} variant="h6">
-                                  {char.name}
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={8} sm={8} md={8}>
-                                <Typography variant="body1" sx={{ color: '#2D2D2D' }}>
-                                  {char.productSpecCharValueDTOS.some(
-                                    (value: ProductCharValue) => value.variant
-                                  )
-                                    ? char.productSpecCharValueDTOS.find(
-                                        (value: ProductCharValue) =>
-                                          variant?.chars?.includes(value.id!)
-                                      ) &&
-                                      char.productSpecCharValueDTOS.find(
-                                        (value: ProductCharValue) =>
-                                          variant?.chars?.includes(value.id!)
-                                      ).value
-                                    : char
-                                        .productSpecCharValueDTOS!.map((value: any) => value.value)
-                                        .join(', ')}
-                                  {/* char.productSpecCharValueDTOS!.map((value: any) => value.value).join(', ')} */}
-                                </Typography>
-                              </Grid>
-                            </Grid>
-                          </ListItem>
-                        );
-                      })}
-                    </List>
+              <Card>
+                <TabContext value={value}>
+                  <Box sx={{ px: 3 }}>
+                    <TabList onChange={(e, value) => setValue(value)}>
+                      <Tab
+                        disableRipple
+                        value="1"
+                        label="Technical Details"
+                        sx={{
+                          '&.Mui-selected': {
+                            color: '#0C68F4',
+                          },
+                          color: 'black',
+                          fontSize: '18px',
+                          fontWeight: 300,
+                        }}
+                      />
+                      <Tab
+                        disableRipple
+                        value="2"
+                        label={`Review (10)`}
+                        sx={{
+                          '&.Mui-selected': {
+                            color: '#0C68F4',
+                          },
+                          color: 'black',
+                          fontSize: '18px',
+                          fontWeight: 300,
+                          '&.MuiTab-wrapper': { whiteSpace: 'nowrap' },
+                        }}
+                      />
+                    </TabList>
                   </Box>
-                </TabPanel>
-                <TabPanel value="2">
-                  <ProductDetailsReview product={product} />
-                </TabPanel>
-              </TabContext>
-            </Card>
-          </>
-        )}
 
-        {!product && <SkeletonProduct />}
+                  <Divider />
 
-        {error && <Typography variant="h6">404 Product not found</Typography>}
-      </Container>
-    </Page>
+                  <TabPanel value="1">
+                    <Box sx={{ p: 3 }}>
+                      <Typography variant="h5" sx={{ mt: 0.5 }}>
+                        Technical Details{' '}
+                      </Typography>
+                      <List
+                        sx={{
+                          color: '#717171',
+                        }}
+                      >
+                        {product.productSpecChars.map((char: any, index) => {
+
+                          return (
+                            <ListItem
+                              key={char.id}
+                              sx={{
+                                p: 2,
+                                backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'transparent',
+                              }}
+                            >
+                              <Grid container justifyContent="flex-start" alignItems="center">
+                                <Grid item xs={4} sm={4} md={4}>
+                                  <Typography sx={{ color: '#717171' }} variant="h6">
+                                    {char.name}
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={8} sm={8} md={8}>
+                                  <Typography variant="body1" sx={{ color: '#2D2D2D' }}>
+                                    {char.productSpecCharValueDTOS.some(
+                                      (value: ProductCharValue) => value.variant
+                                    )
+                                      ? char.productSpecCharValueDTOS.find(
+                                          (value: ProductCharValue) =>
+                                            variant?.chars?.includes(value.id!)
+                                        ) &&
+                                        char.productSpecCharValueDTOS.find(
+                                          (value: ProductCharValue) =>
+                                            variant?.chars?.includes(value.id!)
+                                        ).value
+                                      : char
+                                          .productSpecCharValueDTOS!.map(
+                                            (value: any) => value.value
+                                          )
+                                          .join(', ')}
+                                    {/* char.productSpecCharValueDTOS!.map((value: any) => value.value).join(', ')} */}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                            </ListItem>
+                          );
+                        })}
+                      </List>
+                      <Typography variant="h5" sx={{ mt: 0.5 }}>
+                        Product Details
+                      </Typography>
+                      <div dangerouslySetInnerHTML={{ __html: product.description! }} />
+                    </Box>
+                  </TabPanel>
+                  <TabPanel value="2">
+                    <ProductDetailsReview product={product} />
+                  </TabPanel>
+                </TabContext>
+              </Card>
+            </>
+          )}
+
+          {!product && <SkeletonProduct />}
+
+          {error && <Typography variant="h6">404 Product not found</Typography>}
+        </Container>
+      </Page>
+    </RootStyle>
   );
 }

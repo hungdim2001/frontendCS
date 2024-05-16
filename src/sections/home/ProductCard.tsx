@@ -2,19 +2,20 @@ import React from 'react';
 import { Card, CardContent, CardMedia, Typography, Rating, Box } from '@mui/material';
 import { Product } from 'src/@types/product';
 import Image from '../../components/Image';
-import { fCurrency } from 'src/utils/formatNumber';
-import { PATH_DASHBOARD } from 'src/routes/paths';
+import { caculatorPercent, fCurrency } from 'src/utils/formatNumber';
+import { PATH_DASHBOARD, PATH_ROOT } from 'src/routes/paths';
 import { useNavigate } from 'react-router';
+import Label from 'src/components/Label';
 type Props = {
   product: Product;
 };
 const ProductCard = ({ product }: Props) => {
   const { name, thumbnail, images, price, productSpecChars, id, variants } = product;
-  console.log(product)
-  const linkTo = `${PATH_DASHBOARD.eCommerce.root}/product/${id}/${
+  const linkTo = `${PATH_ROOT.products.root}/${id}/${
     variants.length > 1 ? variants[1].id : variants[0].id
   }`;
   const navigate = useNavigate();
+  console.log(variants[1]);
   return (
     <Card
       onClick={() => {
@@ -22,6 +23,44 @@ const ProductCard = ({ product }: Props) => {
       }}
       sx={{ cursor: 'pointer', padding: '16px 0px', boxShadow: '-2px 2px 15px -1px #7171711F' }}
     >
+      {variants.length > 1 ? (
+        variants[1].discountPrice && (
+          <Label
+            variant="filled"
+            sx={{
+              backgroundColor: '#FDDBC9',
+              color: '#F45E0C',
+              top: '16px',
+              padding: '4px',
+              left: 0,
+              zIndex: 9,
+              borderRadius: '0px 4px 4px 0px',
+              position: 'absolute',
+            }}
+          >
+            {caculatorPercent(variants[1].discountPrice, variants[1].price)}%
+          </Label>
+        )
+      ) : (
+        <></>
+      )}
+      {variants[0].discountPrice && (
+        <Label
+          variant="filled"
+          sx={{
+            backgroundColor: '#FDDBC9',
+            color: '#F45E0C',
+            top: '16px',
+            padding: '4px',
+            left: 0,
+            zIndex: 9,
+            borderRadius: '0px 4px 4px 0px',
+            position: 'absolute',
+          }}
+        >
+            {caculatorPercent(variants[0].discountPrice, variants[0].price)}%
+        </Label>
+      )}
       <Image
         alt={name}
         src={variants.length > 1 ? variants[1]?.image.toString() : thumbnail}
@@ -42,6 +81,7 @@ const ProductCard = ({ product }: Props) => {
           borderImageSlice: 1,
         }}
       >
+        {' '}
         <Typography
           sx={{ textOverflow: 'ellipsis', overflow: 'hidden', maxHeight: '48px' }}
           variant="subtitle1"
@@ -49,6 +89,7 @@ const ProductCard = ({ product }: Props) => {
         >
           {variants.length > 1
             ? name +
+              ' ' +
               productSpecChars
                 .flatMap((productSpecChar) => productSpecChar.productSpecCharValueDTOS)
                 .filter((item) => variants[1].chars.includes(item?.id!))
@@ -56,9 +97,37 @@ const ProductCard = ({ product }: Props) => {
                 .join(' ')
             : name}
         </Typography>
+        {variants.length > 1 ? (
+          <Typography
+            component="span"
+            sx={{
+              color: 'text.disabled',
+              textDecoration: 'line-through',
+              display: variants[1].discountPrice ? 'block' : 'none',
+            }}
+          >
+            {fCurrency(variants[1].price)}₫
+          </Typography>
+        ) : (
+          <Typography
+            component="span"
+            sx={{
+              color: 'text.disabled',
+              textDecoration: 'line-through',
+              display: variants[0].discountPrice ? 'block' : 'none',
+            }}
+          >
+            {fCurrency(variants[0].price)}₫
+          </Typography>
+        )}
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography component="div" variant="subtitle1">
-            {variants.length > 1 ? fCurrency(variants[1].price) : fCurrency(variants[0].price)}₫
+            {variants.length > 1
+              ? fCurrency(variants[1].discountPrice ? variants[1].discountPrice : variants[1].price)
+              : fCurrency(variants[0].discountPrice)
+              ? variants[0].discountPrice
+              : variants[0].price}
+            ₫
           </Typography>
           <Typography
             component="div"

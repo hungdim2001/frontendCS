@@ -40,7 +40,7 @@ export default function CartWidget() {
   const totalItems = sum(checkout.cart.map((item) => item.quantity));
 
   return (
-    <RootStyle to={PATH_DASHBOARD.eCommerce.checkout}>
+    <RootStyle to={"/"}>
       <Badge showZero badgeContent={totalItems} color="error" max={99}>
         <Iconify icon={'eva:shopping-cart-fill'} width={24} height={24} />
       </Badge>

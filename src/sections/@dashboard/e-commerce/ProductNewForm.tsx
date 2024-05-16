@@ -9,9 +9,11 @@ import { Search } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
   Alert,
+  Box,
   Button,
   Card,
   Checkbox,
+  Dialog,
   Divider,
   FormControl,
   Grid,
@@ -44,7 +46,7 @@ import InputStyle from 'src/components/InputStyle';
 import Scrollbar from 'src/components/Scrollbar';
 import SearchNotFound from 'src/components/SearchNotFound';
 import useIsMountedRef from 'src/hooks/useIsMountedRef';
-import { useSelector } from 'src/redux/store';
+import { useDispatch, useSelector } from 'src/redux/store';
 import { productApi } from 'src/service/app-apis/product';
 import {
   FormProvider,
@@ -60,6 +62,9 @@ import ProductCharToolbar from './product-char/ProductCharToolbar';
 import VariantList from './variant/VariantList';
 import { useDropzone } from 'react-dropzone';
 import { fil } from 'date-fns/locale';
+import { toNonAccentVietnamese } from 'src/utils/formatNumber';
+import { DialogAnimate } from 'src/components/animate';
+import { getProductChars } from 'src/redux/slices/product-char';
 
 // ----------------------------------------------------------------------
 
@@ -256,7 +261,11 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
       }
       if (data.description !== currentProduct?.description) {
         const blob = new Blob([data.description], { type: 'text/html' });
-        formData.append('description', blob, `${data.name.replace(/\s/g, '')}.html`);
+        formData.append(
+          'description',
+          blob,
+          `${toNonAccentVietnamese(data.name.replace(/\s/g, ''))}.html`
+        );
       }
       console.log(data.variants);
       if (data.variants) {
@@ -359,6 +368,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const [valueSelected, setValueSelected] = useState<number[]>([]);
 
   const { productChars } = useSelector((state) => state.productChars);
+  const dispatch = useDispatch();
   const [charsSelected, setCharsSelected] = useState<ProductChar[]>([]);
   useEffect(() => {
     if (currentProduct?.productSpecChars) {
@@ -489,6 +499,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
   const handleMenuOpen = () => {
     setSearchText('');
   };
+
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
@@ -538,6 +549,13 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                   <Grid item xs={6}>
                     <div>
                       <LabelStyle>Product character</LabelStyle>
+                      <Button
+                        onClick={(e) => {
+                          dispatch(getProductChars(null))
+                        }}
+                      >
+                        reset
+                      </Button>
                       <RootStyle
                         sx={{
                           ...(charSelected.length > 0 && {
@@ -746,7 +764,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                                                 // const newVariants = variantsValues.filter(
                                                 //   (item) => !item.chars.includes(option)
                                                 // );
-                                                  variantsValues.forEach(
+                                                variantsValues.forEach(
                                                   (variant) =>
                                                     (variant.chars = variant.chars.filter(
                                                       (item) => item !== option
