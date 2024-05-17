@@ -3,14 +3,22 @@ import orderBy from 'lodash/orderBy';
 // form
 import { useForm } from 'react-hook-form';
 // @mui
-import { Container, Typography, Stack, styled } from '@mui/material';
+import {
+  Container,
+  Typography,
+  Stack,
+  styled,
+  MenuItem,
+  Box,
+  BottomNavigationAction,
+} from '@mui/material';
 // redux
 import { useDispatch, useSelector } from '../../redux/store';
 import { getProducts, filterProducts } from '../../redux/slices/product';
 // routes
 import { PATH_DASHBOARD, PATH_ROOT } from '../../routes/paths';
 // @types
-import { Product, ProductFilter } from '../../@types/product';
+import { Product, ProductFilter, ProductType } from '../../@types/product';
 // hooks
 import useSettings from '../../hooks/useSettings';
 // components
@@ -27,6 +35,9 @@ import {
 } from '../../sections/@dashboard/e-commerce/shop';
 import CartWidget from '../../sections/@dashboard/e-commerce/CartWidget';
 import { filter, forEach } from 'lodash';
+import { getProductTypes } from 'src/redux/slices/product-type';
+import LoadingScreen from 'src/components/LoadingScreen';
+import SvgIconStyle from 'src/components/SvgIconStyle';
 
 // ----------------------------------------------------------------------
 const RootStyle = styled('div')(({ theme }) => ({
@@ -59,7 +70,7 @@ export default function EcommerceShop() {
 
   const isDefault = !values.rating && values.brand.length === 0;
   useEffect(() => {
-    dispatch(getProducts(false));
+    dispatch(getProducts(false, null));
   }, [dispatch]);
 
   useEffect(() => {
@@ -100,7 +111,12 @@ export default function EcommerceShop() {
   const handleRemoveRating = () => {
     setValue('rating', '');
   };
-
+  const { productTypes } = useSelector((state) => state.productTypes);
+  const [proudctTypeSelected, setProductTypeSelected] = useState<ProductType | null>(null);
+  useEffect(() => {
+    dispatch(getProductTypes());
+  }, [dispatch]);
+  if (!productTypes) return <LoadingScreen />;
   return (
     <RootStyle>
       <Page title="Ecommerce: Shop">
@@ -115,7 +131,39 @@ export default function EcommerceShop() {
               },
             ]}
           />
+          <Stack direction="row" justifyContent="space-between">
+            {productTypes.map((productType) => (
+              <MenuItem
+                sx={{
+                  padding: 0,
+                  borderBottom:
+                    proudctTypeSelected?.id === productType.id ? '3px solid #0C68F4' : 'none',
+                }}
+                key={productType.id}
+                onClick={() => {
+                  setProductTypeSelected(productType);
 
+                  dispatch(getProducts(false, productType.id));
+                }}
+              >
+                <BottomNavigationAction
+                  sx={{
+                    '& .Mui-selected, .Mui-selected > svg': { color: '#444444' },
+                    color: '#444444',
+                    '& .MuiBottomNavigationAction-label': {
+                      mt: 1,
+                      opacity: 1,
+                      fontSize: '20px',
+                    },
+                  }}
+                  label={productType.name}
+                  icon={
+                    <SvgIconStyle src={productType.icon} sx={{ width: '48px', height: '48px' }} />
+                  }
+                />
+              </MenuItem>
+            ))}
+          </Stack>
           <Stack
             spacing={2}
             direction={{ xs: 'column', sm: 'row' }}
@@ -160,7 +208,9 @@ export default function EcommerceShop() {
           </Stack>
 
           <ShopProductList
-            products={filteredProducts.filter((item) => item.status)}
+            products={
+              filteredProducts.length > 0 ? filteredProducts.filter((item) => item.status) : []
+            }
             loading={!products.length && isDefault}
           />
           {/* <CartWidget /> */}

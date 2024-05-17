@@ -11,7 +11,7 @@ export default function NewProductSection() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getProducts(true));
+    dispatch(getProducts(true,null));
   }, [dispatch]);
   if (products.length !==4 ) return <></>;
   return (

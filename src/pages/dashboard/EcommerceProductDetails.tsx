@@ -110,7 +110,7 @@ export default function EcommerceProductDetails() {
   );
   useEffect(() => {
     const fetchData = async () => {
-      await dispatch(getProducts(false));
+      await dispatch(getProducts(false, null));
       await dispatch(getProduct(+id));
       await dispatch(initCart());
     };

@@ -243,7 +243,7 @@ export function deleteProducts(ids: number[]) {
   return async () => {
     try {
       await productApi.deleteProducts(ids);
-      const response = await productApi.getProducts(null, false);
+      const response = await productApi.getProducts(null, false,null);
       dispatch(slice.actions.getProductsSuccess(response));
     } catch (error) {
       console.log(error);
@@ -251,11 +251,11 @@ export function deleteProducts(ids: number[]) {
   };
 }
 
-export function getProducts(newest: Boolean) {
+export function getProducts(newest: Boolean, productTypeId:number|null) {
   return async () => {
     dispatch(slice.actions.startLoading());
     try {
-      const response = await productApi.getProducts(null, newest);
+      const response = await productApi.getProducts(null, newest, productTypeId);
       dispatch(slice.actions.getProductsSuccess(response));
     } catch (error) {
       dispatch(slice.actions.hasError(error));
@@ -284,7 +284,7 @@ export function getProduct(id: number) {
   return async () => {
     dispatch(slice.actions.startLoading());
     try {
-      const response = await productApi.getProducts(id, false);
+      const response = await productApi.getProducts(id, false, null);
       const product = response[0];
       if (product?.description) {
         fetch(product.description)

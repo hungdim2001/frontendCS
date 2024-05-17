@@ -63,7 +63,6 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
   });
   const { watch, control, setValue, getValues, handleSubmit } = methods;
   const linkTo = `${PATH_ROOT.products.root}/${id}/${getValues('variant')?.id ?? ''}`;
-  console.log(linkTo)
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
   const { currentLocation } = useLocationContext();
