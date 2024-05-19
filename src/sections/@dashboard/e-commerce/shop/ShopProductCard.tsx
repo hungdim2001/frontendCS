@@ -18,9 +18,9 @@ import {
 // routes
 import { PATH_DASHBOARD, PATH_ROOT } from '../../../../routes/paths';
 // utils
-import { fCurrency } from '../../../../utils/formatNumber';
+import { caculatorPercent, fCurrency } from '../../../../utils/formatNumber';
 // @types
-import { CartItem, Product, ProductCharValue } from '../../../../@types/product';
+import { CartItem, Product, ProductCharValue, Variant } from '../../../../@types/product';
 // components
 import Label from '../../../../components/Label';
 import Image from '../../../../components/Image';
@@ -127,22 +127,22 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
           p: 2,
         }}
       >
-        {' '}
-        {price && (
+        {getValues('variant').discountPrice && (
           <Label
             variant="filled"
             sx={{
-              backgroundColor:'#FDDBC9',
+              backgroundColor: '#FDDBC9',
               color: '#F45E0C',
               top: '16px',
-              padding:'4px',  
+              padding: '4px',
               left: 0,
               zIndex: 9,
-              borderRadius:'0px 4px 4px 0px',
+              borderRadius: '0px 4px 4px 0px',
               position: 'absolute',
             }}
           >
-            -15%
+
+            {caculatorPercent(getValues('variant').discountPrice!, getValues('variant').price)}%
           </Label>
         )}
         <Image alt={name} src={getValues('variant')?.image.toString() ?? thumbnail} ratio="1/1" />
@@ -169,6 +169,8 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
                         onClick={(e) => {
                           e.stopPropagation();
                         }}
+                        variants={variants}
+                        currentVariant={getValues('variant')}
                         charValues={char.productSpecCharValueDTOS!}
                         value={field.value}
                         onChange={(e) => {
@@ -194,17 +196,18 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
                 </Stack>
               );
             })}
-          {price && (
+          {getValues('variant').discountPrice && (
             <Typography
               component="span"
               sx={{ color: 'text.disabled', textDecoration: 'line-through' }}
             >
-              {fCurrency(price)}₫
+              {fCurrency(getValues('variant').price)}₫
             </Typography>
           )}
           <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
             <Typography component="div" variant="subtitle1">
-              {fCurrency(price)}₫
+              
+              {getValues('variant').discountPrice!? fCurrency(getValues('variant').discountPrice!): fCurrency(getValues('variant').price)}₫
             </Typography>
             <Typography
               component="div"
@@ -253,33 +256,48 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
 
 interface VariantPickerProps extends RadioGroupProps {
   charValues: ProductCharValue[];
+  currentVariant: Variant;
+  variants: Variant[];
 }
 
-function VariantPicker({ charValues, value, ...other }: VariantPickerProps) {
+function VariantPicker({
+  charValues,
+  variants,
+  currentVariant,
+  value,
+  ...other
+}: VariantPickerProps) {
   return (
     <RadioGroup row {...other}>
-      {charValues.map((charValue) => (
-        <Radio
-          checked={value.chars.includes(charValue.id)}
-          key={charValue.id}
-          value={charValue.id}
-          icon={<IconColor charValue={charValue} variant={value} />}
-          checkedIcon={
-            <IconColor
-              sx={{
-                color: 'black',
-                border: `1px solid #0C68F4`,
-              }}
-              charValue={charValue}
-              variant={value}
-            />
-          }
-          sx={{
-            padding: 0,
-            '&:hover': { opacity: 0.72 },
-          }}
-        />
-      ))}
+      {charValues
+        .filter((value) =>
+          variants
+            .filter((variant) => variant.chars.some((char) => currentVariant.chars.includes(char)))
+            .flatMap((variant) => variant.chars)
+            .includes(value.id!)
+        )
+        .map((charValue) => (
+          <Radio
+            checked={value.chars.includes(charValue.id)}
+            key={charValue.id}
+            value={charValue.id}
+            icon={<IconColor charValue={charValue} variant={value} />}
+            checkedIcon={
+              <IconColor
+                sx={{
+                  color: 'black',
+                  border: `1px solid #0C68F4`,
+                }}
+                charValue={charValue}
+                variant={value}
+              />
+            }
+            sx={{
+              padding: 0,
+              '&:hover': { opacity: 0.72 },
+            }}
+          />
+        ))}
     </RadioGroup>
   );
 }

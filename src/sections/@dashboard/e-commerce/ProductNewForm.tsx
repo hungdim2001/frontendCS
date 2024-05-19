@@ -274,6 +274,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
             'variants',
             JSON.stringify({
               ...value,
+              // id: null, //comment here 
               chars: value.chars.toString(),
               image: value.image instanceof File ? value.image.name : value.image,
             })
@@ -551,7 +552,7 @@ export default function ProductNewForm({ isEdit, currentProduct }: Props) {
                       <LabelStyle>Product character</LabelStyle>
                       <Button
                         onClick={(e) => {
-                          dispatch(getProductChars(null))
+                          dispatch(getProductChars(null));
                         }}
                       >
                         reset

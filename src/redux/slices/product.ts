@@ -290,7 +290,6 @@ export function getProduct(id: number) {
         fetch(product.description)
           .then((response) => response.text())
           .then((data) => {
-            console.log(data)
             dispatch(slice.actions.getProductSuccess({ ...product, description: data }));
           })
           .catch((error) => {

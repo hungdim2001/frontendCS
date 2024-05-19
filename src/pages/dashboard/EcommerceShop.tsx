@@ -209,7 +209,7 @@ export default function EcommerceShop() {
 
           <ShopProductList
             products={
-              filteredProducts.length > 0 ? filteredProducts.filter((item) => item.status) : []
+              filteredProducts[0]?.id!=null ? filteredProducts.filter((item) => item.status) : []
             }
             loading={!products.length && isDefault}
           />

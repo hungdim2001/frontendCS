@@ -9,12 +9,19 @@ import { ProductCharValue, Variant } from 'src/@types/product';
 
 interface Props extends RadioGroupProps {
   charValues: ProductCharValue[];
+  currentVariant: Variant
+  variants:Variant[]
 }
 
-export default function VariantPicker({ charValues, value, ...other }: Props) {
+export default function VariantPicker({ charValues, value,currentVariant, variants,  ...other }: Props) {
   return (
     <RadioGroup  row {...other}>
-      {charValues.map((charValue) => (
+      {charValues.filter(value=>variants
+                    .filter((variant) =>
+                      variant.chars.some((char) => currentVariant.chars.includes(char))
+                    )
+                    .flatMap((variant) => variant.chars)
+                    .includes(value.id!)).map((charValue) => (
         <Radio
           checked={value?.chars.includes(charValue.id)}
           key={charValue.id}

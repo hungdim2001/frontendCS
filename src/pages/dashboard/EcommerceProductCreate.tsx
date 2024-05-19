@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { paramCase } from 'change-case';
 import { useParams, useLocation } from 'react-router-dom';
 // @mui
-import { Container } from '@mui/material';
+import { Container, styled } from '@mui/material';
 // redux
 import { useDispatch, useSelector } from '../../redux/store';
 import { getProducts } from '../../redux/slices/product';
@@ -25,6 +25,10 @@ import { getProductTypes } from 'src/redux/slices/product-type';
 import { getProductChars } from 'src/redux/slices/product-char';
 
 // ----------------------------------------------------------------------
+const RootStyle = styled('div')(({ theme }) => ({
+  height: '100%',
+  marginTop: '77px',
+}));
 
 export default function EcommerceProductCreate() {
   const { themeStretch } = useSettings();
@@ -59,24 +63,26 @@ export default function EcommerceProductCreate() {
   useEffect(() => {
     dispatch(getProductChars(null));
     dispatch(getProductTypes());
-    dispatch(getProducts(false,null));
+    dispatch(getProducts(false, null));
   }, [dispatch]);
   useEffect(() => {}, [isEdit, currentProduct]);
   if (isEdit && !currentProduct.id) {
     return <LoadingScreen />;
   }
   return (
-    <Page title="Ecommerce: Create a new product">
-      <Container maxWidth={themeStretch ? false : 'lg'}>
-        <HeaderBreadcrumbs
-          heading={!isEdit ? 'Create a new product' : 'Edit product'}
-          links={[
-            { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            { name: !isEdit ? 'New product' : currentProduct.name },
-          ]}
-        />
-        <ProductNewForm isEdit={isEdit} currentProduct={currentProduct} />
-      </Container>
-    </Page>
+    <RootStyle>
+      <Page title="Ecommerce: Create a new product">
+        <Container maxWidth={themeStretch ? false : 'lg'}>
+          <HeaderBreadcrumbs
+            heading={!isEdit ? 'Create a new product' : 'Edit product'}
+            links={[
+              { name: 'Dashboard', href: PATH_DASHBOARD.root },
+              { name: !isEdit ? 'New product' : currentProduct.name },
+            ]}
+          />
+          <ProductNewForm isEdit={isEdit} currentProduct={currentProduct} />
+        </Container>
+      </Page>
+    </RootStyle>
   );
 }

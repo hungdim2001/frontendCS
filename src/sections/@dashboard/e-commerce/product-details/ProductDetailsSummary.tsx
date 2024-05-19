@@ -126,7 +126,6 @@ export default function ProductDetailsSummary({
       ?.image.toString()!;
     const currentIndex = product.images.indexOf(image);
     setCurrentIndex(currentIndex);
-    console.log(getValues('variant'));
     setVariant(getValues('variant'));
   }, [getValues('variant')]);
   const onSubmit = async (data: FormValuesProps) => {
@@ -206,7 +205,11 @@ export default function ProductDetailsSummary({
           </Stack>
 
           {productSpecChars
-            .filter((char) => char.productSpecCharValueDTOS?.some((value) => value.variant))
+            .filter((char) =>
+              char.productSpecCharValueDTOS?.some((value) => {
+                return value.variant;
+              })
+            )
             .map((char, index) => {
               return (
                 <Stack key={index} direction="row" alignItems="start" sx={{ mb: 1 }}>
@@ -215,6 +218,8 @@ export default function ProductDetailsSummary({
                     control={control}
                     render={({ field }) => (
                       <VariantPicker
+                        variants={variants}
+                        currentVariant={getValues('variant')}
                         charValues={char.productSpecCharValueDTOS!}
                         value={field.value}
                         onChange={(e) => {
@@ -301,7 +306,7 @@ export default function ProductDetailsSummary({
                       />
                     </svg>
                     &#160;
-                    {caculatorPercent(
+                    -{caculatorPercent(
                       getValues('variant').discountPrice!,
                       getValues('variant').price
                     )}
@@ -312,7 +317,7 @@ export default function ProductDetailsSummary({
                 )}{' '}
               </Stack>
             </Stack>
-            {getValues('variant') ? (
+            {getValues('variant').discountPrice ? (
               <Typography
                 sx={{
                   mb: 2,
