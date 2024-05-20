@@ -40,6 +40,9 @@ import { useDispatch, useSelector } from 'src/redux/store';
 import { getCart } from 'src/redux/slices/product';
 import Maps from 'src/components/GoogleMap';
 import LoadingScreen from 'src/components/LoadingScreen';
+import { ActionAudit, logApi } from 'src/service/app-apis/log';
+import useLocationContext from 'src/hooks/useLocation';
+import useAuth from 'src/hooks/useAuth';
 
 // ----------------------------------------------------------------------
 
@@ -75,7 +78,8 @@ export default function ProductDetailsSummary({
   ...other
 }: Props) {
   const theme = useTheme();
-
+  const { currentLocation } = useLocationContext();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const { id, name, price, thumbnail, status, quantity, productSpecChars, variants } = product;
@@ -235,6 +239,35 @@ export default function ProductDetailsSummary({
                               )
                             )!
                           );
+                          if (!getValues('variant')) {
+                            setValue(
+                              'variant',
+                              variants.find((variant) =>
+                                variant.chars.includes(Number(e.target.value))
+                              )!
+                            );
+                          }
+                          const log: ActionAudit = {
+                            userId: user?.id,
+                            browser: '',
+                            ipClient: currentLocation.ip,
+                            actionTime: new Date(),
+                            action: 'SELECT VARIANT',
+                            variantId: getValues('variant')?.id ?? -1,
+                            deviceType: '',
+                            keyWord: '',
+                            lat: currentLocation.lat,
+                            lon: currentLocation.lon,
+                            road: currentLocation.address.road,
+                            quarter: currentLocation.address.quarter,
+                            suburb: currentLocation.address.suburb,
+                            city: currentLocation.address.city,
+                            ISO3166_2_lvl4: currentLocation.address.ISO3166_2_lvl4,
+                            postcode: currentLocation.address.postcode,
+                            country: currentLocation.address.country,
+                            country_code: currentLocation.address.country_code,
+                          } as ActionAudit;
+                          logApi.createLog(log);
                         }}
                         sx={{
                           gap: 2,
@@ -305,8 +338,8 @@ export default function ProductDetailsSummary({
                         fill="#F45E0C"
                       />
                     </svg>
-                    &#160;
-                    -{caculatorPercent(
+                    &#160; -
+                    {caculatorPercent(
                       getValues('variant').discountPrice!,
                       getValues('variant').price
                     )}

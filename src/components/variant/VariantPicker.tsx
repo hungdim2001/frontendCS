@@ -9,40 +9,48 @@ import { ProductCharValue, Variant } from 'src/@types/product';
 
 interface Props extends RadioGroupProps {
   charValues: ProductCharValue[];
-  currentVariant: Variant
-  variants:Variant[]
+  currentVariant: Variant;
+  variants: Variant[];
 }
 
-export default function VariantPicker({ charValues, value,currentVariant, variants,  ...other }: Props) {
+export default function VariantPicker({
+  charValues,
+  value,
+  currentVariant,
+  variants,
+  ...other
+}: Props) {
   return (
-    <RadioGroup  row {...other}>
-      {charValues.filter(value=>variants
-                    .filter((variant) =>
-                      variant.chars.some((char) => currentVariant.chars.includes(char))
-                    )
-                    .flatMap((variant) => variant.chars)
-                    .includes(value.id!)).map((charValue) => (
-        <Radio
-          checked={value?.chars.includes(charValue.id)}
-          key={charValue.id}
-          value={charValue.id}
-          icon={<IconColor charValue={charValue} variant={value} />}
-          checkedIcon={
-            <IconColor
-              sx={{
-                color: 'black',
-                border: `2px solid #0C68F4`,
-              }}
-              charValue={charValue}
-              variant={value}
-            />
-          }
-          sx={{
-            padding: 0,
-            '&:hover': { opacity: 0.72 },
-          }}
-        />
-      ))}
+    <RadioGroup row {...other}>
+      {charValues
+        // .filter((value) =>
+        //   variants
+        //     .filter((variant) => variant.chars.some((char) => currentVariant.chars.includes(char)))
+        //     .flatMap((variant) => variant.chars)
+        //     .includes(value.id!)
+        // )
+        .map((charValue) => (
+          <Radio
+            checked={value?.chars.includes(charValue.id)}
+            key={charValue.id}
+            value={charValue.id}
+            icon={<IconColor charValue={charValue} variant={value} />}
+            checkedIcon={
+              <IconColor
+                sx={{
+                  color: 'black',
+                  border: `2px solid #0C68F4`,
+                }}
+                charValue={charValue}
+                variant={value}
+              />
+            }
+            sx={{
+              padding: 0,
+              '&:hover': { opacity: 0.72 },
+            }}
+          />
+        ))}
     </RadioGroup>
   );
 }

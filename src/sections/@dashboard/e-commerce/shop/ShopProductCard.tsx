@@ -141,7 +141,6 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
               position: 'absolute',
             }}
           >
-
             {caculatorPercent(getValues('variant').discountPrice!, getValues('variant').price)}%
           </Label>
         )}
@@ -186,6 +185,35 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
                               )
                             )!
                           );
+                          if (!getValues('variant')) {
+                            setValue(
+                              'variant',
+                              variants.find((variant) =>
+                                variant.chars.includes(Number(e.target.value))
+                              )!
+                            );
+                          }
+                          const log: ActionAudit = {
+                            userId: user?.id,
+                            browser: '',
+                            ipClient: currentLocation.ip,
+                            actionTime: new Date(),
+                            action: 'SELECT VARIANT',
+                            variantId: getValues('variant')?.id ?? -1,
+                            deviceType: '',
+                            keyWord: '',
+                            lat: currentLocation.lat,
+                            lon: currentLocation.lon,
+                            road: currentLocation.address.road,
+                            quarter: currentLocation.address.quarter,
+                            suburb: currentLocation.address.suburb,
+                            city: currentLocation.address.city,
+                            ISO3166_2_lvl4: currentLocation.address.ISO3166_2_lvl4,
+                            postcode: currentLocation.address.postcode,
+                            country: currentLocation.address.country,
+                            country_code: currentLocation.address.country_code,
+                          } as ActionAudit;
+                          logApi.createLog(log);
                         }}
                         sx={{
                           gap: '5px',
@@ -206,8 +234,10 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
           )}
           <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
             <Typography component="div" variant="subtitle1">
-              
-              {getValues('variant').discountPrice!? fCurrency(getValues('variant').discountPrice!): fCurrency(getValues('variant').price)}₫
+              {getValues('variant').discountPrice!
+                ? fCurrency(getValues('variant').discountPrice!)
+                : fCurrency(getValues('variant').price)}
+              ₫
             </Typography>
             <Typography
               component="div"
@@ -270,12 +300,12 @@ function VariantPicker({
   return (
     <RadioGroup row {...other}>
       {charValues
-        .filter((value) =>
-          variants
-            .filter((variant) => variant.chars.some((char) => currentVariant.chars.includes(char)))
-            .flatMap((variant) => variant.chars)
-            .includes(value.id!)
-        )
+        // .filter((value) =>
+        //   variants
+        //     .filter((variant) => variant.chars.some((char) => currentVariant.chars.includes(char)))
+        //     .flatMap((variant) => variant.chars)
+        //     .includes(value.id!)
+        // )
         .map((charValue) => (
           <Radio
             checked={value.chars.includes(charValue.id)}
