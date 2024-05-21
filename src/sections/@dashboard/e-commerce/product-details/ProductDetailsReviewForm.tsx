@@ -8,6 +8,12 @@ import { Button, Stack, Rating, Typography, FormHelperText } from '@mui/material
 import { LoadingButton } from '@mui/lab';
 // components
 import { FormProvider, RHFTextField } from '../../../../components/hook-form';
+import { ratingApi } from 'src/service/app-apis/rating';
+import { Rating as RatingType } from 'src/@types/product';
+import { useSelector } from 'src/redux/store';
+import { stat } from 'fs';
+import useAuth from 'src/hooks/useAuth';
+import { useSnackbar } from 'notistack';
 
 // ----------------------------------------------------------------------
 
@@ -21,10 +27,10 @@ const RootStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
-  rating: number | string | null;
+  rating: number | null;
   review: string;
-  name: string;
-  email: string;
+  // name: string;
+  // email: string;
 };
 
 type Props = {
@@ -36,15 +42,13 @@ export default function ProductDetailsReviewForm({ onClose, id, ...other }: Prop
   const ReviewSchema = Yup.object().shape({
     rating: Yup.mixed().required('Rating is required'),
     review: Yup.string().required('Review is required'),
-    name: Yup.string().required('Name is required'),
-    email: Yup.string().email('Email must be a valid email address').required('Email is required'),
+    // name: Yup.string().required('Name is required'),
+    // email: Yup.string().email('Email must be a valid email address').required('Email is required'),
   });
 
   const defaultValues = {
     rating: null,
     review: '',
-    name: '',
-    email: '',
   };
 
   const methods = useForm<FormValuesProps>({
@@ -59,12 +63,27 @@ export default function ProductDetailsReviewForm({ onClose, id, ...other }: Prop
     formState: { errors, isSubmitting },
   } = methods;
 
+  const { product } = useSelector((state) => state.product);
+  const { user } = useAuth();
+
+  const { enqueueSnackbar } = useSnackbar();
   const onSubmit = async (data: FormValuesProps) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const rating: RatingType = {
+        star: Number(data.rating),
+        comment: data.review,
+        productId: product?.id!,
+        userId: user?.id!,
+        createUser: user?.id!,
+        createDatetime: new Date()
+      } as RatingType;
+      console.log(product)
+      await ratingApi.addComment(rating);
+
       reset();
       onClose();
     } catch (error) {
+      enqueueSnackbar(error.message, { variant: 'error' });
       console.error(error);
     }
   };

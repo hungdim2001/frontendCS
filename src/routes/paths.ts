@@ -49,6 +49,7 @@ export const PATH_ROOT = {
     list: path(ROOTS, '/products/list'),
     newProduct: path(ROOTS,'/products/new'),
     edit: path(ROOTS, '/products/:id/edit'),
+    checkout: path(ROOTS, '/products/checkout'),
   },
 };
 export const PATH_DASHBOARD = {

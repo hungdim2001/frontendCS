@@ -20,7 +20,7 @@ import {
   Grid,
 } from '@mui/material';
 // routes
-import { PATH_DASHBOARD } from '../../../../routes/paths';
+import { PATH_DASHBOARD, PATH_ROOT } from '../../../../routes/paths';
 // utils
 import { fShortenNumber, fCurrency, caculatorPercent } from '../../../../utils/formatNumber';
 // @types
@@ -141,7 +141,7 @@ export default function ProductDetailsSummary({
         });
       }
       onGotoStep(0);
-      // navigate(PATH_DASHBOARD.eCommerce.checkout);
+      navigate(PATH_ROOT.products.checkout );
     } catch (error) {
       console.error(error);
     }

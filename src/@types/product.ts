@@ -36,7 +36,7 @@ export type Variant = BaseDTO & {
   chars: number[];
   quantity: number;
   price: number;
-  discountPrice:number|null;
+  discountPrice: number | null;
   image: string | CustomFile;
   charValues: CharValues;
 };
@@ -48,6 +48,12 @@ export type ProductChar = BaseDTO & {
 export type ProductType = BaseDTO & {
   icon: string;
   name: string;
+};
+export type Rating = BaseDTO & {
+  comment: string;
+  productId: number;
+  star: number;
+  userId: number;
 };
 export type ProductCharState = {
   productChars: ProductChar[] | [];
@@ -61,7 +67,7 @@ export type AddressState = {
   adresss: Address[];
 };
 export type MenuState = {
-  optionSelected:  any
+  optionSelected: any;
 };
 export type ProductCharValue = BaseDTO & {
   value: string;
@@ -98,8 +104,7 @@ export type OrderRequest = {
   shippingFee: number;
   estimateDate: number;
   addressId: number;
-
-}
+};
 export type CartItem = BaseDTO & {
   cartId: number;
   name: string;
@@ -144,7 +149,7 @@ export type ProductState = {
   product: Product | null;
   sortBy: string | null;
   filters: {
-    brand:string[]
+    brand: string[];
     rating: string;
   };
   checkout: {
