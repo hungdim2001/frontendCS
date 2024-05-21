@@ -101,15 +101,14 @@ export default function CheckoutPayment() {
       };
       if (data.payment === 'vnpay') {
         const paymentLink = await orderApi.createVnPay(orderRequest, true);
-       console.log('vnpay')
+        console.log(paymentLink);
+        window.location.href = paymentLink;
+      } else {
+        const paymentLink = await orderApi.createVnPay(orderRequest, false);
+        console.log('normal');
         window.location.href = paymentLink;
       }
-      else{
-       const paymentLink = await orderApi.createVnPay(orderRequest, false);
-       console.log('normal')
-        window.location.href = paymentLink;
-      }
-      
+
       //  handleNextStep() ;
     } catch (error) {
       console.error(error);

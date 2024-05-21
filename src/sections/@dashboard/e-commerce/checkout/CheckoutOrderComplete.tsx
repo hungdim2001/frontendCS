@@ -6,7 +6,7 @@ import { Box, Link, Button, Divider, Typography, Stack, DialogProps } from '@mui
 import { useDispatch } from '../../../../redux/store';
 import { resetCart } from '../../../../redux/slices/product';
 // routes
-import { PATH_DASHBOARD } from '../../../../routes/paths';
+import { PATH_DASHBOARD, PATH_ROOT } from '../../../../routes/paths';
 // components
 import Iconify from '../../../../components/Iconify';
 import { DialogAnimate } from '../../../../components/animate';
@@ -29,30 +29,32 @@ const DialogStyle = styled(DialogAnimate)(({ theme }) => ({
 }));
 
 // ----------------------------------------------------------------------
-
+const RootStyle = styled('div')(({ theme }) => ({
+  height: '100%',
+  marginTop: '77px',
+}));
 export default function CheckoutOrderComplete() {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const { token } = useParams();
   const handleResetStep = () => {
     dispatch(resetCart());
-    navigate(PATH_DASHBOARD.eCommerce.shop);
+    navigate(PATH_ROOT.products.root);
   };
   useEffect(() => {
     (async () => {
-
       try {
         authApi.setSession({ accessToken: token! });
         await orderApi.checkOrder();
-        console.log('here')
+        console.log('here');
       } catch (error) {
         // setError('afterSubmit', { type: 'custom', message: 'Link đã hết hạn hoặc không tồn tại' });
         // setDisableSubmit(true);
       }
     })();
-
-  })
+  });
   return (
+    <RootStyle>
       <Box sx={{ p: 4, maxWidth: 480, margin: 'auto' }}>
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant="h4" paragraph>
@@ -87,14 +89,15 @@ export default function CheckoutOrderComplete() {
           >
             Continue Shopping
           </Button>
-          <Button
+          {/* <Button
             variant="contained"
             startIcon={<Iconify icon={'ant-design:file-pdf-filled'} />}
             onClick={handleResetStep}
           >
             Download as PDF
-          </Button>
+          </Button> */}
         </Stack>
       </Box>
+    </RootStyle>
   );
 }

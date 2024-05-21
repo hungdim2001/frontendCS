@@ -145,7 +145,7 @@ export default function EcommerceProductDetails() {
             ]}
           />
 
-          <CartWidget />
+          {/* <CartWidget /> */}
 
           {product && (
             <>

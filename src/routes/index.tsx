@@ -218,6 +218,7 @@ export default function Router() {
             { path: 'list', element: <EcommerceProductList /> },
             { path: 'new', element: <EcommerceProductCreate /> },
             { path: ':id/edit', element: <EcommerceProductCreate /> },
+            { path: 'checkout', element: <EcommerceCheckout /> },
           ],
         },
         // { path: 'contact-us', element: <Contact /> },

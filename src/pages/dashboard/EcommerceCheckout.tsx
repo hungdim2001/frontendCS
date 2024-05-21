@@ -16,7 +16,7 @@ import {
 import { useDispatch, useSelector } from '../../redux/store';
 import { getCart, createBilling } from '../../redux/slices/product';
 // routes
-import { PATH_DASHBOARD } from '../../routes/paths';
+import { PATH_DASHBOARD, PATH_ROOT } from '../../routes/paths';
 // hooks
 import useIsMountedRef from '../../hooks/useIsMountedRef';
 import useSettings from '../../hooks/useSettings';
@@ -114,7 +114,11 @@ function ColorlibStepIcon(props: StepIconProps) {
     </ColorlibStepIconRoot>
   );
 }
-
+// ----------------------------------------------------------------------
+const RootStyle = styled('div')(({ theme }) => ({
+  height: '100%',
+  marginTop: '77px',
+}));
 export default function EcommerceCheckout() {
   const { themeStretch } = useSettings();
 
@@ -140,16 +144,16 @@ export default function EcommerceCheckout() {
   }, [dispatch, activeStep]);
 
   return (
-    <Page title="Ecommerce: Checkout">
+    <RootStyle >
       <Container maxWidth={themeStretch ? false : 'lg'}>
         <HeaderBreadcrumbs
-          heading="Checkout"
+          heading=""
           links={[
-            { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            {
-              name: 'E-Commerce',
-              href: PATH_DASHBOARD.eCommerce.root,
-            },
+           { name: 'Home', href: '/' },
+              {
+                name: 'Products',
+                href: PATH_ROOT.products.root,
+              },
             { name: 'Checkout' },
           ]}
         />
@@ -184,6 +188,6 @@ export default function EcommerceCheckout() {
            <CheckoutOrderComplete />
         )}
       </Container>
-    </Page>
+    </RootStyle>
   );
 }

@@ -1,5 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 // @mui
+import { Link as RouterLink } from 'react-router-dom';
+
 import {
   AppBar,
   Box,
@@ -108,9 +110,11 @@ export default function MainHeader() {
           >
             <UserPopover />
             <SearchModal />
-            <IconButton sx={{ color: '#0c0c0c' }} type="button">
-              <SvgIconStyle src={'/icons/ic_bag.svg'} />
-            </IconButton>
+            <RouterLink to="/products/checkout">
+              <IconButton sx={{ color: '#0c0c0c' }} type="button">
+                <SvgIconStyle src={'/icons/ic_bag.svg'} />
+              </IconButton>
+            </RouterLink>
           </Stack>
         </Container>
       </ToolbarStyle>
