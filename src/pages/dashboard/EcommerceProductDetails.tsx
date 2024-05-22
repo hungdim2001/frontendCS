@@ -185,7 +185,7 @@ export default function EcommerceProductDetails() {
                       <Tab
                         disableRipple
                         value="2"
-                        label={`Review (10)`}
+                        label={`Review (${product.ratingDTOS.length})`}
                         sx={{
                           '&.Mui-selected': {
                             color: '#0C68F4',

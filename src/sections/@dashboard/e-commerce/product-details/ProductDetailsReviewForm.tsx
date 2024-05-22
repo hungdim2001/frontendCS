@@ -75,9 +75,10 @@ export default function ProductDetailsReviewForm({ onClose, id, ...other }: Prop
         productId: product?.id!,
         userId: user?.id!,
         createUser: user?.id!,
-        createDatetime: new Date()
+        status:true,
+        createDatetime: new Date(),
       } as RatingType;
-      console.log(product)
+      console.log(product);
       await ratingApi.addComment(rating);
 
       reset();

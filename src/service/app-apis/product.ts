@@ -9,7 +9,6 @@ const getProducts = (id: number | null, newest: Boolean, productTypeId: number |
   let path = id ? `/${id}` : '';
   if (newest) path += '?newest=true';
   if (productTypeId) path += `?productTypeId=${productTypeId}`;
-  console.log(path)
   return productIns.get<Product[]>(`/${path}`);
 };
 

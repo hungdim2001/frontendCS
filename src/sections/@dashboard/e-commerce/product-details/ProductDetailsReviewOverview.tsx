@@ -8,6 +8,7 @@ import { fShortenNumber } from '../../../../utils/formatNumber';
 import { Product } from '../../../../@types/product';
 // components
 import Iconify from '../../../../components/Iconify';
+import { store } from 'emoji-mart';
 
 // ----------------------------------------------------------------------
 
@@ -35,11 +36,42 @@ type Props = {
   product: Product;
   onOpen: VoidFunction;
 };
+type StarRating = {
+  name: string;
+  totalStar: number;
+};
 
+type ProgressItemProps = {
+  star: StarRating;
+  total: number;
+};
 export default function ProductDetailsReviewOverview({ product, onOpen }: Props) {
-  // const { totalRating, totalReview, ratings } = product;
+  const { ratingDTOS } = product;
+  const totalRating = ratingDTOS.reduce(function (acc, obj) {
+    return acc + 1;
+  }, 0);
+  const ratingGroups =
+    ratingDTOS.length > 0
+      ? ratingDTOS.slice(1).reduce(
+          function (acc: StarRating[], obj) {
+            const existingItem = acc.find((item) => item.name === obj.star.toString());
+            if (existingItem) {
+              existingItem.totalStar += 1;
+            } else {
+              acc.push({
+                name: obj.star.toString(),
+                totalStar: 1,
+              });
+            }
+            return acc;
+          },
+          [{ name: ratingDTOS[0].star.toString(), totalStar: 1 }]
+        )
+      : [];
 
-  // const total = sumBy(ratings, (star) => star.starCount);
+  const storedRating = ratingGroups.sort((a, b) => b.totalStar - a.totalStar);
+  const averageRating = Number((totalRating / ratingDTOS.length).toFixed(1));
+
   return (
     <Grid container>
       <GridStyle item xs={12} md={4}>
@@ -47,23 +79,20 @@ export default function ProductDetailsReviewOverview({ product, onOpen }: Props)
           Average rating
         </Typography>
         <Typography variant="h2" gutterBottom sx={{ color: 'error.main' }}>
-          {/* {totalRating}/5 */}
+          {averageRating}/5
         </Typography>
-        {/* <RatingStyle readOnly value={totalRating} precision={0.1} /> */}
+        <RatingStyle readOnly value={averageRating} precision={0.1} />
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {/* ({fShortenNumber(totalReview)} */}
+          ({fShortenNumber(ratingDTOS.length)}
           &nbsp;reviews)
         </Typography>
       </GridStyle>
 
       <GridStyle item xs={12} md={4}>
         <Stack spacing={1.5} sx={{ width: 1 }}>
-          {/* {ratings
-            .slice(0)
-            .reverse()
-            .map((rating) => (
-              <ProgressItem key={rating.name} star={rating} total={total} />
-            ))} */}
+          {storedRating.map((rating) => (
+            <ProgressItem key={rating.name} star={rating} total={totalRating} />
+          ))}
         </Stack>
       </GridStyle>
 
@@ -85,25 +114,14 @@ export default function ProductDetailsReviewOverview({ product, onOpen }: Props)
 
 // ----------------------------------------------------------------------
 
-type StarRating = {
-  name: string;
-  starCount: number;
-  reviewCount: number;
-};
-
-type ProgressItemProps = {
-  star: StarRating;
-  total: number;
-};
-
 function ProgressItem({ star, total }: ProgressItemProps) {
-  const { name, starCount, reviewCount } = star;
+  const { name, totalStar } = star;
   return (
     <Stack direction="row" alignItems="center" spacing={1.5}>
-      <Typography variant="subtitle2">{name}</Typography>
+      <Typography variant="subtitle2">{name} star</Typography>
       <LinearProgress
         variant="determinate"
-        value={(starCount / total) * 100}
+        value={(totalStar / total) * 100}
         sx={{
           mx: 2,
           flexGrow: 1,
@@ -114,7 +132,7 @@ function ProgressItem({ star, total }: ProgressItemProps) {
         variant="body2"
         sx={{ color: 'text.secondary', minWidth: 64, textAlign: 'right' }}
       >
-        {fShortenNumber(reviewCount)}
+        {fShortenNumber(totalStar)}
       </Typography>
     </Stack>
   );
