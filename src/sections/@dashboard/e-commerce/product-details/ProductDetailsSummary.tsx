@@ -82,7 +82,18 @@ export default function ProductDetailsSummary({
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { id, name, price, thumbnail, status, quantity, productSpecChars, variants } = product;
+  const {
+    id,
+    name,
+    price,
+    thumbnail,
+    status,
+    sold,
+    quantity,
+    productSpecChars,
+    variants,
+    ratingDTOS,
+  } = product;
   const alreadyProduct = cart.map((item) => item.variant.id).includes(id);
   const isMaxQuantity =
     cart.filter((item) => item.variantId === id).map((item) => item.quantity)[0] >= quantity;
@@ -141,7 +152,7 @@ export default function ProductDetailsSummary({
         });
       }
       onGotoStep(0);
-      navigate(PATH_ROOT.products.checkout );
+      navigate(PATH_ROOT.products.checkout);
     } catch (error) {
       console.error(error);
     }
@@ -163,6 +174,9 @@ export default function ProductDetailsSummary({
       console.error(error);
     }
   };
+  const totalRating = ratingDTOS?.reduce(function (acc, obj) {
+    return acc + obj.star;
+  }, 0);
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Grid container>
@@ -192,7 +206,7 @@ export default function ProductDetailsSummary({
                   fill="white"
                 />
               </svg>
-              4.9
+              {totalRating ? Number((totalRating / ratingDTOS.length).toFixed(1)) : 5}
             </Label>
             <Divider orientation="vertical" flexItem />
             <Typography
@@ -204,7 +218,7 @@ export default function ProductDetailsSummary({
                 textShadow: '0px 4px 4px rgb(0, 0, 0, 0.25)',
               }}
             >
-              sold: 24
+              sold: {sold}
             </Typography>
           </Stack>
 
@@ -296,7 +310,6 @@ export default function ProductDetailsSummary({
             >
               {getValues('variant')?.discountPrice ? (
                 <Typography variant="h6">
-                  {' '}
                   {fCurrency(getValues('variant')?.discountPrice!)}₫
                 </Typography>
               ) : (

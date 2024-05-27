@@ -47,11 +47,11 @@ type ProgressItemProps = {
 };
 export default function ProductDetailsReviewOverview({ product, onOpen }: Props) {
   const { ratingDTOS } = product;
-  const totalRating = ratingDTOS.reduce(function (acc, obj) {
-    return acc + 1;
+  const totalRating = ratingDTOS?.reduce(function (acc, obj) {
+    return acc + obj.star;
   }, 0);
   const ratingGroups =
-    ratingDTOS.length > 0
+    ratingDTOS?.length > 0
       ? ratingDTOS.slice(1).reduce(
           function (acc: StarRating[], obj) {
             const existingItem = acc.find((item) => item.name === obj.star.toString());
@@ -70,8 +70,7 @@ export default function ProductDetailsReviewOverview({ product, onOpen }: Props)
       : [];
 
   const storedRating = ratingGroups.sort((a, b) => b.totalStar - a.totalStar);
-  const averageRating = Number((totalRating / ratingDTOS.length).toFixed(1));
-
+  const averageRating = Number((totalRating / ratingDTOS?.length).toFixed(1));
   return (
     <Grid container>
       <GridStyle item xs={12} md={4}>
@@ -79,11 +78,11 @@ export default function ProductDetailsReviewOverview({ product, onOpen }: Props)
           Average rating
         </Typography>
         <Typography variant="h2" gutterBottom sx={{ color: 'error.main' }}>
-          {averageRating}/5
+          {averageRating ? averageRating : 5}/5
         </Typography>
-        <RatingStyle readOnly value={averageRating} precision={0.1} />
+        <RatingStyle readOnly value={averageRating ? averageRating : 5} precision={0.1} />
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          ({fShortenNumber(ratingDTOS.length)}
+          ({fShortenNumber(ratingDTOS ? ratingDTOS.length : 0)}
           &nbsp;reviews)
         </Typography>
       </GridStyle>
@@ -91,7 +90,7 @@ export default function ProductDetailsReviewOverview({ product, onOpen }: Props)
       <GridStyle item xs={12} md={4}>
         <Stack spacing={1.5} sx={{ width: 1 }}>
           {storedRating.map((rating) => (
-            <ProgressItem key={rating.name} star={rating} total={totalRating} />
+            <ProgressItem key={rating.name} star={rating} total={ratingDTOS.length} />
           ))}
         </Stack>
       </GridStyle>

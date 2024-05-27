@@ -10,12 +10,14 @@ type Props = {
   product: Product;
 };
 const ProductCard = ({ product }: Props) => {
-  const { name, thumbnail, images, price, productSpecChars, id, variants } = product;
+  const { name, thumbnail, images, price, productSpecChars, id, variants, ratingDTOS } = product;
   const linkTo = `${PATH_ROOT.products.root}/${id}/${
     variants.length > 1 ? variants[1].id : variants[0].id
   }`;
+  const totalRating = ratingDTOS?.reduce(function (acc, obj) {
+    return acc + obj.star;
+  }, 0);
   const navigate = useNavigate();
-  console.log(variants[1]);
   return (
     <Card
       onClick={() => {
@@ -58,7 +60,7 @@ const ProductCard = ({ product }: Props) => {
             position: 'absolute',
           }}
         >
-            {caculatorPercent(variants[0].discountPrice, variants[0].price)}%
+          {caculatorPercent(variants[0].discountPrice, variants[0].price)}%
         </Label>
       )}
       <Image
@@ -152,7 +154,7 @@ const ProductCard = ({ product }: Props) => {
                 fill="#063A88"
               />
             </svg>
-            4.9
+            {totalRating ? Number((totalRating / ratingDTOS.length).toFixed(1)) : 5}
           </Typography>
         </Box>
       </Box>

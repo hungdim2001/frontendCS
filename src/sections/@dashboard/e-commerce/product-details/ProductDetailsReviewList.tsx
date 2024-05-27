@@ -1,13 +1,15 @@
 import { useState } from 'react';
 // @mui
-import { Box, List, Button, Rating, Avatar, ListItem, Pagination, Typography } from '@mui/material';
+import { Box, List, Button, Rating,  ListItem, Pagination, Typography } from '@mui/material';
 // utils
 import { fDate } from '../../../../utils/formatTime';
 import { fShortenNumber } from '../../../../utils/formatNumber';
 // @types
-import { Product, ProductReview } from '../../../../@types/product';
+import { Product, ProductReview, Rating as RatingType} from '../../../../@types/product';
 // components
 import Iconify from '../../../../components/Iconify';
+import Avatar from 'src/components/Avatar';
+import MyAvatar from 'src/components/MyAvatar';
 
 // ----------------------------------------------------------------------
 
@@ -16,15 +18,15 @@ type Props = {
 };
 
 export default function ProductDetailsReviewList({ product }: Props) {
-  // const { reviews } = product;
+  const { ratingDTOS } = product;
 
   return (
     <Box sx={{ pt: 3, px: 2, pb: 5 }}>
-      {/* <List disablePadding>
-        {reviews.map((review) => (
-          <ReviewItem key={review.id} review={review} />
+      <List disablePadding>
+        {ratingDTOS?.map((rating) => (
+          <ReviewItem key={rating.id} ratingType={rating} />
         ))}
-      </List> */}
+      </List>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Pagination count={10} color="primary" />
       </Box>
@@ -35,13 +37,14 @@ export default function ProductDetailsReviewList({ product }: Props) {
 // ----------------------------------------------------------------------
 
 type ReviewItemProps = {
-  review: ProductReview;
+  // review: ProductReview;
+  ratingType: RatingType;
 };
 
-function ReviewItem({ review }: ReviewItemProps) {
+function ReviewItem({ ratingType }: ReviewItemProps) {
   const [isHelpful, setHelpfuls] = useState(false);
 
-  const { name, rating, comment, helpful, postedAt, avatarUrl, isPurchased } = review;
+  const { fullName,star , comment, createDatetime } = ratingType;
 
   const handleClickHelpful = () => {
     setHelpfuls((prev) => !prev);
@@ -68,29 +71,21 @@ function ReviewItem({ review }: ReviewItemProps) {
             flexDirection: { sm: 'column' },
           }}
         >
-          <Avatar
-            src={avatarUrl}
-            sx={{
-              mr: { xs: 2, sm: 0 },
-              mb: { sm: 2 },
-              width: { md: 64 },
-              height: { md: 64 },
-            }}
-          />
+         <MyAvatar/> 
           <div>
             <Typography variant="subtitle2" noWrap>
-              {name}
+              {fullName}
             </Typography>
             <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
-              {fDate(postedAt)}
+              {fDate(createDatetime!)}
             </Typography>
           </div>
         </Box>
 
         <div>
-          <Rating size="small" value={rating} precision={0.1} readOnly />
+          <Rating size="small" value={star} precision={0.1} readOnly />
 
-          {isPurchased && (
+          {/* {isPurchased && (
             <Typography
               variant="caption"
               sx={{
@@ -103,10 +98,10 @@ function ReviewItem({ review }: ReviewItemProps) {
               <Iconify icon={'ic:round-verified'} width={16} height={16} />
               &nbsp;Verified purchase
             </Typography>
-          )}
+          )} */}
 
           <Typography variant="body2">{comment}</Typography>
-
+{/* 
           <Box
             sx={{
               mt: 1,
@@ -130,7 +125,7 @@ function ReviewItem({ review }: ReviewItemProps) {
               {isHelpful ? 'Helpful' : 'Thank'}({fShortenNumber(!isHelpful ? helpful : helpful + 1)}
               )
             </Button>
-          </Box>
+          </Box> */}
         </div>
       </ListItem>
     </>

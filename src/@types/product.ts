@@ -96,7 +96,7 @@ export type Product = BaseDTO & {
   // inventoryType: ProductInventoryType;
   // sizes: string[];
 
-  // sold: number;
+  sold: number;
   // createdAt: Date | string | number;
   // category: ProductCategory;
   // gender: ProductGender;

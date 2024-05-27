@@ -43,7 +43,7 @@ type Props = {
 
 type FormValuesProps = CartItem;
 export default function ShopProductCard({ product, onAddCart }: Props) {
-  const { name, thumbnail, images, price, productSpecChars, id, variants } = product;
+  const { name, thumbnail, images, price, productSpecChars, id, variants, ratingDTOS } = product;
   const defaultValues = {
     name,
     variant:
@@ -65,6 +65,9 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
   const linkTo = `${PATH_ROOT.products.root}/${id}/${getValues('variant')?.id ?? ''}`;
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
+  const totalRating = ratingDTOS?.reduce(function (acc, obj) {
+    return acc + obj.star;
+  }, 0);
   const { currentLocation } = useLocationContext();
   const { user } = useAuth();
 
@@ -262,7 +265,7 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
                   fill="#063A88"
                 />
               </svg>
-              4.9
+              {totalRating? Number((totalRating / ratingDTOS.length).toFixed(1)): 5 }
             </Typography>
           </Box>
           {/* <Stack direction="row" alignItems="center" spacing={0.5}>
