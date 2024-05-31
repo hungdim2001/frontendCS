@@ -19,6 +19,7 @@ import FindEmail from '../pages/auth/FindEmail';
 import ResetPassWord from 'src/pages/auth/ResetPassword';
 import { CheckoutOrderComplete } from 'src/sections/@dashboard/e-commerce/checkout';
 import { children } from 'cheerio/lib/api/traversing';
+import Blog from 'src/pages/Blog';
 
 // ----------------------------------------------------------------------
 
@@ -219,6 +220,15 @@ export default function Router() {
             { path: 'new', element: <EcommerceProductCreate /> },
             { path: ':id/edit', element: <EcommerceProductCreate /> },
             { path: 'checkout', element: <EcommerceCheckout /> },
+          ],
+        },
+        {
+          path: 'blog',
+          children: [
+            {
+              element: <Blog />,
+              index: true,
+            },
           ],
         },
         // { path: 'contact-us', element: <Contact /> },

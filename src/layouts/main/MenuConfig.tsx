@@ -22,7 +22,7 @@ const menuConfig = [
   },
   {
     title: 'Blogs',
-    path: '/blogs',
+    path: '/blog',
   },
   {
     title: 'FAQ',

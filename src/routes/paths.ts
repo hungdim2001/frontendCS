@@ -47,9 +47,12 @@ export const PATH_ROOT = {
   products: {
     root: path(ROOTS, '/products'),
     list: path(ROOTS, '/products/list'),
-    newProduct: path(ROOTS,'/products/new'),
+    newProduct: path(ROOTS, '/products/new'),
     edit: path(ROOTS, '/products/:id/edit'),
     checkout: path(ROOTS, '/products/checkout'),
+  },
+  blog: {
+    root: path(ROOTS, '/blog'),
   },
 };
 export const PATH_DASHBOARD = {
