@@ -8,6 +8,12 @@ export function fCurrency(number: string | number) {
 export function caculatorPercent(discountPrince: number, price: number) {
   return Math.round((1 - discountPrince / price) * 100).toFixed(0);
 }
+export function caculatorReadingTime(textLength:number) {
+    const wordsPerMinute = 200; // Average case.
+
+    return Math.ceil(textLength / wordsPerMinute);
+ 
+}
 
 // This function keeps the casing unchanged for str, then perform the conversion
 export function toNonAccentVietnamese(str: string) {

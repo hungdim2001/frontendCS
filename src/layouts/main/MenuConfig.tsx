@@ -26,7 +26,7 @@ const menuConfig = [
   },
   {
     title: 'FAQ',
-    path: '/faq',
+    path: '/faqs',
   },
   {
     title: 'Contac Us',

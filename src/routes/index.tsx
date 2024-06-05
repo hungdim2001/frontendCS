@@ -232,7 +232,7 @@ export default function Router() {
           ],
         },
         // { path: 'contact-us', element: <Contact /> },
-        // { path: 'faqs', element: <Faqs /> },
+        { path: 'faqs', element: <Faqs /> },
       ],
     },
     { path: '*', element: <Navigate to="/404" replace /> },
