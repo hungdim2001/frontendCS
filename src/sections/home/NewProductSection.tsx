@@ -11,9 +11,9 @@ export default function NewProductSection() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getProducts(true,null));
+    dispatch(getProducts(true, null, null));
   }, [dispatch]);
-  if (products.length !==4 ) return <></>;
+  if (products.length !== 4) return <></>;
   return (
     <Container sx={{ marginY: 2 }}>
       <Box

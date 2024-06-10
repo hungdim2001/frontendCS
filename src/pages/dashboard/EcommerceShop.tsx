@@ -70,7 +70,7 @@ export default function EcommerceShop() {
 
   const isDefault = !values.rating && values.brand.length === 0;
   useEffect(() => {
-    dispatch(getProducts(false, null));
+    dispatch(getProducts(false, null, null));
   }, [dispatch]);
 
   useEffect(() => {
@@ -143,7 +143,7 @@ export default function EcommerceShop() {
                 onClick={() => {
                   setProductTypeSelected(productType);
 
-                  dispatch(getProducts(false, productType.id));
+                  dispatch(getProducts(false, productType.id, null));
                 }}
               >
                 <BottomNavigationAction
@@ -209,7 +209,7 @@ export default function EcommerceShop() {
 
           <ShopProductList
             products={
-              filteredProducts[0]?.id!=null ? filteredProducts.filter((item) => item.status) : []
+              filteredProducts[0]?.id != null ? filteredProducts.filter((item) => item.status) : []
             }
             loading={!products.length && isDefault}
           />

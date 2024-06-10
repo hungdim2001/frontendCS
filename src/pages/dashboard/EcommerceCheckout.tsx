@@ -16,13 +16,11 @@ import {
 import { useDispatch, useSelector } from '../../redux/store';
 import { getCart, createBilling } from '../../redux/slices/product';
 // routes
-import { PATH_DASHBOARD, PATH_ROOT } from '../../routes/paths';
+import { PATH_ROOT } from '../../routes/paths';
 // hooks
 import useIsMountedRef from '../../hooks/useIsMountedRef';
 import useSettings from '../../hooks/useSettings';
 // components
-import Page from '../../components/Page';
-import Iconify from '../../components/Iconify';
 import HeaderBreadcrumbs from '../../components/HeaderBreadcrumbs';
 // sections
 import {
@@ -31,9 +29,11 @@ import {
   CheckoutOrderComplete,
   CheckoutBillingAddress,
 } from '../../sections/@dashboard/e-commerce/checkout';
-import { Check } from '@mui/icons-material';
-import SvgIconStyle from 'src/components/SvgIconStyle';
 import SvgIconStep from 'src/components/SvgIconStep';
+import useAuth from 'src/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
+import { UserMenu, setOptionMenuSelected } from 'src/redux/slices/menu';
 
 // ----------------------------------------------------------------------
 
@@ -119,11 +119,11 @@ const RootStyle = styled('div')(({ theme }) => ({
   height: '100%',
   marginTop: '77px',
 }));
+
 export default function EcommerceCheckout() {
   const { themeStretch } = useSettings();
 
   const dispatch = useDispatch();
-
   const isMountedRef = useIsMountedRef();
 
   const { checkout } = useSelector((state) => state.product);
@@ -142,18 +142,17 @@ export default function EcommerceCheckout() {
       dispatch(createBilling(null));
     }
   }, [dispatch, activeStep]);
-
   return (
-    <RootStyle >
+    <RootStyle>
       <Container maxWidth={themeStretch ? false : 'lg'}>
         <HeaderBreadcrumbs
           heading=""
           links={[
-           { name: 'Home', href: '/' },
-              {
-                name: 'Products',
-                href: PATH_ROOT.products.root,
-              },
+            { name: 'Home', href: '/' },
+            {
+              name: 'Products',
+              href: PATH_ROOT.products.root,
+            },
             { name: 'Checkout' },
           ]}
         />
@@ -185,7 +184,7 @@ export default function EcommerceCheckout() {
           </>
         ) : (
           // <CheckoutOrderComplete open={isComplete} />
-           <CheckoutOrderComplete />
+          <CheckoutOrderComplete />
         )}
       </Container>
     </RootStyle>

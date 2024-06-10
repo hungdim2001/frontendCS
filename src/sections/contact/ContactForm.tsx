@@ -8,13 +8,12 @@ import { MotionInView, varFade } from '../../components/animate';
 export default function ContactForm() {
   return (
     <Stack spacing={5}>
-      <MotionInView variants={varFade().inUp}>
+      {/* <MotionInView variants={varFade().inUp}>
         <Typography variant="h3">
           Feel free to contact us. <br />
           We'll be glad to hear from you, buddy.
         </Typography>
-      </MotionInView>
-
+      </MotionInView> */}
       <Stack spacing={3}>
         <MotionInView variants={varFade().inUp}>
           <TextField fullWidth label="Name" />

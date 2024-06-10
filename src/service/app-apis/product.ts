@@ -5,10 +5,16 @@ import { BaseFormDataApi } from './base-form-data-api';
 const productIns = new BaseApi('/api/product');
 const productFormIns = new BaseFormDataApi('/api/product');
 
-const getProducts = (id: number | null, newest: Boolean, productTypeId: number | null) => {
+const getProducts = (
+  id: number | null,
+  newest: Boolean,
+  productTypeId: number | null,
+  keyword: string | null
+) => {
   let path = id ? `/${id}` : '';
   if (newest) path += '?newest=true';
   if (productTypeId) path += `?productTypeId=${productTypeId}`;
+  if (keyword) path += `?keyword=${keyword}`;
   return productIns.get<Product[]>(`/${path}`);
 };
 

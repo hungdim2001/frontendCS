@@ -14,7 +14,6 @@ import {
 // components
 import Page from '../components/Page';
 // sections
-import { FaqsHero, FaqsCategory, FaqsList, FaqsForm } from '../sections/faqs';
 import HeaderBreadcrumbs from 'src/components/HeaderBreadcrumbs';
 import { PATH_ROOT } from 'src/routes/paths';
 import Image from '../components/Image';
@@ -67,8 +66,6 @@ export default function Faqs() {
   return (
     <Page title="Faqs">
       <RootStyle>
-        {/* <FaqsHero /> */}
-
         <Container>
           <HeaderBreadcrumbs
             heading=""

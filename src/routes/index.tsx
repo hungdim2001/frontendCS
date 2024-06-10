@@ -231,7 +231,7 @@ export default function Router() {
             },
           ],
         },
-        // { path: 'contact-us', element: <Contact /> },
+        { path: 'contact-us', element: <Contact /> },
         { path: 'faqs', element: <Faqs /> },
       ],
     },

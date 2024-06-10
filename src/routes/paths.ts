@@ -57,6 +57,9 @@ export const PATH_ROOT = {
   faq: {
     root: path(ROOTS, '/faqs'),
   },
+  contactUs: {
+    root: path(ROOTS, '/contact-us'),
+  },
 };
 export const PATH_DASHBOARD = {
   root: ROOTS_DASHBOARD,

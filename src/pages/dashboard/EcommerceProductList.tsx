@@ -83,7 +83,7 @@ export default function EcommerceProductList() {
   const [orderBy, setOrderBy] = useState('createdAt');
 
   useEffect(() => {
-    dispatch(getProducts(false, null));
+    dispatch(getProducts(false, null, null));
   }, [dispatch]);
 
   useEffect(() => {

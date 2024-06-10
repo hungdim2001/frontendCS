@@ -39,6 +39,9 @@ import { LoginForm } from 'src/sections/auth/login';
 import MenuPopover from 'src/components/MenuPopover';
 import UserPopover from '../dashboard/header/UserPopover';
 import SearchModal from '../dashboard/header/SearchModal';
+import { useSnackbar } from 'notistack';
+import { useDispatch } from 'src/redux/store';
+import { setOptionMenuSelected } from 'src/redux/slices/menu';
 
 // ----------------------------------------------------------------------
 
@@ -72,12 +75,26 @@ const UserMenu = [
   { title: 'Order', icon: '/icons/ic_bag.svg' },
   { title: 'Security & access', icon: '/icons/security-safe.svg' },
 ];
+const useCurrentRole = () => {
+  const { user } = useAuth();
+  return user?.role!;
+};
 export default function MainHeader() {
   const isOffset = useOffSetTop(HEADER.MAIN_DESKTOP_HEIGHT);
   const theme = useTheme();
   const { pathname } = useLocation();
   const isDesktop = useResponsive('up', 'md');
   const isHome = pathname === '/';
+  const currentRole = useCurrentRole();
+
+  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  // if (!currentRole) {
+  //   enqueueSnackbar('must login', { variant: 'error' });
+  //   navigate('/');
+  //   dispatch(setOptionMenuSelected(UserMenu[0]));
+  // }
   return (
     <AppBar sx={{ boxShadow: 0, bgcolor: 'transparent' }}>
       <ToolbarStyle
@@ -110,11 +127,21 @@ export default function MainHeader() {
           >
             <UserPopover />
             <SearchModal />
-            <RouterLink to="/products/checkout">
-              <IconButton sx={{ color: '#0c0c0c' }} type="button">
-                <SvgIconStyle src={'/icons/ic_bag.svg'} />
-              </IconButton>
-            </RouterLink>
+            {/* <RouterLink  to="/products/checkout"> */}
+            <IconButton
+              onClick={(e) => {
+                if (!currentRole) {
+                  enqueueSnackbar('must login', { variant: 'error' });
+                } else {
+                  navigate('/products/checkout');
+                }
+              }}
+              sx={{ color: '#0c0c0c' }}
+              type="button"
+            >
+              <SvgIconStyle src={'/icons/ic_bag.svg'} />
+            </IconButton>
+            {/* </RouterLink> */}
           </Stack>
         </Container>
       </ToolbarStyle>
