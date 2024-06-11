@@ -117,7 +117,6 @@ export default function ProductDetailsSummary({
     }),
     [variantId, variants]
   );
-
   const methods = useForm<FormValuesProps>({
     defaultValues,
   });
@@ -177,6 +176,7 @@ export default function ProductDetailsSummary({
   const totalRating = ratingDTOS?.reduce(function (acc, obj) {
     return acc + obj.star;
   }, 0);
+
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Grid container>
@@ -263,7 +263,6 @@ export default function ProductDetailsSummary({
                           }
                           const log: ActionAudit = {
                             userId: user?.id,
-                            browser: '',
                             ipClient: currentLocation.ip,
                             actionTime: new Date(),
                             action: 'SELECT VARIANT',
@@ -276,7 +275,6 @@ export default function ProductDetailsSummary({
                             quarter: currentLocation.address.quarter,
                             suburb: currentLocation.address.suburb,
                             city: currentLocation.address.city,
-                            ISO3166_2_lvl4: currentLocation.address.ISO3166_2_lvl4,
                             postcode: currentLocation.address.postcode,
                             country: currentLocation.address.country,
                             country_code: currentLocation.address.country_code,

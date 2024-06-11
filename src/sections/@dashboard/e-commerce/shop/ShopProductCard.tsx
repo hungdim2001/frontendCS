@@ -96,7 +96,6 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
       onClick={async () => {
         const log: ActionAudit = (await {
           userId: user?.id,
-          browser: '',
           ipClient: currentLocation.ip,
           actionTime: new Date(),
           action: 'CLICK',
@@ -109,12 +108,12 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
           quarter: currentLocation.address.quarter,
           suburb: currentLocation.address.suburb,
           city: currentLocation.address.city,
-          ISO3166_2_lvl4: currentLocation.address.ISO3166_2_lvl4,
           postcode: currentLocation.address.postcode,
           country: currentLocation.address.country,
           country_code: currentLocation.address.country_code,
         }) as ActionAudit;
         await logApi.createLog(log);
+        console.log(linkTo)
         navigate(linkTo);
       }}
       onMouseEnter={() => setHovered(true)}
@@ -198,7 +197,6 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
                           }
                           const log: ActionAudit = {
                             userId: user?.id,
-                            browser: '',
                             ipClient: currentLocation.ip,
                             actionTime: new Date(),
                             action: 'SELECT VARIANT',
@@ -211,7 +209,6 @@ export default function ShopProductCard({ product, onAddCart }: Props) {
                             quarter: currentLocation.address.quarter,
                             suburb: currentLocation.address.suburb,
                             city: currentLocation.address.city,
-                            ISO3166_2_lvl4: currentLocation.address.ISO3166_2_lvl4,
                             postcode: currentLocation.address.postcode,
                             country: currentLocation.address.country,
                             country_code: currentLocation.address.country_code,

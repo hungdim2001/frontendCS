@@ -16,6 +16,7 @@ const initialState: ProductState = {
   isLoading: false,
   error: null,
   products: [],
+  productsSearch: [],
   product: null,
   sortBy: null,
   filters: {
@@ -53,6 +54,10 @@ const slice = createSlice({
     getProductsSuccess(state, action) {
       state.isLoading = false;
       state.products = action.payload;
+    },
+    getProductsSearchSuccess(state, action) {
+      state.isLoading = false;
+      state.productsSearch = action.payload;
     },
 
     // GET PRODUCT
@@ -257,6 +262,25 @@ export function getProducts(newest: Boolean, productTypeId: number | null, keywo
     try {
       const response = await productApi.getProducts(null, newest, productTypeId, keyword);
       dispatch(slice.actions.getProductsSuccess(response));
+    } catch (error) {
+      dispatch(slice.actions.hasError(error));
+    }
+  };
+}
+export function getProductSearch(
+  newest: Boolean,
+  productTypeId: number | null,
+  keyword: string | null,
+  init: Boolean
+) {
+  return async () => {
+    try {
+      if (init) {
+        dispatch(slice.actions.getProductsSearchSuccess([]));
+        return;
+      }
+      const response = await productApi.getProducts(null, newest, productTypeId, keyword);
+      dispatch(slice.actions.getProductsSearchSuccess(response));
     } catch (error) {
       dispatch(slice.actions.hasError(error));
     }

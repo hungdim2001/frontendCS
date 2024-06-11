@@ -54,7 +54,7 @@ export type Rating = BaseDTO & {
   productId: number;
   star: number;
   userId: number;
-  fullName:string;
+  fullName: string;
 };
 export type ProductCharState = {
   productChars: ProductChar[] | [];
@@ -84,7 +84,7 @@ export type Product = BaseDTO & {
   productSpecChars: ProductChar[];
   valueSelected: ProductCharValue[];
   variants: Variant[];
-  ratingDTOS: Rating[]
+  ratingDTOS: Rating[];
   // tags: string[];
   // priceSale: number | null;
   // totalRating: number;
@@ -148,6 +148,7 @@ export type ProductState = {
   isLoading: boolean;
   error: Error | string | null;
   products: Product[];
+  productsSearch: Product[] ;
   product: Product | null;
   sortBy: string | null;
   filters: {

@@ -1,14 +1,13 @@
-import { CurrentLocation } from 'src/contexts/LocationContext';
 import { BaseApi } from './base-api';
 
 const logApiIns = new BaseApi('/api/log');
-export type ActionAudit = {
+export type ActionAudit =  {
   userId: number;
-  browser: string;
   ipClient: string;
   actionTime: Date;
   action: string;
   variantId:number;
+  productId:number;
   deviceType: string;
   keyWord: string;
   lat: string;

@@ -179,7 +179,6 @@ export default function CheckoutNewAddressForm({
           lon: selectPosition.lon,
         } as Address;
         const response = await addressApi.createOrUpdate(address);
-        console.log(response);
         dispatch(getAddressSucess(response));
       }
       reset();

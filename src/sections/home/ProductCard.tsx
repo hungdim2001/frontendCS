@@ -6,10 +6,14 @@ import { caculatorPercent, fCurrency } from 'src/utils/formatNumber';
 import { PATH_DASHBOARD, PATH_ROOT } from 'src/routes/paths';
 import { useNavigate } from 'react-router';
 import Label from 'src/components/Label';
+import useAuth from 'src/hooks/useAuth';
+import useLocationContext from 'src/hooks/useLocation';
+import { ActionAudit, logApi } from 'src/service/app-apis/log';
 type Props = {
   product: Product;
+  onClose?: VoidFunction;
 };
-const ProductCard = ({ product }: Props) => {
+const ProductCard = ({ product, onClose }: Props) => {
   const { name, thumbnail, images, price, productSpecChars, id, variants, ratingDTOS } = product;
   const linkTo = `${PATH_ROOT.products.root}/${id}/${
     variants.length > 1 ? variants[1].id : variants[0].id
@@ -18,9 +22,31 @@ const ProductCard = ({ product }: Props) => {
     return acc + obj.star;
   }, 0);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { currentLocation } = useLocationContext();
   return (
     <Card
-      onClick={() => {
+      onClick={async () => {
+        const log: ActionAudit = await ({
+          userId: user?.id,
+          ipClient: currentLocation.ip,
+          actionTime: new Date(),
+          action: 'CLICK',
+          deviceType: '',
+          keyWord: '',
+          productId: id,
+          lat: currentLocation.lat,
+          lon: currentLocation.lon,
+          road: currentLocation.address.road,
+          quarter: currentLocation.address.quarter,
+          suburb: currentLocation.address.suburb,
+          city: currentLocation.address.city,
+          postcode: currentLocation.address.postcode,
+          country: currentLocation.address.country,
+          country_code: currentLocation.address.country_code,
+        } as ActionAudit);
+        await logApi.createLog(log);
+        onClose?.();
         navigate(linkTo);
       }}
       sx={{ cursor: 'pointer', padding: '16px 0px', boxShadow: '-2px 2px 15px -1px #7171711F' }}

@@ -11,6 +11,7 @@ import {
   Grid,
   Typography,
   Stack,
+  Box,
 } from '@mui/material';
 // utils
 import cssStyles from '../../../utils/cssStyles';
@@ -18,12 +19,16 @@ import cssStyles from '../../../utils/cssStyles';
 import Iconify from '../../../components/Iconify';
 import { DialogAnimate, IconButtonAnimate } from '../../../components/animate';
 import SvgIconStyle from 'src/components/SvgIconStyle';
-import { dispatch } from 'src/redux/store';
-import { getProducts } from 'src/redux/slices/product';
+import { dispatch, useDispatch, useSelector } from 'src/redux/store';
+import { getProductSearch, getProducts } from 'src/redux/slices/product';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FormProvider, RHFTextField } from 'src/components/hook-form';
+import ProductCard from 'src/sections/home/ProductCard';
+import { ActionAudit, logApi } from 'src/service/app-apis/log';
+import useLocationContext from 'src/hooks/useLocation';
+import useAuth from 'src/hooks/useAuth';
 // ----------------------------------------------------------------------
 
 const APPBAR_MOBILE = 64;
@@ -47,9 +52,6 @@ export default function SearchModal() {
   const handleClose = () => {
     setOpen(false);
   };
-  useEffect(() => {
-    dispatch(getProducts(false, null, null));
-  }, [dispatch]);
   const [keyword, setKeyword] = useState('');
   useEffect(() => {}, [keyword]);
   const SearchSchema = Yup.object().shape({});
@@ -60,10 +62,37 @@ export default function SearchModal() {
     resolver: yupResolver(SearchSchema),
     defaultValues,
   });
-  const { handleSubmit } = methods;
+  useEffect(() => {
+    setValue('keyword', '');
+     dispatch(getProductSearch(false, null, null, true));
+  }, [isOpen]);
+  const { handleSubmit, setValue } = methods;
+  const { currentLocation } = useLocationContext();
+  const { user } = useAuth();
   const onSubmit = async (data: FormValuesProps) => {
+    if (data.keyword) {
+        const log: ActionAudit = (await {
+          userId: user?.id,
+          ipClient: currentLocation.ip,
+          actionTime: new Date(),
+          action: 'SEARCH',
+          deviceType: '',
+          keyWord: data.keyword,
+          lat: currentLocation.lat,
+          lon: currentLocation.lon,
+          road: currentLocation.address.road,
+          quarter: currentLocation.address.quarter,
+          suburb: currentLocation.address.suburb,
+          city: currentLocation.address.city,
+          postcode: currentLocation.address.postcode,
+          country: currentLocation.address.country,
+          country_code: currentLocation.address.country_code,
+        }) as ActionAudit;
+        await logApi.createLog(log);
+      await dispatch(getProductSearch(false, null, data.keyword, false));
+    }
   };
-
+  const { productsSearch } = useSelector((state) => state.product);
   return (
     <>
       <IconButton onClick={handleOpen} sx={{ color: '#0c0c0c' }} type="button">
@@ -78,10 +107,12 @@ export default function SearchModal() {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="start">
-                    <Iconify
-                      icon={'eva:search-fill'}
-                      sx={{ cursor: 'pointer', color: '#444444', width: 20, height: 20 }}
-                    />
+                    <Button type="submit">
+                      <Iconify
+                        icon={'eva:search-fill'}
+                        sx={{ cursor: 'pointer', color: '#444444', width: 20, height: 20 }}
+                      />
+                    </Button>
                   </InputAdornment>
                 ),
               }}
@@ -99,12 +130,6 @@ export default function SearchModal() {
               name="keyword"
             />
           </FormProvider>
-          {/* <Input
-            value={keyword}
-            onChange={(e) => {
-              setKeyword(e.target.value);
-            }}
-          /> */}
         </SearchbarStyle>
         <Grid container>
           <Grid item md={12}>
@@ -115,7 +140,29 @@ export default function SearchModal() {
               <Typography>Iphone x</Typography>
             </Stack>
           </Grid>
-          <Grid item md={8}></Grid>
+          <Grid item md={8}>
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 3,
+                marginTop: '20px',
+                gridTemplateColumns: {
+                  xs: 'repeat(1, 1fr)',
+                  sm: 'repeat(2, 1fr)',
+                  md: 'repeat(3, 1fr)',
+                  lg: 'repeat(4, 1fr)',
+                },
+              }}
+            >
+              {productsSearch?.length > 0 ? (
+                productsSearch?.map((product, index) => (
+                  <ProductCard onClose={handleClose} key={product.id} product={product} />
+                ))
+              ) : (
+                <></>
+              )}
+            </Box>
+          </Grid>
         </Grid>
       </DialogAnimate>
     </>
